@@ -89,7 +89,15 @@
 }
 
 .form-section-content {
-  padding: 0 1.5rem 1.5rem;
+  padding: 0 1.5rem 2rem;
+}
+
+.form-section {
+  margin-bottom: 1rem;
+}
+
+.form-section:last-child {
+  margin-bottom: 0;
 }
 
 .form-grid {
@@ -103,29 +111,82 @@
 
 .form-grid-2 {
   grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
 }
 
 .form-grid-3 {
   grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.form-grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+  .form-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
   .form-grid-2,
-  .form-grid-3 {
+  .form-grid-3,
+  .form-grid-4 {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 
 .form-field {
   display: flex;
   flex-direction: column;
+  margin-bottom: 0.5rem;
 }
 
 .form-label {
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   color: #374151;
   margin-bottom: 0.5rem;
+  text-transform: capitalize;
+}
+
+/* Material Form Field Styling */
+::ng-deep .mat-mdc-form-field {
+  width: 100% !important;
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-form-field-wrapper {
+  padding-bottom: 0 !important;
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-form-field-infix {
+  min-height: 44px !important;
+  padding: 8px 0 !important;
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-input-element {
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-floating-label {
+  font-size: 0.875rem !important;
+}
+
+::ng-deep .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline {
+  border-radius: 8px !important;
+}
+
+::ng-deep .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline-thick {
+  border-width: 1px !important;
+}
+
+::ng-deep .mat-mdc-form-field-appearance-outline.mat-focused .mat-mdc-form-field-outline-thick {
+  border-color: #3b82f6 !important;
+  border-width: 2px !important;
 }
 
 /* Buttons */
@@ -309,8 +370,29 @@
     align-items: stretch;
   }
   
-  .form-grid-2,
-  .form-grid-3 {
-    grid-template-columns: 1fr;
+  .form-section-title {
+    font-size: 1rem;
+    padding: 1rem 1rem 0;
+  }
+  
+  .form-section-content {
+    padding: 0 1rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .off-canvas-header {
+    padding: 1rem;
+  }
+  
+  .off-canvas-footer {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
   }
 }
