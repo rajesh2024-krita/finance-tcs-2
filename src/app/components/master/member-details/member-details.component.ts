@@ -2,6 +2,7 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -46,7 +47,7 @@ import { MemberViewDialogComponent } from './member-view-dialog.component';
 export class MemberDetailsComponent implements OnInit {
   memberForm: FormGroup;
   dataSource = new MatTableDataSource<Member>([]);
-  displayedColumns: string[] = ['memberNo', 'name', 'mobile', 'status', 'actions'];
+  displayedColumns: string[] = ['memberNo', 'name', 'fhName', 'dateOfBirth', 'mobile', 'email', 'designation', 'actions'];
 
   // Signals for component state
   private offCanvasOpen = signal(false);
@@ -61,13 +62,25 @@ export class MemberDetailsComponent implements OnInit {
     private fb: FormBuilder,
     private memberService: MemberService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private route: ActivatedRoute
   ) {
     this.memberForm = this.createMemberForm();
   }
 
   ngOnInit() {
     this.loadMembers();
+    
+    // Check for edit query parameter
+    this.route.queryParams.subscribe(params => {
+      if (params['edit']) {
+        const memberId = parseInt(params['edit']);
+        const member = this.allMembers.find(m => m.id === memberId);
+        if (member) {
+          this.openOffCanvas('edit', member);
+        }
+      }
+    });
   }
 
   // Signal getters
@@ -310,10 +323,16 @@ export class MemberDetailsComponent implements OnInit {
   }
 
   onView(member: Member) {
-    this.dialog.open(MemberViewDialogComponent, {
+    const dialogRef = this.dialog.open(MemberViewDialogComponent, {
       width: '900px',
       maxWidth: '95vw',
       data: member
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.action === 'edit') {
+        this.openOffCanvas('edit', result.member);
+      }
     });
   }
 

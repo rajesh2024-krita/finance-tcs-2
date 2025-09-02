@@ -7,22 +7,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTabsModule } from '@angular/material/tabs';
-
-interface Member {
-  id: number;
-  memberNo: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  role: string;
-  society: string;
-  joinDate: Date;
-  status: string;
-  address?: string;
-  city?: string;
-  state?: string;
-}
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MemberService, Member } from '../../services/member.service';
 
 @Component({
   selector: 'app-member-details-view',
@@ -34,7 +20,8 @@ interface Member {
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
-    MatTabsModule
+    MatTabsModule,
+    MatSnackBarModule
   ],
   template: `
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
@@ -51,23 +38,30 @@ interface Member {
           </button>
         </div>
 
+        <!-- Loading State -->
+        <div *ngIf="loading" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+          <mat-icon class="text-6xl text-gray-400 dark:text-gray-500 mb-4 animate-spin">refresh</mat-icon>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Loading Member Details</h3>
+          <p class="text-gray-500 dark:text-gray-400">Please wait while we fetch the member information.</p>
+        </div>
+
         <!-- Member Profile Card -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div *ngIf="!loading && member" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
           <!-- Profile Header -->
           <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-8">
             <div class="flex items-center space-x-4">
               <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
                 <span class="text-2xl font-bold text-white">
-                  {{member ? getInitials(member.firstName, member.lastName) : ''}}
+                  {{getInitials(member.name || '')}}
                 </span>
               </div>
               <div class="text-white">
-                <h1 class="text-3xl font-bold">{{member?.firstName}} {{member?.lastName}}</h1>
-                <p class="text-blue-100">{{member?.memberNo}} • {{member?.role}}</p>
+                <h1 class="text-3xl font-bold">{{member.name}}</h1>
+                <p class="text-blue-100">{{member.memberNo || member.memNo}} • {{member.designation || 'Member'}}</p>
                 <div class="mt-2">
                   <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full"
-                        [class]="member?.status === 'Active' ? 'bg-green-500 bg-opacity-20 text-green-100' : 'bg-red-500 bg-opacity-20 text-red-100'">
-                    {{member?.status}}
+                        [class]="member.status === 'Active' ? 'bg-green-500 bg-opacity-20 text-green-100' : 'bg-red-500 bg-opacity-20 text-red-100'">
+                    {{member.status || 'Active'}}
                   </span>
                 </div>
               </div>
@@ -83,41 +77,41 @@ interface Member {
                   <div class="space-y-4">
                     <div>
                       <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Member Number</label>
-                      <p class="text-lg text-gray-900 dark:text-white">{{member?.memberNo}}</p>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.memberNo || member.memNo}}</p>
                     </div>
                     <div>
                       <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Full Name</label>
-                      <p class="text-lg text-gray-900 dark:text-white">{{member?.firstName}} {{member?.lastName}}</p>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.name}}</p>
                     </div>
                     <div>
-                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Email</label>
-                      <p class="text-lg text-gray-900 dark:text-white">{{member?.email}}</p>
+                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Father/Husband Name</label>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.fhName || 'Not provided'}}</p>
                     </div>
                     <div>
-                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Phone</label>
-                      <p class="text-lg text-gray-900 dark:text-white">{{member?.phone}}</p>
+                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Date of Birth</label>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.dateOfBirth ? (member.dateOfBirth | date:'fullDate') : 'Not provided'}}</p>
                     </div>
                   </div>
                   <div class="space-y-4">
                     <div>
-                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Role</label>
+                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Email</label>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.email || 'Not provided'}}</p>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Mobile</label>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.mobile || 'Not provided'}}</p>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Designation</label>
                       <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                        {{member?.role}}
+                        {{member.designation || 'Member'}}
                       </span>
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Society</label>
-                      <p class="text-lg text-gray-900 dark:text-white">{{member?.society}}</p>
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Join Date</label>
-                      <p class="text-lg text-gray-900 dark:text-white">{{member?.joinDate | date:'fullDate'}}</p>
                     </div>
                     <div>
                       <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Status</label>
                       <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full"
-                            [class]="member?.status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
-                        {{member?.status}}
+                            [class]="member.status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                        {{member.status || 'Active'}}
                       </span>
                     </div>
                   </div>
@@ -125,37 +119,80 @@ interface Member {
               </div>
             </mat-tab>
 
-            <!-- Address Information Tab -->
-            <mat-tab label="Address Information">
+            <!-- Contact Information Tab -->
+            <mat-tab label="Contact Information">
               <div class="py-6 space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div class="space-y-4">
                     <div>
-                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Address</label>
-                      <p class="text-lg text-gray-900 dark:text-white">{{member?.address || 'Not provided'}}</p>
+                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Office Address</label>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.officeAddress || 'Not provided'}}</p>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Residence Address</label>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.residenceAddress || 'Not provided'}}</p>
                     </div>
                     <div>
                       <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">City</label>
-                      <p class="text-lg text-gray-900 dark:text-white">{{member?.city || 'Not provided'}}</p>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.city || 'Not provided'}}</p>
                     </div>
                   </div>
                   <div class="space-y-4">
                     <div>
-                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">State</label>
-                      <p class="text-lg text-gray-900 dark:text-white">{{member?.state || 'Not provided'}}</p>
+                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Office Phone</label>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.phoneOffice || 'Not provided'}}</p>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Residence Phone</label>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.phoneResidence || 'Not provided'}}</p>
                     </div>
                   </div>
                 </div>
               </div>
             </mat-tab>
 
-            <!-- Activity Tab -->
-            <mat-tab label="Recent Activity">
-              <div class="py-6">
-                <div class="text-center py-12">
-                  <mat-icon class="text-6xl text-gray-400 dark:text-gray-500 mb-4">history</mat-icon>
-                  <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Recent Activity</h3>
-                  <p class="text-gray-500 dark:text-gray-400">Member activity will appear here when available.</p>
+            <!-- Financial Information Tab -->
+            <mat-tab label="Financial Information">
+              <div class="py-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Share Amount</label>
+                      <p class="text-lg text-gray-900 dark:text-white">₹{{member.shareAmount || 0 | number:'1.2-2'}}</p>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">CD Amount</label>
+                      <p class="text-lg text-gray-900 dark:text-white">₹{{member.cdAmount || 0 | number:'1.2-2'}}</p>
+                    </div>
+                  </div>
+                  <div class="space-y-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Bank Name</label>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.bankName || 'Not provided'}}</p>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Account Number</label>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.accountNo || 'Not provided'}}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-tab>
+
+            <!-- Nominee Information Tab -->
+            <mat-tab label="Nominee Information">
+              <div class="py-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Nominee Name</label>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.nominee || 'Not provided'}}</p>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Nominee Relation</label>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.nomineeRelation || 'Not provided'}}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </mat-tab>
@@ -198,6 +235,13 @@ interface Member {
     :host {
       display: block;
     }
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
   `]
 })
 export class MemberDetailsViewComponent implements OnInit {
@@ -206,7 +250,9 @@ export class MemberDetailsViewComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private memberService: MemberService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
@@ -217,62 +263,26 @@ export class MemberDetailsViewComponent implements OnInit {
   }
 
   loadMember(id: number) {
-    // In a real application, you would fetch this from a service
-    // For now, using sample data
-    const sampleMembers: Member[] = [
-      {
-        id: 1,
-        memberNo: 'MEM1001',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john.doe@email.com',
-        phone: '9876543210',
-        role: 'Member',
-        society: 'Main Branch',
-        joinDate: new Date('2024-01-15'),
-        status: 'Active',
-        address: '123 Main Street',
-        city: 'Mumbai',
-        state: 'Maharashtra'
+    this.loading = true;
+    this.memberService.getMemberById(id).subscribe({
+      next: (member) => {
+        this.member = member;
+        this.loading = false;
       },
-      {
-        id: 2,
-        memberNo: 'MEM1002',
-        firstName: 'Jane',
-        lastName: 'Smith',
-        email: 'jane.smith@email.com',
-        phone: '9876543211',
-        role: 'Executive',
-        society: 'North Branch',
-        joinDate: new Date('2024-02-20'),
-        status: 'Active',
-        address: '456 Oak Avenue',
-        city: 'Delhi',
-        state: 'Delhi'
-      },
-      {
-        id: 3,
-        memberNo: 'MEM1003',
-        firstName: 'Mike',
-        lastName: 'Johnson',
-        email: 'mike.johnson@email.com',
-        phone: '9876543212',
-        role: 'Board Member',
-        society: 'South Branch',
-        joinDate: new Date('2023-12-10'),
-        status: 'Inactive',
-        address: '789 Pine Road',
-        city: 'Bangalore',
-        state: 'Karnataka'
+      error: (error) => {
+        console.error('Error loading member:', error);
+        this.showSnackBar('Error loading member details');
+        this.loading = false;
       }
-    ];
-
-    this.member = sampleMembers.find(m => m.id === id) || null;
-    this.loading = false;
+    });
   }
 
-  getInitials(firstName: string, lastName: string): string {
-    return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+  getInitials(name: string): string {
+    const names = name.trim().split(' ');
+    if (names.length >= 2) {
+      return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+    }
+    return names[0] ? names[0].charAt(0).toUpperCase() : '?';
   }
 
   goBack() {
@@ -283,6 +293,14 @@ export class MemberDetailsViewComponent implements OnInit {
     // Navigate back to member list with edit mode
     this.router.navigate(['/master/member-details'], { 
       queryParams: { edit: this.member?.id } 
+    });
+  }
+
+  private showSnackBar(message: string) {
+    this.snackBar.open(message, 'Close', {
+      duration: 3000,
+      horizontalPosition: 'right',
+      verticalPosition: 'top'
     });
   }
 }
