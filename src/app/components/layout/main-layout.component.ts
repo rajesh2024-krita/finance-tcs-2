@@ -333,18 +333,18 @@ interface MenuItem {
         <!-- Main Content Area -->
         <mat-sidenav-content class="main-content">
           <!-- Professional Header -->
-          <mat-toolbar class="header-professional">
+          <mat-toolbar class="header-professional flex justify-between">
             <button mat-icon-button (click)="drawer.toggle()" class="menu-button">
               <mat-icon>menu</mat-icon>
             </button>
 
             <!-- Breadcrumb -->
-            <div class="breadcrumb flex-1">
+            <!-- <div class="breadcrumb flex-1">
               <ng-container *ngFor="let breadcrumb of breadcrumbs; let last = last">
                 <span [class.active]="last">{{ breadcrumb.label }}</span>
                 <mat-icon *ngIf="!last" class="separator text-sm">chevron_right</mat-icon>
               </ng-container>
-            </div>
+            </div> -->
 
             <!-- Header Actions -->
             <div class="flex items-center space-x-2">
@@ -357,12 +357,12 @@ interface MenuItem {
               </button>
 
               <!-- Notifications -->
-              <button mat-icon-button 
+              <!-- <button mat-icon-button 
                       [matMenuTriggerFor]="notificationMenu"
                       matTooltip="Notifications"
                       class="header-action">
                 <mat-icon matBadge="3" matBadgeColor="warn">notifications</mat-icon>
-              </button>
+              </button> -->
 
               <!-- User Menu -->
               <button mat-icon-button 

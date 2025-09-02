@@ -114,6 +114,8 @@ export class AuthService {
           role: data.role,
         };
 
+        console.log('user = ', user)
+
         if (!user) throw new Error('User data missing in response');
 
         user.token = data.token;

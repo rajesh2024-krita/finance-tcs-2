@@ -17,7 +17,7 @@ import { Member } from '../../../services/member.service';
     MatCardModule
   ],
   template: `
-    <div class="p-6 max-w-4xl mx-auto">
+    <div class="p-6 max-w-4xl mx-auto h-[80vh] overflow-y-auto">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-800">Member Details</h2>
         <button mat-icon-button (click)="onClose()">
