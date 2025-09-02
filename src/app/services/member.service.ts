@@ -14,39 +14,30 @@ export interface BankingDetails {
 
 export interface Member {
   id?: number;
-  memberNo: string;
+  memberNo?: string;
+  memNo?: string; // Alternative member number field
   name: string;
-  fhName: string;
+  fhName?: string;
   dateOfBirth?: Date | string;
+  dob?: Date | string; // Alternative date of birth field
   mobile?: string;
   email?: string;
   designation?: string;
-  dojJob?: Date | string;
-  doRetirement?: Date | string;
-  branch?: string;
-  dojSociety?: Date | string;
+  doj?: Date | string;
+  status?: string;
   officeAddress?: string;
   residenceAddress?: string;
   city?: string;
   phoneOffice?: string;
+  phoneRes?: string;
   phoneResidence?: string;
+  shareAmount?: number;
+  cdAmount?: number;
+  bankName?: string;
+  accountNo?: string;
   nominee?: string;
   nomineeRelation?: string;
-  shareAmount: number;
-  cdAmount: number;
-  bankName?: string;
-  payableAt?: string;
-  accountNo?: string;
-  status?: string;
-  date?: Date | string;
-  photoPath?: string;
-  signaturePath?: string;
-  shareDeduction?: number;
-  withdrawal?: number;
-  gLoanInstalment?: number;
-  eLoanInstalment?: number;
-  createdDate?: Date | string;
-  updatedDate?: Date | string;
+  // Add other properties as needed
 }
 
 @Injectable({
@@ -118,9 +109,9 @@ export class MemberService {
   /** Error Handling */
   private handleError = (error: HttpErrorResponse) => {
     let errorMessage = 'An unknown error occurred';
-    
+
     console.error('Full API Error:', error);
-    
+
     if (error.status === 401) {
       errorMessage = 'Unauthorized - Please login again.';
     } else if (error.error instanceof ErrorEvent) {
@@ -156,7 +147,7 @@ export class MemberService {
           errorMessage = `Server Error (${error.status}): ${error.message || 'Unknown error'}`;
       }
     }
-    
+
     return throwError(() => new Error(errorMessage));
   }
 }

@@ -46,7 +46,7 @@ import { Member } from '../../../services/member.service';
                 </div>
                 <div class="info-item">
                   <label>Date of Birth</label>
-                  <span>{{data.dob ? (data.dob | date:'dd/MM/yyyy') : 'Not provided'}}</span>
+                  <span>{{data.dateOfBirth ? (data.dateOfBirth | date:'dd/MM/yyyy') : 'Not provided'}}</span>
                 </div>
                 <div class="info-item">
                   <label>Mobile</label>
@@ -59,6 +59,10 @@ import { Member } from '../../../services/member.service';
                 <div class="info-item">
                   <label>Designation</label>
                   <span>{{data.designation || 'Not provided'}}</span>
+                </div>
+                <div class="info-item">
+                  <label>Date of Joining</label>
+                  <span>{{data.doj ? (data.doj | date:'dd/MM/yyyy') : 'Not provided'}}</span>
                 </div>
                 <div class="info-item">
                   <label>Status</label>
@@ -112,11 +116,11 @@ import { Member } from '../../../services/member.service';
                 </div>
                 <div class="info-item">
                   <label>Bank Name</label>
-                  <span>{{data.bankName || data.bankingDetails?.bankName || 'Not provided'}}</span>
+                  <span>{{data.bankName || 'Not provided'}}</span>
                 </div>
                 <div class="info-item">
                   <label>Account Number</label>
-                  <span>{{data.accountNo || data.bankingDetails?.accountNumber || 'Not provided'}}</span>
+                  <span>{{data.accountNo || 'Not provided'}}</span>
                 </div>
               </div>
             </div>
