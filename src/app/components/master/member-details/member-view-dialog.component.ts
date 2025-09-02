@@ -34,7 +34,7 @@ import { Member } from '../../../services/member.service';
               <div class="info-grid">
                 <div class="info-item">
                   <label>Member Number</label>
-                  <span>{{data.memberNo}}</span>
+                  <span>{{data.memberNo || data.memNo}}</span>
                 </div>
                 <div class="info-item">
                   <label>Name</label>
@@ -46,7 +46,7 @@ import { Member } from '../../../services/member.service';
                 </div>
                 <div class="info-item">
                   <label>Date of Birth</label>
-                  <!-- <span>{{data.dob ? (data.dob | date:'dd/MM/yyyy') : 'Not provided'}}</span> -->
+                  <span>{{data.dob ? (data.dob | date:'dd/MM/yyyy') : 'Not provided'}}</span>
                 </div>
                 <div class="info-item">
                   <label>Mobile</label>
@@ -92,7 +92,7 @@ import { Member } from '../../../services/member.service';
                 </div>
                 <div class="info-item">
                   <label>Residence Phone</label>
-                  <span>{{data.phoneResidence || 'Not provided'}}</span>
+                  <span>{{data.phoneRes || data.phoneResidence || 'Not provided'}}</span>
                 </div>
               </div>
             </div>
@@ -112,14 +112,22 @@ import { Member } from '../../../services/member.service';
                 </div>
                 <div class="info-item">
                   <label>Bank Name</label>
-                  <span>{{data.bankName || 'Not provided'}}</span>
+                  <span>{{data.bankName || data.bankingDetails?.bankName || 'Not provided'}}</span>
                 </div>
                 <div class="info-item">
                   <label>Account Number</label>
-                  <span>{{data.accountNo || 'Not provided'}}</span>
+                  <span>{{data.accountNo || data.bankingDetails?.accountNumber || 'Not provided'}}</span>
                 </div>
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- Nominee Information Tab -->
+          <mat-tab label="Nominee Information">
+            <div class="tab-content">
+              <div class="info-grid">
                 <div class="info-item">
-                  <label>Nominee</label>
+                  <label>Nominee Name</label>
                   <span>{{data.nominee || 'Not provided'}}</span>
                 </div>
                 <div class="info-item">

@@ -118,21 +118,45 @@ export class MemberService {
   /** Error Handling */
   private handleError = (error: HttpErrorResponse) => {
     let errorMessage = 'An unknown error occurred';
+    
+    console.error('Full API Error:', error);
+    
     if (error.status === 401) {
       errorMessage = 'Unauthorized - Please login again.';
     } else if (error.error instanceof ErrorEvent) {
-      errorMessage = `Error: ${error.error.message}`;
+      errorMessage = `Client Error: ${error.error.message}`;
     } else {
+      // Handle server errors
       switch (error.status) {
-        case 400: errorMessage = 'Bad Request'; break;
-        case 403: errorMessage = 'Forbidden'; break;
-        case 404: errorMessage = 'Not Found'; break;
-        case 409: errorMessage = 'Conflict - Member number exists'; break;
-        case 500: errorMessage = 'Internal Server Error'; break;
-        default: errorMessage = `Server Error: ${error.status}`;
+        case 0:
+          errorMessage = 'Network Error - Please check your connection';
+          break;
+        case 400:
+          errorMessage = 'Bad Request - Invalid data provided';
+          if (error.error && typeof error.error === 'object') {
+            const validationErrors = Object.values(error.error).flat();
+            if (validationErrors.length > 0) {
+              errorMessage += `: ${validationErrors.join(', ')}`;
+            }
+          }
+          break;
+        case 403:
+          errorMessage = 'Forbidden - Access denied';
+          break;
+        case 404:
+          errorMessage = 'Not Found - Resource does not exist';
+          break;
+        case 409:
+          errorMessage = 'Conflict - Member number already exists';
+          break;
+        case 500:
+          errorMessage = 'Internal Server Error - Please try again later';
+          break;
+        default:
+          errorMessage = `Server Error (${error.status}): ${error.message || 'Unknown error'}`;
       }
     }
-    console.error('API Error:', error);
+    
     return throwError(() => new Error(errorMessage));
   }
 }
