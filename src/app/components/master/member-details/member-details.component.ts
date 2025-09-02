@@ -2,7 +2,6 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -47,7 +46,7 @@ import { MemberViewDialogComponent } from './member-view-dialog.component';
 export class MemberDetailsComponent implements OnInit {
   memberForm: FormGroup;
   dataSource = new MatTableDataSource<Member>([]);
-  displayedColumns: string[] = ['memberNo', 'name', 'fhName', 'dateOfBirth', 'mobile', 'email', 'designation', 'actions'];
+  displayedColumns: string[] = ['memberNo', 'name', 'mobile', 'status', 'actions'];
 
   // Signals for component state
   private offCanvasOpen = signal(false);
@@ -62,25 +61,13 @@ export class MemberDetailsComponent implements OnInit {
     private fb: FormBuilder,
     private memberService: MemberService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog,
-    private route: ActivatedRoute
+    private dialog: MatDialog
   ) {
     this.memberForm = this.createMemberForm();
   }
 
   ngOnInit() {
     this.loadMembers();
-    
-    // Check for edit query parameter
-    this.route.queryParams.subscribe(params => {
-      if (params['edit']) {
-        const memberId = parseInt(params['edit']);
-        const member = this.allMembers.find(m => m.id === memberId);
-        if (member) {
-          this.openOffCanvas('edit', member);
-        }
-      }
-    });
   }
 
   // Signal getters
@@ -113,8 +100,6 @@ export class MemberDetailsComponent implements OnInit {
       bankName: [''],
       payableAt: [''],
       accountNo: [''],
-      ifscCode: [''],
-      accountHolderName: [''],
       status: ['Active'],
       shareDeduction: [0],
       withdrawal: [0],
@@ -184,44 +169,31 @@ export class MemberDetailsComponent implements OnInit {
   }
 
   populateForm(member: any) {
-    // Helper function to safely convert date
-    const formatDate = (dateValue: any) => {
-      if (!dateValue) return '';
-      try {
-        const date = new Date(dateValue);
-        return isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
-      } catch {
-        return '';
-      }
-    };
-
     // Map form field names to API field names
     this.memberForm.patchValue({
-      memberNo: member.memNo || member.memberNo || '',
-      name: member.name || '',
-      fhName: member.fhName || '',
-      dateOfBirth: formatDate(member.dob),
-      mobile: member.mobile || '',
-      email: member.email || '',
-      designation: member.designation || '',
-      dojJob: formatDate(member.dojOrg),
-      doRetirement: formatDate(member.dor),
-      branch: member.branch || '',
-      dojSociety: formatDate(member.dojSociety),
-      officeAddress: member.officeAddress || '',
-      residenceAddress: member.residenceAddress || '',
-      city: member.city || '',
-      phoneOffice: member.phoneOffice || '',
-      phoneResidence: member.phoneResidence || member.phoneRes || '',
-      nominee: member.nominee || '',
-      nomineeRelation: member.nomineeRelation || '',
+      memberNo: member.memNo || member.memberNo,
+      name: member.name,
+      fhName: member.fhName,
+      dateOfBirth: member.dob ? new Date(member.dob).toISOString().split('T')[0] : null,
+      mobile: member.mobile,
+      email: member.email,
+      designation: member.designation,
+      dojJob: member.dojOrg ? new Date(member.dojOrg).toISOString().split('T')[0] : null,
+      doRetirement: member.dor ? new Date(member.dor).toISOString().split('T')[0] : null,
+      branch: member.branch,
+      dojSociety: member.dojSociety ? new Date(member.dojSociety).toISOString().split('T')[0] : null,
+      officeAddress: member.officeAddress,
+      residenceAddress: member.residenceAddress,
+      city: member.city,
+      phoneOffice: member.phoneOffice,
+      phoneResidence: member.phoneResidence || member.phoneRes,
+      nominee: member.nominee,
+      nomineeRelation: member.nomineeRelation,
       shareAmount: member.shareAmount || 0,
       cdAmount: member.cdAmount || 0,
-      bankName: member.bankName || (member.bankingDetails?.bankName) || '',
-      payableAt: member.payableAt || member.branchName || (member.bankingDetails?.branchName) || '',
-      accountNo: member.accountNo || (member.bankingDetails?.accountNumber) || '',
-      ifscCode: member.ifscCode || (member.bankingDetails?.ifscCode) || '',
-      accountHolderName: member.accountHolderName || (member.bankingDetails?.accountHolderName) || '',
+      bankName: member.bankName || (member.bankingDetails?.bankName),
+      payableAt: member.payableAt || member.branchName,
+      accountNo: member.accountNo || (member.bankingDetails?.accountNumber),
       status: member.status || 'Active',
       shareDeduction: member.shareDeduction || 0,
       withdrawal: member.withdrawal || 0,
@@ -231,53 +203,42 @@ export class MemberDetailsComponent implements OnInit {
   }
 
   private transformFormDataToApi(formData: any): any {
-    // Helper function to safely convert date string to ISO format
-    const formatDateForApi = (dateValue: any) => {
-      if (!dateValue) return null;
-      try {
-        const date = new Date(dateValue);
-        return isNaN(date.getTime()) ? null : date.toISOString();
-      } catch {
-        return null;
-      }
-    };
-
-    return {
-      memNo: formData.memberNo || '',
-      name: formData.name || '',
-      fhName: formData.fhName || '',
-      dob: formatDateForApi(formData.dateOfBirth),
-      mobile: formData.mobile || null,
-      email: formData.email || null,
-      designation: formData.designation || null,
-      dojOrg: formatDateForApi(formData.dojJob),
-      dor: formatDateForApi(formData.doRetirement),
-      branch: formData.branch || null,
-      dojSociety: formatDateForApi(formData.dojSociety),
-      officeAddress: formData.officeAddress || null,
-      residenceAddress: formData.residenceAddress || null,
-      city: formData.city || null,
-      phoneOffice: formData.phoneOffice || null,
-      phoneRes: formData.phoneResidence || null,
-      nominee: formData.nominee || null,
-      nomineeRelation: formData.nomineeRelation || null,
-      shareAmount: Number(formData.shareAmount) || 0,
-      cdAmount: Number(formData.cdAmount) || 0,
-      status: formData.status || 'Active',
-      shareDeduction: Number(formData.shareDeduction) || 0,
-      withdrawal: Number(formData.withdrawal) || 0,
-      gLoanInstalment: Number(formData.gLoanInstalment) || 0,
-      eLoanInstalment: Number(formData.eLoanInstalment) || 0,
-      // Nested object as per schema
-      bankingDetails: {
-        bankName: formData.bankName || '',
-        accountNumber: formData.accountNo || '',
-        branchName: formData.payableAt || '',
-        ifscCode: formData.ifscCode || '',
-        accountHolderName: formData.accountHolderName || ''
-      }
-    };
-  }
+  return {
+    memNo: formData.memberNo,
+    name: formData.name,
+    fhName: formData.fhName,
+    dob: formData.dateOfBirth || null,
+    mobile: formData.mobile || null,
+    email: formData.email || null,
+    designation: formData.designation || null,
+    dojOrg: formData.dojJob || null,
+    dor: formData.doRetirement || null,
+    branch: formData.branch || null,
+    dojSociety: formData.dojSociety || null,
+    officeAddress: formData.officeAddress || null,
+    residenceAddress: formData.residenceAddress || null,
+    city: formData.city || null,
+    phoneOffice: formData.phoneOffice || null,
+    phoneRes: formData.phoneResidence || null,
+    nominee: formData.nominee || null,
+    nomineeRelation: formData.nomineeRelation || null,
+    shareAmount: formData.shareAmount || 0,
+    cdAmount: formData.cdAmount || 0,
+    status: formData.status || 'Active',
+    shareDeduction: formData.shareDeduction || 0,
+    withdrawal: formData.withdrawal || 0,
+    gLoanInstalment: formData.gLoanInstalment || 0,
+    eLoanInstalment: formData.eLoanInstalment || 0,
+    // Nested object as per schema
+    bankingDetails: {
+      bankName: formData.bankName || null,
+      accountNumber: formData.accountNo || null,
+      branchName: formData.payableAt || null,
+      ifscCode: formData.ifscCode || null,
+      accountHolderName: formData.accountHolderName || null
+    }
+  };
+}
 
 
 
@@ -349,16 +310,10 @@ export class MemberDetailsComponent implements OnInit {
   }
 
   onView(member: Member) {
-    const dialogRef = this.dialog.open(MemberViewDialogComponent, {
+    this.dialog.open(MemberViewDialogComponent, {
       width: '900px',
       maxWidth: '95vw',
       data: member
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result && result.action === 'edit') {
-        this.openOffCanvas('edit', result.member);
-      }
     });
   }
 

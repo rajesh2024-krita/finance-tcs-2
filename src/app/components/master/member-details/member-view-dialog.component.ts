@@ -1,10 +1,9 @@
-
 import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MatCardModule } from '@angular/material/card';
 import { Member } from '../../../services/member.service';
 
 @Component({
@@ -15,213 +14,147 @@ import { Member } from '../../../services/member.service';
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
-    MatTabsModule
+    MatCardModule
   ],
   template: `
-    <div class="member-dialog">
-      <div class="dialog-header">
-        <h2 mat-dialog-title>Member Details</h2>
-        <button mat-icon-button mat-dialog-close>
+    <div class="p-6 max-w-4xl mx-auto">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Member Details</h2>
+        <button mat-icon-button (click)="onClose()">
           <mat-icon>close</mat-icon>
         </button>
       </div>
 
-      <div mat-dialog-content class="dialog-content">
-        <mat-tab-group>
-          <!-- Basic Information Tab -->
-          <mat-tab label="Basic Information">
-            <div class="tab-content">
-              <div class="info-grid">
-                <div class="info-item">
-                  <label>Member Number</label>
-                  <span>{{data.memberNo || data.memNo}}</span>
-                </div>
-                <div class="info-item">
-                  <label>Name</label>
-                  <span>{{data.name}}</span>
-                </div>
-                <div class="info-item">
-                  <label>Father/Husband Name</label>
-                  <span>{{data.fhName || 'Not provided'}}</span>
-                </div>
-                <div class="info-item">
-                  <label>Date of Birth</label>
-                  <span>{{data.dateOfBirth ? (data.dateOfBirth | date:'dd/MM/yyyy') : 'Not provided'}}</span>
-                </div>
-                <div class="info-item">
-                  <label>Mobile</label>
-                  <span>{{data.mobile || 'Not provided'}}</span>
-                </div>
-                <div class="info-item">
-                  <label>Email</label>
-                  <span>{{data.email || 'Not provided'}}</span>
-                </div>
-                <div class="info-item">
-                  <label>Designation</label>
-                  <span>{{data.designation || 'Not provided'}}</span>
-                </div>
-                <div class="info-item">
-                  <label>Date of Joining</label>
-                  <span>{{data.doj ? (data.doj | date:'dd/MM/yyyy') : 'Not provided'}}</span>
-                </div>
-                <div class="info-item">
-                  <label>Status</label>
-                  <span class="status-badge" [class.active]="data.status === 'Active'">
-                    {{data.status || 'Active'}}
-                  </span>
-                </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Profile Section -->
+        <div class="md:col-span-1">
+          <mat-card class="p-4">
+            <div class="flex flex-col items-center">
+              <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <span class="text-blue-600 text-2xl font-bold">{{data.name?.charAt(0)}}</span>
+              </div>
+              <h3 class="text-xl font-semibold">{{data.name}}</h3>
+              <p class="text-gray-600">{{data.memberNo}}</p>
+              <div class="mt-3 px-3 py-1 rounded-full text-xs font-medium"
+                  [class.bg-green-100]="data.status === 'Active'"
+                  [class.text-green-800]="data.status === 'Active'"
+                  [class.bg-red-100]="data.status !== 'Active'"
+                  [class.text-red-800]="data.status !== 'Active'">
+                {{data.status || 'N/A'}}
               </div>
             </div>
-          </mat-tab>
+          </mat-card>
+        </div>
 
-          <!-- Contact Information Tab -->
-          <mat-tab label="Contact Information">
-            <div class="tab-content">
-              <div class="info-grid">
-                <div class="info-item">
-                  <label>Office Address</label>
-                  <span>{{data.officeAddress || 'Not provided'}}</span>
-                </div>
-                <div class="info-item">
-                  <label>Residence Address</label>
-                  <span>{{data.residenceAddress || 'Not provided'}}</span>
-                </div>
-                <div class="info-item">
-                  <label>City</label>
-                  <span>{{data.city || 'Not provided'}}</span>
-                </div>
-                <div class="info-item">
-                  <label>Office Phone</label>
-                  <span>{{data.phoneOffice || 'Not provided'}}</span>
-                </div>
-                <div class="info-item">
-                  <label>Residence Phone</label>
-                  <span>{{data.phoneRes || data.phoneResidence || 'Not provided'}}</span>
+        <!-- Details Section -->
+        <div class="md:col-span-2">
+          <mat-card class="p-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Personal Details -->
+              <div>
+                <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                  <mat-icon class="mr-2 text-blue-500" style="font-size: 20px;">person</mat-icon>
+                  Personal Details
+                </h4>
+                <div class="space-y-2">
+                  <p><span class="text-gray-600">Father/Husband:</span> {{data.fhName || 'N/A'}}</p>
+                  <p><span class="text-gray-600">Date of Birth:</span> {{(data.dateOfBirth | date) || 'N/A'}}</p>
+                  <p><span class="text-gray-600">Mobile:</span> {{data.mobile || 'N/A'}}</p>
+                  <p><span class="text-gray-600">Email:</span> {{data.email || 'N/A'}}</p>
+                  <p><span class="text-gray-600">City:</span> {{data.city || 'N/A'}}</p>
                 </div>
               </div>
-            </div>
-          </mat-tab>
 
-          <!-- Financial Information Tab -->
-          <mat-tab label="Financial Information">
-            <div class="tab-content">
-              <div class="info-grid">
-                <div class="info-item">
-                  <label>Share Amount</label>
-                  <span>₹{{data.shareAmount || 0 | number:'1.2-2'}}</span>
-                </div>
-                <div class="info-item">
-                  <label>CD Amount</label>
-                  <span>₹{{data.cdAmount || 0 | number:'1.2-2'}}</span>
-                </div>
-                <div class="info-item">
-                  <label>Bank Name</label>
-                  <span>{{data.bankName || 'Not provided'}}</span>
-                </div>
-                <div class="info-item">
-                  <label>Account Number</label>
-                  <span>{{data.accountNo || 'Not provided'}}</span>
+              <!-- Professional Details -->
+              <div>
+                <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                  <mat-icon class="mr-2 text-green-500" style="font-size: 20px;">work</mat-icon>
+                  Professional Details
+                </h4>
+                <div class="space-y-2">
+                  <p><span class="text-gray-600">Designation:</span> {{data.designation || 'N/A'}}</p>
+                  <p><span class="text-gray-600">Branch:</span> {{data.branch || 'N/A'}}</p>
+                  <p><span class="text-gray-600">DOJ Job:</span> {{(data.dojJob | date) || 'N/A'}}</p>
+                  <p><span class="text-gray-600">Retirement:</span> {{(data.doRetirement | date) || 'N/A'}}</p>
+                  <p><span class="text-gray-600">DOJ Society:</span> {{(data.dojSociety | date) || 'N/A'}}</p>
                 </div>
               </div>
-            </div>
-          </mat-tab>
 
-          <!-- Nominee Information Tab -->
-          <mat-tab label="Nominee Information">
-            <div class="tab-content">
-              <div class="info-grid">
-                <div class="info-item">
-                  <label>Nominee Name</label>
-                  <span>{{data.nominee || 'Not provided'}}</span>
+              <!-- Address Details -->
+              <div class="md:col-span-2">
+                <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                  <mat-icon class="mr-2 text-purple-500" style="font-size: 20px;">location_on</mat-icon>
+                  Address Details
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p class="text-gray-600">Office Address:</p>
+                    <p>{{data.officeAddress || 'N/A'}}</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-600">Residence Address:</p>
+                    <p>{{data.residenceAddress || 'N/A'}}</p>
+                  </div>
                 </div>
-                <div class="info-item">
-                  <label>Nominee Relation</label>
-                  <span>{{data.nomineeRelation || 'Not provided'}}</span>
+              </div>
+
+              <!-- Financial Details -->
+              <div class="md:col-span-2">
+                <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                  <mat-icon class="mr-2 text-amber-500" style="font-size: 20px;">account_balance</mat-icon>
+                  Financial Details
+                </h4>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <p class="text-gray-600">Share Amount:</p>
+                    <p>{{data.shareAmount | currency:'INR'}}</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-600">CD Amount:</p>
+                    <p>{{data.cdAmount | currency:'INR'}}</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-600">Bank Name:</p>
+                    <p>{{data.bankName || 'N/A'}}</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-600">Account No:</p>
+                    <p>{{data.accountNo || 'N/A'}}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Nominee Details -->
+              <div class="md:col-span-2">
+                <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                  <mat-icon class="mr-2 text-red-500" style="font-size: 20px;">people</mat-icon>
+                  Nominee Details
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p class="text-gray-600">Nominee Name:</p>
+                    <p>{{data.nominee || 'N/A'}}</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-600">Relation:</p>
+                    <p>{{data.nomineeRelation || 'N/A'}}</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </mat-tab>
-        </mat-tab-group>
+          </mat-card>
+        </div>
       </div>
 
-      <div mat-dialog-actions class="dialog-actions">
-        <button mat-button mat-dialog-close>Close</button>
-        <button mat-raised-button color="primary" (click)="editMember()">
-          <mat-icon>edit</mat-icon>
-          Edit Member
-        </button>
+      <div class="flex justify-end mt-6">
+        <button mat-raised-button color="primary" (click)="onClose()">Close</button>
       </div>
     </div>
   `,
   styles: [`
-    .member-dialog {
-      width: 100%;
-      max-width: 800px;
-    }
-
-    .dialog-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .dialog-content {
-      padding: 0;
-      max-height: 70vh;
-      overflow-y: auto;
-    }
-
-    .tab-content {
-      padding: 1.5rem;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .info-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .info-item label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #6b7280;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .info-item span {
-      font-size: 0.875rem;
-      color: #1f2937;
+    .text-gray-600 {
+      color: #718096;
       font-weight: 500;
-    }
-
-    .status-badge {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      background-color: #fef2f2;
-      color: #dc2626;
-    }
-
-    .status-badge.active {
-      background-color: #f0fdf4;
-      color: #16a34a;
-    }
-
-    .dialog-actions {
-      padding: 1rem 1.5rem;
-      border-top: 1px solid #e5e7eb;
-      background-color: #f9fafb;
     }
   `]
 })
@@ -231,7 +164,7 @@ export class MemberViewDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: Member
   ) {}
 
-  editMember() {
-    this.dialogRef.close({ action: 'edit', member: this.data });
+  onClose(): void {
+    this.dialogRef.close();
   }
 }

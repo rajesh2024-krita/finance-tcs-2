@@ -14,32 +14,39 @@ export interface BankingDetails {
 
 export interface Member {
   id?: number;
-  memberNo?: string;
-  memNo?: string; // Alternative member number field
+  memberNo: string;
   name: string;
-  fhName?: string;
+  fhName: string;
   dateOfBirth?: Date | string;
-  dob?: Date | string; // Alternative date of birth field
   mobile?: string;
   email?: string;
   designation?: string;
-  doj?: Date | string;
-  status?: string;
+  dojJob?: Date | string;
+  doRetirement?: Date | string;
+  branch?: string;
+  dojSociety?: Date | string;
   officeAddress?: string;
   residenceAddress?: string;
   city?: string;
   phoneOffice?: string;
-  phoneRes?: string;
   phoneResidence?: string;
-  shareAmount?: number;
-  cdAmount?: number;
-  bankName?: string;
-  accountNo?: string;
-  ifscCode?: string;
-  accountHolderName?: string;
   nominee?: string;
   nomineeRelation?: string;
-  // Add other properties as needed
+  shareAmount: number;
+  cdAmount: number;
+  bankName?: string;
+  payableAt?: string;
+  accountNo?: string;
+  status?: string;
+  date?: Date | string;
+  photoPath?: string;
+  signaturePath?: string;
+  shareDeduction?: number;
+  withdrawal?: number;
+  gLoanInstalment?: number;
+  eLoanInstalment?: number;
+  createdDate?: Date | string;
+  updatedDate?: Date | string;
 }
 
 @Injectable({
@@ -111,45 +118,21 @@ export class MemberService {
   /** Error Handling */
   private handleError = (error: HttpErrorResponse) => {
     let errorMessage = 'An unknown error occurred';
-
-    console.error('Full API Error:', error);
-
     if (error.status === 401) {
       errorMessage = 'Unauthorized - Please login again.';
     } else if (error.error instanceof ErrorEvent) {
-      errorMessage = `Client Error: ${error.error.message}`;
+      errorMessage = `Error: ${error.error.message}`;
     } else {
-      // Handle server errors
       switch (error.status) {
-        case 0:
-          errorMessage = 'Network Error - Please check your connection';
-          break;
-        case 400:
-          errorMessage = 'Bad Request - Invalid data provided';
-          if (error.error && typeof error.error === 'object') {
-            const validationErrors = Object.values(error.error).flat();
-            if (validationErrors.length > 0) {
-              errorMessage += `: ${validationErrors.join(', ')}`;
-            }
-          }
-          break;
-        case 403:
-          errorMessage = 'Forbidden - Access denied';
-          break;
-        case 404:
-          errorMessage = 'Not Found - Resource does not exist';
-          break;
-        case 409:
-          errorMessage = 'Conflict - Member number already exists';
-          break;
-        case 500:
-          errorMessage = 'Internal Server Error - Please try again later';
-          break;
-        default:
-          errorMessage = `Server Error (${error.status}): ${error.message || 'Unknown error'}`;
+        case 400: errorMessage = 'Bad Request'; break;
+        case 403: errorMessage = 'Forbidden'; break;
+        case 404: errorMessage = 'Not Found'; break;
+        case 409: errorMessage = 'Conflict - Member number exists'; break;
+        case 500: errorMessage = 'Internal Server Error'; break;
+        default: errorMessage = `Server Error: ${error.status}`;
       }
     }
-
+    console.error('API Error:', error);
     return throwError(() => new Error(errorMessage));
   }
 }
