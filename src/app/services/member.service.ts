@@ -35,6 +35,8 @@ export interface Member {
   cdAmount?: number;
   bankName?: string;
   accountNo?: string;
+  ifscCode?: string;
+  accountHolderName?: string;
   nominee?: string;
   nomineeRelation?: string;
   // Add other properties as needed

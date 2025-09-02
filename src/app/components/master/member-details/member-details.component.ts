@@ -113,6 +113,8 @@ export class MemberDetailsComponent implements OnInit {
       bankName: [''],
       payableAt: [''],
       accountNo: [''],
+      ifscCode: [''],
+      accountHolderName: [''],
       status: ['Active'],
       shareDeduction: [0],
       withdrawal: [0],
@@ -218,6 +220,8 @@ export class MemberDetailsComponent implements OnInit {
       bankName: member.bankName || (member.bankingDetails?.bankName) || '',
       payableAt: member.payableAt || member.branchName || (member.bankingDetails?.branchName) || '',
       accountNo: member.accountNo || (member.bankingDetails?.accountNumber) || '',
+      ifscCode: member.ifscCode || (member.bankingDetails?.ifscCode) || '',
+      accountHolderName: member.accountHolderName || (member.bankingDetails?.accountHolderName) || '',
       status: member.status || 'Active',
       shareDeduction: member.shareDeduction || 0,
       withdrawal: member.withdrawal || 0,
@@ -266,11 +270,11 @@ export class MemberDetailsComponent implements OnInit {
       eLoanInstalment: Number(formData.eLoanInstalment) || 0,
       // Nested object as per schema
       bankingDetails: {
-        bankName: formData.bankName || null,
-        accountNumber: formData.accountNo || null,
-        branchName: formData.payableAt || null,
-        ifscCode: formData.ifscCode || null,
-        accountHolderName: formData.accountHolderName || null
+        bankName: formData.bankName || '',
+        accountNumber: formData.accountNo || '',
+        branchName: formData.payableAt || '',
+        ifscCode: formData.ifscCode || '',
+        accountHolderName: formData.accountHolderName || ''
       }
     };
   }

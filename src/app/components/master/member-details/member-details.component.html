@@ -346,7 +346,7 @@
           <div class="form-section">
             <h3 class="form-section-title">Banking Information</h3>
             <div class="form-section-content">
-              <div class="form-grid form-grid-2">
+              <div class="form-grid form-grid-3">
                 <div class="form-field">
                   <label class="form-label">Bank Name</label>
                   <mat-form-field appearance="outline" class="w-full">
@@ -358,6 +358,26 @@
                   <label class="form-label">Account Number</label>
                   <mat-form-field appearance="outline" class="w-full">
                     <input matInput formControlName="accountNo" placeholder="Enter account number">
+                  </mat-form-field>
+                </div>
+
+                <div class="form-field">
+                  <label class="form-label">IFSC Code</label>
+                  <mat-form-field appearance="outline" class="w-full">
+                    <input matInput formControlName="ifscCode" placeholder="Enter IFSC Code">
+                    <mat-error *ngIf="memberForm.get('ifscCode')?.hasError('required')">
+                      IFSC Code is required
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-field">
+                  <label class="form-label">Account Holder Name</label>
+                  <mat-form-field appearance="outline" class="w-full">
+                    <input matInput formControlName="accountHolderName" placeholder="Enter Account Holder Name">
+                    <mat-error *ngIf="memberForm.get('accountHolderName')?.hasError('required')">
+                      Account Holder Name is required
+                    </mat-error>
                   </mat-form-field>
                 </div>
 
