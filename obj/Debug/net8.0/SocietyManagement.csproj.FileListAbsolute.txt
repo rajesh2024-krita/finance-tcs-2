@@ -1,0 +1,8 @@
+/home/runner/workspace/obj/Debug/net8.0/SocietyManagement.csproj.AssemblyReference.cache
+/home/runner/workspace/obj/Debug/net8.0/SocietyManagement.GeneratedMSBuildEditorConfig.editorconfig
+/home/runner/workspace/obj/Debug/net8.0/SocietyManagement.AssemblyInfoInputs.cache
+/home/runner/workspace/obj/Debug/net8.0/SocietyManagement.AssemblyInfo.cs
+/home/runner/workspace/obj/Debug/net8.0/SocietyManagement.csproj.CoreCompileInputs.cache
+/home/runner/workspace/obj/Debug/net8.0/SocietyManagement.MvcApplicationPartsAssemblyInfo.cs
+/home/runner/workspace/obj/Debug/net8.0/SocietyManagement.MvcApplicationPartsAssemblyInfo.cache
+/home/runner/workspace/obj/Debug/net8.0/SocietyManagement.sourcelink.json
