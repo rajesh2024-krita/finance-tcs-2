@@ -57,7 +57,7 @@ import { MemberService, Member } from '../../services/member.service';
               </div>
               <div class="text-white">
                 <h1 class="text-3xl font-bold">{{member.name}}</h1>
-                <p class="text-blue-100">{{member.memberNo || member.memNo}} • {{member.designation || 'Member'}}</p>
+                <p class="text-blue-100">{{member.memberNo}} • {{member.designation || 'Member'}}</p>
                 <div class="mt-2">
                   <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full"
                         [class]="member.status === 'Active' ? 'bg-green-500 bg-opacity-20 text-green-100' : 'bg-red-500 bg-opacity-20 text-red-100'">
@@ -77,7 +77,7 @@ import { MemberService, Member } from '../../services/member.service';
                   <div class="space-y-4">
                     <div>
                       <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Member Number</label>
-                      <p class="text-lg text-gray-900 dark:text-white">{{member.memberNo || member.memNo}}</p>
+                      <p class="text-lg text-gray-900 dark:text-white">{{member.memberNo}}</p>
                     </div>
                     <div>
                       <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Full Name</label>

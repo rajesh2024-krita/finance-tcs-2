@@ -34,7 +34,7 @@ import { Member } from '../../../services/member.service';
               <div class="info-grid">
                 <div class="info-item">
                   <label>Member Number</label>
-                  <span>{{data.memberNo || data.memNo}}</span>
+                  <span>{{data.memberNo}}</span>
                 </div>
                 <div class="info-item">
                   <label>Name</label>
@@ -46,7 +46,7 @@ import { Member } from '../../../services/member.service';
                 </div>
                 <div class="info-item">
                   <label>Date of Birth</label>
-                  <span>{{data.dob ? (data.dob | date:'dd/MM/yyyy') : 'Not provided'}}</span>
+                  <!-- <span>{{data.dob ? (data.dob | date:'dd/MM/yyyy') : 'Not provided'}}</span> -->
                 </div>
                 <div class="info-item">
                   <label>Mobile</label>
@@ -92,7 +92,7 @@ import { Member } from '../../../services/member.service';
                 </div>
                 <div class="info-item">
                   <label>Residence Phone</label>
-                  <span>{{data.phoneResidence || data.phoneRes || 'Not provided'}}</span>
+                  <span>{{data.phoneResidence || 'Not provided'}}</span>
                 </div>
               </div>
             </div>
@@ -112,11 +112,11 @@ import { Member } from '../../../services/member.service';
                 </div>
                 <div class="info-item">
                   <label>Bank Name</label>
-                  <span>{{data.bankName || data.bankingDetails?.bankName || 'Not provided'}}</span>
+                  <span>{{data.bankName || 'Not provided'}}</span>
                 </div>
                 <div class="info-item">
                   <label>Account Number</label>
-                  <span>{{data.accountNo || data.bankingDetails?.accountNumber || 'Not provided'}}</span>
+                  <span>{{data.accountNo || 'Not provided'}}</span>
                 </div>
                 <div class="info-item">
                   <label>Nominee</label>
