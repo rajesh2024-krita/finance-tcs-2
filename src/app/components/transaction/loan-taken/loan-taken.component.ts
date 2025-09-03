@@ -1,1225 +1,360 @@
-
-import { Component, signal, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatIconModule } from '@angular/material/icon';
-import { MatRadioModule } from '@angular/material/radio';
-import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatTableModule } from '@angular/material/table';
-import { MatTableDataSource } from '@angular/material/table';
-
-interface LoanSummary {
-  loanNo: string;
-  loanDate: Date;
-  amount: number;
-  member: string;
-  edpNo: string;
-}
-
-interface Employee {
-  edpNo: string;
-  memberName: string;
-}
-
-interface GivenTakenMember {
-  memNo: string;
-  name: string;
-}
+import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 
 @Component({
-  selector: 'app-loan-taken',
+  selector: 'app-loan-entry-form',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatTabsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatIconModule,
-    MatRadioModule,
-    MatDialogModule,
-    MatTableModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="animate-fade-in">
-      <!-- Page Header -->
-      <div class="content-header mb-6">
-        <div class="breadcrumb">
-          <span>Transaction</span>
-          <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
-          <span class="breadcrumb-active">Loan Taken</span>
-        </div>
-        <h1 class="text-page-title">Loan Entry</h1>
-        <p class="text-body text-gray-600 dark:text-gray-400">Manage loan applications and processing</p>
+  <div class="bg-white border">
+    <div class="flex justify-between items-center p-6 bg-gradient-to-br from-indigo-400 to-purple-600 text-white">
+      <h2 class="text-2xl font-semibold">Loan Entry Form</h2>
+      <div class="space-x-2">
+        <button (click)="onValidate()" class="px-3 py-1 rounded bg-amber-500 text-white">Validate</button>
+        <button (click)="onSave()" [disabled]="!canSave" class="px-3 py-1 rounded bg-green-600 text-white disabled:opacity-50">Save</button>
+        <button (click)="onClear()" class="px-3 py-1 rounded border">Clear</button>
+        <!-- <button (click)="onClose()" class="px-3 py-1 rounded border">Close</button> -->
       </div>
-
-      <!-- Main Loan Form -->
-      <form class="form-container" [formGroup]="loanForm">
-        <mat-card class="card">
-          <!-- Card Header -->
-          <div class="card-header bg-gradient-to-r from-blue-600 to-purple-600">
-            <div class="card-title">
-              <mat-icon>account_balance</mat-icon>
-              <span>Loan Entry</span>
-            </div>
-          </div>
-
-          <mat-card-content class="p-0">
-            <div class="p-6">
-              <!-- Main Form Section -->
-              <div class="form-section">
-                <div class="form-section-header">
-                  <mat-icon>description</mat-icon>
-                  <span>Loan Information</span>
-                </div>
-                <div class="form-section-content">
-                  <div class="form-row">
-                    <!-- Left Column -->
-                    <div class="form-column">
-                      <div class="form-field">
-                        <label class="form-label form-label-required">Loan Type</label>
-                        <select class="form-select" formControlName="loanType">
-                          <option value="">Select loan type</option>
-                          <option value="General">General Loan</option>
-                          <option value="Emergency">Emergency Loan</option>
-                          <option value="Festival">Festival Loan</option>
-                          <option value="Medical">Medical Loan</option>
-                        </select>
-                        <div class="form-error" *ngIf="loanForm.get('loanType')?.invalid && loanForm.get('loanType')?.touched">
-                          Loan type is required
-                        </div>
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label form-label-required">Loan No.</label>
-                        <div class="input-group">
-                          <input 
-                            type="text" 
-                            class="form-input"
-                            placeholder="Enter loan number"
-                            formControlName="loanNo">
-                          <button type="button" class="btn btn-outline" (click)="openLoanSummary()">
-                            <mat-icon>search</mat-icon>
-                          </button>
-                        </div>
-                        <div class="form-error" *ngIf="loanForm.get('loanNo')?.invalid && loanForm.get('loanNo')?.touched">
-                          Loan number is required
-                        </div>
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label form-label-required">Loan Date</label>
-                        <input 
-                          type="date" 
-                          class="form-input"
-                          formControlName="loanDate">
-                        <div class="form-error" *ngIf="loanForm.get('loanDate')?.invalid && loanForm.get('loanDate')?.touched">
-                          Loan date is required
-                        </div>
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label form-label-required">EDP No.</label>
-                        <div class="input-group">
-                          <input 
-                            type="text" 
-                            class="form-input"
-                            placeholder="Enter EDP number"
-                            formControlName="edpNo">
-                          <button type="button" class="btn btn-outline" (click)="openEmployeeSearch()">
-                            <mat-icon>search</mat-icon>
-                          </button>
-                        </div>
-                        <div class="form-error" *ngIf="loanForm.get('edpNo')?.invalid && loanForm.get('edpNo')?.touched">
-                          EDP number is required
-                        </div>
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label">Name</label>
-                        <input 
-                          type="text" 
-                          class="form-input"
-                          placeholder="Auto-filled from employee search"
-                          formControlName="name"
-                          readonly>
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label form-label-required">Loan Amount</label>
-                        <input 
-                          type="number" 
-                          class="form-input"
-                          placeholder="Enter loan amount"
-                          formControlName="loanAmount"
-                          (input)="calculateNetLoan()">
-                        <div class="form-error" *ngIf="loanForm.get('loanAmount')?.invalid && loanForm.get('loanAmount')?.touched">
-                          Loan amount is required
-                        </div>
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label">Previous Loan (Remaining)</label>
-                        <input 
-                          type="number" 
-                          class="form-input"
-                          placeholder="Previous loan amount"
-                          formControlName="previousLoan"
-                          (input)="calculateNetLoan()">
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label">Net Loan</label>
-                        <input 
-                          type="number" 
-                          class="form-input calculation-field"
-                          placeholder="Auto-calculated"
-                          formControlName="netLoan"
-                          readonly>
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label form-label-required">No. of Inst.</label>
-                        <input 
-                          type="number" 
-                          class="form-input"
-                          placeholder="Number of installments"
-                          formControlName="noOfInstallments"
-                          (input)="calculateInstallmentAmount()">
-                        <div class="form-error" *ngIf="loanForm.get('noOfInstallments')?.invalid && loanForm.get('noOfInstallments')?.touched">
-                          Number of installments is required
-                        </div>
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label">Inst. Amount</label>
-                        <input 
-                          type="number" 
-                          class="form-input calculation-field"
-                          placeholder="Auto-calculated"
-                          formControlName="installmentAmount"
-                          readonly>
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label">Purpose</label>
-                        <textarea 
-                          class="form-textarea"
-                          placeholder="Enter purpose of loan"
-                          rows="3"
-                          formControlName="purpose"></textarea>
-                      </div>
-
-                      <div class="form-field" *ngIf="requiresAuthorization()">
-                        <label class="form-label form-label-required">Authorized By</label>
-                        <input 
-                          type="text" 
-                          class="form-input"
-                          placeholder="Authorization required"
-                          formControlName="authorizedBy">
-                        <div class="form-error" *ngIf="loanForm.get('authorizedBy')?.invalid && loanForm.get('authorizedBy')?.touched">
-                          Authorization is required for this loan amount
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Right Column -->
-                    <div class="form-column">
-                      <div class="form-field">
-                        <label class="form-label">Share</label>
-                        <input 
-                          type="number" 
-                          class="form-input"
-                          placeholder="Share amount"
-                          formControlName="share">
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label">CD</label>
-                        <input 
-                          type="number" 
-                          class="form-input"
-                          placeholder="CD amount"
-                          formControlName="cd">
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label">Last Salary</label>
-                        <input 
-                          type="number" 
-                          class="form-input"
-                          placeholder="Last salary"
-                          formControlName="lastSalary">
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label">Share</label>
-                        <input 
-                          type="number" 
-                          class="form-input"
-                          placeholder="Share amount"
-                          formControlName="shareRight">
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label">CD</label>
-                        <input 
-                          type="number" 
-                          class="form-input"
-                          placeholder="CD amount"
-                          formControlName="cdRight">
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label">MWF</label>
-                        <input 
-                          type="number" 
-                          class="form-input"
-                          placeholder="MWF amount"
-                          formControlName="mwf">
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label">Pay Amount</label>
-                        <input 
-                          type="number" 
-                          class="form-input"
-                          placeholder="Pay amount"
-                          formControlName="payAmount">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Payment Mode Section -->
-              <div class="form-section">
-                <div class="form-section-header">
-                  <mat-icon>payment</mat-icon>
-                  <span>Payment Mode</span>
-                </div>
-                <div class="form-section-content">
-                  <mat-radio-group formControlName="paymentMode" class="payment-mode-group">
-                    <mat-radio-button value="Cash" class="payment-mode-option">Cash</mat-radio-button>
-                    <mat-radio-button value="Cheque" class="payment-mode-option">Cheque</mat-radio-button>
-                    <mat-radio-button value="Opening" class="payment-mode-option">Opening</mat-radio-button>
-                  </mat-radio-group>
-
-                  <div class="cheque-details" *ngIf="loanForm.get('paymentMode')?.value === 'Cheque'">
-                    <div class="form-grid form-grid-3">
-                      <div class="form-field">
-                        <label class="form-label">Bank Name</label>
-                        <input 
-                          type="text" 
-                          class="form-input"
-                          placeholder="Enter bank name"
-                          formControlName="bankName">
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label">Cheque No.</label>
-                        <input 
-                          type="text" 
-                          class="form-input"
-                          placeholder="Enter cheque number"
-                          formControlName="chequeNo">
-                      </div>
-
-                      <div class="form-field">
-                        <label class="form-label">Cheque Date</label>
-                        <input 
-                          type="date" 
-                          class="form-input"
-                          formControlName="chequeDate">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Tabs Section -->
-              <div class="form-section">
-                <div class="form-section-header">
-                  <mat-icon>swap_horiz</mat-icon>
-                  <span>Given & Taken Details</span>
-                </div>
-                <div class="form-section-content">
-                  <mat-tab-group class="member-tabs">
-                    <mat-tab label="Given">
-                      <div class="tab-content">
-                        <div class="table-container">
-                          <table class="member-table">
-                            <thead>
-                              <tr>
-                                <th>Mem No</th>
-                                <th>Name</th>
-                                <th>Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr *ngFor="let member of givenMembers; let i = index">
-                                <td>{{member.memNo}}</td>
-                                <td>{{member.name}}</td>
-                                <td>
-                                  <button type="button" class="btn btn-sm btn-danger" (click)="removeGivenMember(i)">
-                                    <mat-icon>delete</mat-icon>
-                                  </button>
-                                </td>
-                              </tr>
-                              <tr *ngIf="givenMembers.length === 0">
-                                <td colspan="3" class="text-center text-gray-500">No members added</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                        <button type="button" class="btn btn-primary mt-3" (click)="addGivenMember()">
-                          <mat-icon>add</mat-icon>
-                          Add Member
-                        </button>
-                      </div>
-                    </mat-tab>
-
-                    <mat-tab label="Taken">
-                      <div class="tab-content">
-                        <div class="table-container">
-                          <table class="member-table">
-                            <thead>
-                              <tr>
-                                <th>Mem No</th>
-                                <th>Name</th>
-                                <th>Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr *ngFor="let member of takenMembers; let i = index">
-                                <td>{{member.memNo}}</td>
-                                <td>{{member.name}}</td>
-                                <td>
-                                  <button type="button" class="btn btn-sm btn-danger" (click)="removeTakenMember(i)">
-                                    <mat-icon>delete</mat-icon>
-                                  </button>
-                                </td>
-                              </tr>
-                              <tr *ngIf="takenMembers.length === 0">
-                                <td colspan="3" class="text-center text-gray-500">No members added</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                        <button type="button" class="btn btn-primary mt-3" (click)="addTakenMember()">
-                          <mat-icon>add</mat-icon>
-                          Add Member
-                        </button>
-                      </div>
-                    </mat-tab>
-                  </mat-tab-group>
-                </div>
-              </div>
-              <!-- Loan Basic Details Section -->
-              <div class="form-section">
-                <div class="form-section-header">
-                  <mat-icon>description</mat-icon>
-                  <span>Loan Details</span>
-                </div>
-                <div class="form-section-content">
-                  <div class="form-grid form-grid-3">
-                    <div class="form-field">
-                      <label class="form-label form-label-required">Loan Type</label>
-                      <select class="form-select" formControlName="loanType">
-                        <option value="">Select loan type</option>
-                        <option value="General">General Loan</option>
-                        <option value="Emergency">Emergency Loan</option>
-                        <option value="Festival">Festival Loan</option>
-                        <option value="Medical">Medical Loan</option>
-                      </select>
-                      <div class="form-error" *ngIf="loanForm.get('loanType')?.invalid && loanForm.get('loanType')?.touched">
-                        Loan type is required
-                      </div>
-                    </div>
-
-                    <div class="form-field">
-                      <label class="form-label form-label-required">Loan No.</label>
-                      <input 
-                        type="text" 
-                        class="form-input"
-                        placeholder="Enter loan number"
-                        formControlName="loanNo">
-                      <div class="form-error" *ngIf="loanForm.get('loanNo')?.invalid && loanForm.get('loanNo')?.touched">
-                        Loan number is required
-                      </div>
-                    </div>
-
-                    <div class="form-field">
-                      <label class="form-label form-label-required">Loan Date</label>
-                      <input 
-                        type="date" 
-                        class="form-input"
-                        formControlName="loanDate">
-                      <div class="form-error" *ngIf="loanForm.get('loanDate')?.invalid && loanForm.get('loanDate')?.touched">
-                        Loan date is required
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Employee Details Section -->
-              <div class="form-section">
-                <div class="form-section-header">
-                  <mat-icon>person</mat-icon>
-                  <span>Employee Details</span>
-                </div>
-                <div class="form-section-content">
-                  <div class="form-grid form-grid-2">
-                    <div class="form-field">
-                      <label class="form-label form-label-required">EDP No.</label>
-                      <div class="input-group">
-                        <input 
-                          type="text" 
-                          class="form-input"
-                          placeholder="Enter EDP number"
-                          formControlName="edpNo">
-                        <button type="button" class="btn btn-outline" (click)="openEmployeeSearch()">
-                          <mat-icon>search</mat-icon>
-                          Search
-                        </button>
-                      </div>
-                      <div class="form-error" *ngIf="loanForm.get('edpNo')?.invalid && loanForm.get('edpNo')?.touched">
-                        EDP number is required
-                      </div>
-                    </div>
-
-                    <div class="form-field">
-                      <label class="form-label">Name</label>
-                      <input 
-                        type="text" 
-                        class="form-input"
-                        placeholder="Auto-filled from employee search"
-                        formControlName="name"
-                        readonly>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Loan Amount Section -->
-              <div class="form-section">
-                <div class="form-section-header">
-                  <mat-icon>payments</mat-icon>
-                  <span>Loan Amount & Terms</span>
-                </div>
-                <div class="form-section-content">
-                  <div class="form-grid form-grid-3">
-                    <div class="form-field">
-                      <label class="form-label form-label-required">Loan Amount</label>
-                      <input 
-                        type="number" 
-                        class="form-input"
-                        placeholder="Enter loan amount"
-                        formControlName="loanAmount"
-                        (input)="calculateNetLoan()">
-                      <div class="form-error" *ngIf="loanForm.get('loanAmount')?.invalid && loanForm.get('loanAmount')?.touched">
-                        Loan amount is required
-                      </div>
-                    </div>
-
-                    <div class="form-field">
-                      <label class="form-label">Previous Loan (Remaining)</label>
-                      <input 
-                        type="number" 
-                        class="form-input"
-                        placeholder="Auto-calculated"
-                        formControlName="previousLoan"
-                        readonly>
-                    </div>
-
-                    <div class="form-field">
-                      <label class="form-label">Net Loan</label>
-                      <input 
-                        type="number" 
-                        class="form-input calculation-field"
-                        placeholder="Auto-calculated"
-                        formControlName="netLoan"
-                        readonly>
-                    </div>
-
-                    <div class="form-field">
-                      <label class="form-label form-label-required">No. of Installments</label>
-                      <input 
-                        type="number" 
-                        class="form-input"
-                        placeholder="Enter number of installments"
-                        formControlName="noOfInstallments"
-                        (input)="calculateInstallmentAmount()">
-                      <div class="form-error" *ngIf="loanForm.get('noOfInstallments')?.invalid && loanForm.get('noOfInstallments')?.touched">
-                        Number of installments is required
-                      </div>
-                    </div>
-
-                    <div class="form-field">
-                      <label class="form-label">Installment Amount</label>
-                      <input 
-                        type="number" 
-                        class="form-input calculation-field"
-                        placeholder="Auto-calculated"
-                        formControlName="installmentAmount"
-                        readonly>
-                    </div>
-
-                    <div class="form-field">
-                      <label class="form-label">Last Salary</label>
-                      <input 
-                        type="number" 
-                        class="form-input"
-                        placeholder="Enter last salary"
-                        formControlName="lastSalary">
-                    </div>
-                  </div>
-
-                  <div class="form-field mt-4">
-                    <label class="form-label">Purpose</label>
-                    <textarea 
-                      class="form-textarea"
-                      placeholder="Enter purpose of loan"
-                      rows="3"
-                      formControlName="purpose"></textarea>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Balance Information Section -->
-              <div class="form-section">
-                <div class="form-section-header">
-                  <mat-icon>account_balance_wallet</mat-icon>
-                  <span>Balance Information</span>
-                </div>
-                <div class="form-section-content">
-                  <div class="balance-grid">
-                    <div class="balance-column">
-                      <h4 class="balance-column-title">Current Balance</h4>
-                      <div class="form-grid form-grid-2">
-                        <div class="form-field">
-                          <label class="form-label">Share</label>
-                          <input 
-                            type="number" 
-                            class="form-input"
-                            placeholder="Current share"
-                            formControlName="shareLeft">
-                        </div>
-                        <div class="form-field">
-                          <label class="form-label">CD (Credit Deposit)</label>
-                          <input 
-                            type="number" 
-                            class="form-input"
-                            placeholder="Current CD"
-                            formControlName="cdLeft">
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="balance-column">
-                      <h4 class="balance-column-title">After Loan</h4>
-                      <div class="form-grid form-grid-2">
-                        <div class="form-field">
-                          <label class="form-label">Share</label>
-                          <input 
-                            type="number" 
-                            class="form-input"
-                            placeholder="Remaining share"
-                            formControlName="shareRight">
-                        </div>
-                        <div class="form-field">
-                          <label class="form-label">CD</label>
-                          <input 
-                            type="number" 
-                            class="form-input"
-                            placeholder="Remaining CD"
-                            formControlName="cdRight">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="form-grid form-grid-2 mt-4">
-                    <div class="form-field">
-                      <label class="form-label">MWF</label>
-                      <input 
-                        type="number" 
-                        class="form-input"
-                        placeholder="Enter MWF amount"
-                        formControlName="mwf">
-                    </div>
-                    <div class="form-field">
-                      <label class="form-label">Pay Amount</label>
-                      <input 
-                        type="number" 
-                        class="form-input"
-                        placeholder="Enter pay amount"
-                        formControlName="payAmount">
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Authorization Section -->
-              <div class="form-section" *ngIf="requiresAuthorization()">
-                <div class="form-section-header">
-                  <mat-icon>verified</mat-icon>
-                  <span>Authorization</span>
-                </div>
-                <div class="form-section-content">
-                  <div class="form-field">
-                    <label class="form-label form-label-required">Authorized By</label>
-                    <select class="form-select" formControlName="authorizedBy">
-                      <option value="">Select authorizing officer</option>
-                      <option value="Manager">Manager</option>
-                      <option value="Assistant Manager">Assistant Manager</option>
-                      <option value="President">President</option>
-                      <option value="Secretary">Secretary</option>
-                    </select>
-                    <div class="form-error" *ngIf="loanForm.get('authorizedBy')?.invalid && loanForm.get('authorizedBy')?.touched">
-                      Authorization is required for this loan amount
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Payment Details Section -->
-              <div class="form-section">
-                <div class="form-section-header">
-                  <mat-icon>payment</mat-icon>
-                  <span>Payment Details</span>
-                </div>
-                <div class="form-section-content">
-                  <div class="form-grid form-grid-3">
-                    <div class="form-field">
-                      <label class="form-label form-label-required">Payment Mode</label>
-                      <select class="form-select" formControlName="paymentMode">
-                        <option value="">Select payment mode</option>
-                        <option value="Cash">Cash</option>
-                        <option value="Cheque">Cheque</option>
-                        <option value="Bank Transfer">Bank Transfer</option>
-                      </select>
-                      <div class="form-error" *ngIf="loanForm.get('paymentMode')?.invalid && loanForm.get('paymentMode')?.touched">
-                        Payment mode is required
-                      </div>
-                    </div>
-
-                    <div class="form-field">
-                      <label class="form-label">Bank</label>
-                      <input 
-                        type="text" 
-                        class="form-input"
-                        placeholder="Enter bank name"
-                        formControlName="bank">
-                    </div>
-
-                    <div class="form-field">
-                      <label class="form-label">Cheque No.</label>
-                      <input 
-                        type="text" 
-                        class="form-input"
-                        placeholder="Enter cheque number"
-                        formControlName="chequeNo">
-                    </div>
-
-                    <div class="form-field">
-                      <label class="form-label">Cheque Date</label>
-                      <input 
-                        type="date" 
-                        class="form-input"
-                        formControlName="chequeDate">
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Transaction Details Section -->
-              <div class="form-section">
-                <div class="form-section-header">
-                  <mat-icon>swap_horiz</mat-icon>
-                  <span>Transaction Details</span>
-                </div>
-                <div class="form-section-content">
-                  <div class="form-grid form-grid-2">
-                    <div class="form-field">
-                      <label class="form-label">Given</label>
-                      <select class="form-select" formControlName="given">
-                        <option value="">Select member</option>
-                        <option value="M001 - John Doe">M001 - John Doe</option>
-                        <option value="M002 - Jane Smith">M002 - Jane Smith</option>
-                        <option value="M003 - Mike Johnson">M003 - Mike Johnson</option>
-                      </select>
-                    </div>
-
-                    <div class="form-field">
-                      <label class="form-label">Taken</label>
-                      <select class="form-select" formControlName="taken">
-                        <option value="">Select member</option>
-                        <option value="M001 - John Doe">M001 - John Doe</option>
-                        <option value="M002 - Jane Smith">M002 - Jane Smith</option>
-                        <option value="M003 - Mike Johnson">M003 - Mike Johnson</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </mat-card-content>
-
-          <!-- Action Buttons -->
-          <div class="card-actions">
-            <div class="flex justify-end gap-3">
-              <button type="button" class="btn btn-secondary" (click)="onValidate()">
-                <mat-icon>check_circle</mat-icon>
-                Validate
-              </button>
-              <button type="button" class="btn btn-primary" (click)="onSave()">
-                <mat-icon>save</mat-icon>
-                Save
-              </button>
-              <button type="button" class="btn btn-warning" (click)="onClear()">
-                <mat-icon>clear</mat-icon>
-                Clear
-              </button>
-              <button type="button" class="btn btn-secondary" (click)="onClose()">
-                <mat-icon>close</mat-icon>
-                Close
-              </button>
-            </div>
-          </div>
-        </mat-card>
-      </form>
     </div>
-  `,
-  styleUrl: './loan-taken.component.css'
+
+    <form [formGroup]="form" (ngSubmit)="onSave()" class="space-y-4 p-6">
+      <div>
+          <label class="block text-sm font-medium">Loan Type</label>
+          <select formControlName="loanType" (change)="onLoanTypeChange()" class="mt-1 p-2 border rounded w-full">
+            <option value="General">General</option>
+            <option value="Custom">Custom Loan</option>
+          </select>
+          <div *ngIf="isCustom()" class="mt-2">
+            <label class="block text-xs font-medium">Custom Type</label>
+            <select formControlName="customType" class="mt-1 p-2 border rounded w-full">
+              <option value="Emergency">Emergency</option>
+              <option value="Festival">Festival</option>
+              <option value="LAS">LAS</option>
+              <option value="LA FDR">LA FDR</option>
+            </select>
+          </div>
+        </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border p-3 mb-2">
+            <div>
+              <label class="block text-sm font-medium">Loan No.</label>
+              <div class="flex-cols items-center gap-2 space-x-2 space-y-2">
+                <input formControlName="loanNo" class="mt-1 p-2 border rounded w-full" />
+                <!-- <button type="button" (click)="generateLoanNo()" class="px-2 py-1 rounded bg-slate-200">New</button> -->
+                <!-- <button type="button" (click)="openSearch()" class="px-2 py-1 rounded bg-slate-200">Search</button> -->
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium">Loan Date</label>
+              <input type="date" formControlName="loanDate" class="mt-1 p-2 border rounded w-full" />
+            </div>
+
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <div>
+              <label class="block text-sm font-medium">EDP No.</label>
+              <select formControlName="edpNo" (change)="onEdpSelect()" class="mt-1 p-2 border rounded w-full">
+                <option value="">-- Select Member --</option>
+                <option *ngFor="let m of members" [value]="m.memNo">{{ m.memNo }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Name (member)</label>
+              <input formControlName="member" readonly class="mt-1 p-2 border rounded w-full bg-slate-50" />
+            </div>
+
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium">Loan Amount (₹)</label>
+              <input type="number" formControlName="loanAmount" (input)="recalculate()" class="mt-1 p-2 border rounded w-full" />
+            </div>
+
+            
+            <div>
+              <label class="block text-sm font-medium">Previous Loan (Remaining)</label>
+              <input type="number" formControlName="previousLoan" class="mt-1 p-2 border rounded w-full" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium">Net Loan (Auto)</label>
+              <input [value]="formatCurrency(netLoan())" readonly class="mt-1 p-2 border rounded w-full bg-slate-50" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium">No. of Installments</label>
+              <input type="number" formControlName="installments" (input)="recalculate()" class="mt-1 p-2 border rounded w-full" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium">Installment Amount (Auto)</label>
+              <input [value]="formatCurrency(installmentAmount())" readonly class="mt-1 p-2 border rounded w-full bg-slate-50" />
+            </div>
+
+            <div class="sr-only">
+              <label class="block text-sm font-medium">Interest Rate (Auto)</label>
+              <input [value]="(interestRate*100).toFixed(2) + '%'" readonly class="mt-1 p-2 border rounded w-full bg-slate-50" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium">Purpose</label>
+              <textarea formControlName="purpose" rows="2" class="mt-1 p-2 border rounded w-full"></textarea>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium">Authorized By</label>
+              <input formControlName="authorizedBy" class="mt-1 p-2 border rounded w-full" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium">Payment Mode</label>
+              <div class="mt-1 flex gap-3 items-center">
+                <label class="flex items-center gap-2"><input type="radio" formControlName="paymentMode" value="Cash" (change)="onPaymentModeChange()" /> Cash</label>
+                <label class="flex items-center gap-2"><input type="radio" formControlName="paymentMode" value="Cheque" (change)="onPaymentModeChange()" /> Cheque</label>
+                <label class="flex items-center gap-2"><input type="radio" formControlName="paymentMode" value="Opening" (change)="onPaymentModeChange()" /> Opening</label>
+              </div>
+            </div>
+
+            <div *ngIf="isCheque()">
+              <label class="block text-sm font-medium">Bank</label>
+              <select formControlName="bank" class="mt-1 p-2 border rounded w-full">
+                <option value="">-- Select Bank --</option>
+                <option *ngFor="let b of banks" [value]="b">{{b}}</option>
+              </select>
+              <label class="block text-sm font-medium mt-2">Cheque No.</label>
+              <input formControlName="chequeNo" class="mt-1 p-2 border rounded w-full" />
+              <label class="block text-sm font-medium mt-2">Cheque Date</label>
+              <input type="date" formControlName="chequeDate" class="mt-1 p-2 border rounded w-full" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Pay amount dedection -->
+        <div>
+          <div class="">
+            <h3 class="font-semibold mb-2">Member History</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="block text-xs">Share</label>
+                <input [value]="formatCurrency(selectedMember?.share ?? 0)" readonly class="p-2 border rounded w-full bg-slate-50" />
+              </div>
+              <div class="space-y-1">
+                <label class="block text-xs">CD</label>
+                <input [value]="formatCurrency(selectedMember?.cd ?? 0)" readonly class="p-2 border rounded w-full bg-slate-50" />
+              </div>
+              <div class="space-y-1">
+                <label class="block text-xs">Last Salary</label>
+                <input [value]="formatCurrency(selectedMember?.lastSalary ?? 0)" readonly class="p-2 border rounded w-full bg-slate-50" />
+              </div>
+              <div class="space-y-1">
+                <label class="block text-xs">MWF</label>
+                <input [value]="selectedMember?.mwf ?? 0" readonly class="p-2 border rounded w-full bg-slate-50" />
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t pt-4">
+            <h3 class="font-semibold mb-2">New Loan Adjustments</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs">New Loan Share (Auto)</label>
+                <input [value]="formatCurrency(newLoanShare())" readonly class="p-2 border rounded w-full bg-slate-50" />
+              </div>
+              <div>
+                <label class="block text-xs">Pay Amount (Auto)</label>
+                <input [value]="formatCurrency(payAmount())" readonly class="p-2 border rounded w-full bg-slate-50" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Surity Tabs -->
+      <div class="border-t pt-4">
+        <h3 class="font-semibold mb-2">Surity Tables</h3>
+        <div>
+          <div class="flex border-b mb-2">
+            <button type="button" (click)="activeTab='given'" [class.border-b-2]="activeTab==='given'" [class.font-bold]="activeTab==='given'" class="px-4 py-2">Given Surity</button>
+            <button type="button" (click)="activeTab='taken'" [class.border-b-2]="activeTab==='taken'" [class.font-bold]="activeTab==='taken'" class="px-4 py-2">Taken Surity</button>
+          </div>
+          <div *ngIf="activeTab==='given'">
+            <table class="w-full mt-2 border">
+              <thead class="bg-slate-50"><tr><th class="p-2">MemNo</th><th class="p-2">Name</th></tr></thead>
+              <tbody>
+                <tr *ngFor="let s of givenSurity"><td class="p-2">{{s.memNo}}</td><td class="p-2">{{s.name}}</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="activeTab==='taken'">
+            <table class="w-full mt-2 border">
+              <thead class="bg-slate-50"><tr><th class="p-2">MemNo</th><th class="p-2">Name</th></tr></thead>
+              <tbody>
+                <tr *ngFor="let s of takenSurity"><td class="p-2">{{s.memNo}}</td><td class="p-2">{{s.name}}</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  `
 })
 export class LoanTakenComponent {
-  loanForm: FormGroup;
-  givenMembers: GivenTakenMember[] = [];
-  takenMembers: GivenTakenMember[] = [];
-  
-  // Sample data
-  loanSummaryData: LoanSummary[] = [
-    { loanNo: 'L001', loanDate: new Date('2024-01-15'), amount: 50000, member: 'John Doe', edpNo: 'EMP001' },
-    { loanNo: 'L002', loanDate: new Date('2024-01-20'), amount: 75000, member: 'Jane Smith', edpNo: 'EMP002' },
-    { loanNo: 'L003', loanDate: new Date('2024-01-25'), amount: 30000, member: 'Mike Johnson', edpNo: 'EMP003' }
-  ];
+  form: FormGroup;
+  canSave = false;
+  activeTab: 'given' | 'taken' = 'given';
 
-  employeeData: Employee[] = [
-    { edpNo: 'EMP001', memberName: 'John Doe' },
-    { edpNo: 'EMP002', memberName: 'Jane Smith' },
-    { edpNo: 'EMP003', memberName: 'Mike Johnson' },
-    { edpNo: 'EMP004', memberName: 'Sarah Wilson' },
-    { edpNo: 'EMP005', memberName: 'David Brown' }
+  members = [
+    { memNo: 'M001', name: 'Ramesh Kumar', share: 20000, cd: 5000, lastSalary: 25000, mwf: 150 },
+    { memNo: 'M002', name: 'Suresh Patel', share: 50000, cd: 10000, lastSalary: 40000, mwf: 200 },
+    { memNo: 'M003', name: 'Anita Sharma', share: 15000, cd: 2000, lastSalary: 18000, mwf: 120 }
   ];
+  banks = ['State Bank', 'HDFC', 'ICICI', 'Axis Bank'];
 
-  constructor(private fb: FormBuilder, private dialog: MatDialog) {
-    this.loanForm = this.fb.group({
-      loanType: ['', Validators.required],
-      loanNo: ['', Validators.required],
-      loanDate: [new Date().toISOString().split('T')[0], Validators.required],
-      edpNo: ['', Validators.required],
-      name: [''],
-      loanAmount: ['', [Validators.required, Validators.min(1)]],
-      previousLoan: [0],
-      netLoan: [0],
-      noOfInstallments: ['', [Validators.required, Validators.min(1)]],
-      installmentAmount: [0],
+  selectedMember: any = null;
+  givenSurity: Array<{ memNo: string; name: string }> = [];
+  takenSurity: Array<{ memNo: string; name: string }> = [];
+
+  constructor(private fb: FormBuilder) {
+    const today = new Date().toISOString().split('T')[0];
+    this.form = this.fb.group({
+      loanNo: [this.generateLoanNoStr()],
+      loanDate: [today, Validators.required],
+      edpNo: [''],
+      loanType: ['General', Validators.required],
+      customType: ['Emergency'],
+      member: ['', Validators.required],
+      loanAmount: [0, [Validators.required, Validators.min(0)]],
+      previousLoan: [0, [Validators.min(0)]],
+      installments: [60, [Validators.required, Validators.min(1), Validators.max(60)]],
       purpose: [''],
       authorizedBy: [''],
-      paymentMode: ['Cash', Validators.required],
-      bankName: [''],
+      paymentMode: ['Cash'],
+      bank: [''],
       chequeNo: [''],
-      chequeDate: [''],
-      share: [0],
-      cd: [0],
-      shareRight: [0],
-      cdRight: [0],
-      lastSalary: [0],
-      mwf: [0],
-      payAmount: [0]
+      chequeDate: ['']
     });
   }
 
-  calculateNetLoan() {
-    const loanAmount = this.loanForm.get('loanAmount')?.value || 0;
-    const previousLoan = this.loanForm.get('previousLoan')?.value || 0;
-    const netLoan = loanAmount - previousLoan;
-    this.loanForm.patchValue({ netLoan });
-    this.calculateInstallmentAmount();
+  generateLoanNoStr() {
+    const t = Date.now().toString().slice(-6);
+    return `LN-${new Date().getFullYear()}-${t}`;
   }
-
-  calculateInstallmentAmount() {
-    const netLoan = this.loanForm.get('netLoan')?.value || 0;
-    const noOfInstallments = this.loanForm.get('noOfInstallments')?.value || 1;
-    const installmentAmount = netLoan / noOfInstallments;
-    this.loanForm.patchValue({ installmentAmount: Math.round(installmentAmount) });
+  generateLoanNo() {
+    this.form.patchValue({ loanNo: this.generateLoanNoStr() });
   }
-
-  requiresAuthorization(): boolean {
-    const loanAmount = this.loanForm.get('loanAmount')?.value || 0;
-    return loanAmount > 100000; // Require authorization for loans above 1 lakh
-  }
-
-  addGivenMember() {
-    // In a real application, this would open a member selection dialog
-    const newMember: GivenTakenMember = {
-      memNo: 'M' + (this.givenMembers.length + 1).toString().padStart(3, '0'),
-      name: 'Member ' + (this.givenMembers.length + 1)
-    };
-    this.givenMembers.push(newMember);
-  }
-
-  removeGivenMember(index: number) {
-    this.givenMembers.splice(index, 1);
-  }
-
-  addTakenMember() {
-    // In a real application, this would open a member selection dialog
-    const newMember: GivenTakenMember = {
-      memNo: 'M' + (this.takenMembers.length + 1).toString().padStart(3, '0'),
-      name: 'Member ' + (this.takenMembers.length + 1)
-    };
-    this.takenMembers.push(newMember);
-  }
-
-  removeTakenMember(index: number) {
-    this.takenMembers.splice(index, 1);
-  }
-
-  openLoanSummary() {
-    const dialogRef = this.dialog.open(LoanSummaryDialog, {
-      width: '800px',
-      data: this.loanSummaryData
+  openSearch() { alert('Open Loan Search - implement search modal'); }
+  onClose() { this.onClear(); }
+  onClear() {
+    const today = new Date().toISOString().split('T')[0];
+    this.form.reset({
+      loanNo: this.generateLoanNoStr(),
+      loanDate: today,
+      edpNo: '',
+      loanType: 'General',
+      customType: 'Emergency',
+      member: '',
+      loanAmount: 0,
+      previousLoan: 0,
+      installments: 60,
+      purpose: '',
+      authorizedBy: '',
+      paymentMode: 'Cash',
+      bank: '',
+      chequeNo: '',
+      chequeDate: ''
     });
+    this.selectedMember = null;
+    this.givenSurity = [];
+    this.takenSurity = [];
+    this.canSave = false;
+  }
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loanForm.patchValue({
-          loanNo: result.loanNo
-        });
+  formatCurrency(v: number) {
+    return '₹' + (Number(v) || 0).toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+  }
+
+  onEdpSelect() {
+    const memNo = this.form.get('edpNo')!.value;
+    const member = this.members.find(m => m.memNo === memNo);
+    if (member) {
+      this.selectedMember = member;
+      this.form.patchValue({ member: member.name });
+    }
+  }
+
+  isCustom() { return this.form.get('loanType')!.value === 'Custom'; }
+  isCheque() { return this.form.get('paymentMode')!.value === 'Cheque'; }
+  onLoanTypeChange() { this.recalculate(); }
+  onPaymentModeChange() { }
+
+  get interestRate() { return this.isCustom() ? 0.09 : 0.07; }
+  netLoan() { return (Number(this.form.get('loanAmount')!.value) || 0) + (Number(this.form.get('previousLoan')!.value) || 0); }
+  installmentAmount() {
+    const loan = Number(this.form.get('loanAmount')!.value) || 0;
+    const n = Number(this.form.get('installments')!.value) || 1;
+    if (n <= 0) return 0;
+    return Math.round((((loan * this.interestRate) + loan) / n + Number.EPSILON) * 100) / 100;
+  }
+  newLoanShare() {
+    const loan = Number(this.form.get('loanAmount')!.value) || 0;
+    const historyShare = this.selectedMember?.share ?? 0;
+    const required = loan * 0.1;
+    const extra = required > historyShare ? (required - historyShare) : 0;
+    return Math.round((extra + Number.EPSILON) * 100) / 100;
+  }
+  payAmount() {
+    const loan = Number(this.form.get('loanAmount')!.value) || 0;
+    const prev = Number(this.form.get('previousLoan')!.value) || 0;
+    const newShare = this.newLoanShare();
+    return Math.round(((loan - prev) - newShare + Number.EPSILON) * 100) / 100;
+  }
+
+  enforceLoanRules() {
+    const loan = Number(this.form.get('loanAmount')!.value) || 0;
+    if (loan < 0) return { ok: false, message: 'Loan amount cannot be negative' };
+    const installments = Number(this.form.get('installments')!.value) || 0;
+    if (!Number.isInteger(installments) || installments <= 0) return { ok: false, message: 'Installments must be positive' };
+    if (installments > 60) return { ok: false, message: 'Installments cannot exceed 60' };
+    if (!this.selectedMember) return { ok: false, message: 'Select a valid member' };
+    if (!this.isCustom()) {
+      const share = this.selectedMember.share || 0;
+      const eligibleMax = share * 10;
+      if (loan > eligibleMax) {
+        const adjustedShare = Math.ceil((loan / 10));
+        return { ok: false, message: `Requested loan exceeds max (₹${eligibleMax}). Increase share to ₹${adjustedShare} or reduce loan.` };
       }
-    });
-  }
-
-  openEmployeeSearch() {
-    const dialogRef = this.dialog.open(EmployeeSearchDialog, {
-      width: '600px',
-      data: this.employeeData
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loanForm.patchValue({
-          edpNo: result.edpNo,
-          name: result.memberName
-        });
-      }
-    });
+    }
+    if (this.isCheque() && !this.form.get('chequeDate')!.value) return { ok: false, message: 'Cheque date required' };
+    return { ok: true };
   }
 
   onValidate() {
-    this.markFormGroupTouched(this.loanForm);
-    if (this.loanForm.valid) {
-      alert('All fields are valid!');
-    } else {
-      alert('Please fill in all required fields.');
-    }
+    const res = this.enforceLoanRules();
+    if (!res.ok) { alert(res.message); this.canSave = false; return; }
+    alert('Validation successful');
+    this.canSave = true;
   }
 
   onSave() {
-    if (this.loanForm.valid) {
-      const formData = {
-        ...this.loanForm.value,
-        givenMembers: this.givenMembers,
-        takenMembers: this.takenMembers
-      };
-      console.log('Loan data:', formData);
-      alert('Loan data saved successfully!');
-    } else {
-      this.markFormGroupTouched(this.loanForm);
-      alert('Please fill in all required fields.');
-    }
+    if (!this.canSave) { alert('Please validate before saving'); return; }
+    const payload = { ...this.form.value, member: this.selectedMember, netLoan: this.netLoan(), installmentAmount: this.installmentAmount(), newLoanShare: this.newLoanShare(), payAmount: this.payAmount() };
+    console.log('Saving Loan Payload', payload);
+    alert('Loan saved (mock). Check console for payload.');
+    this.canSave = false;
+    this.onClear();
   }
 
-  onClear() {
-    this.loanForm.reset();
-    this.loanForm.patchValue({
-      loanDate: new Date().toISOString().split('T')[0],
-      paymentMode: 'Cash',
-      previousLoan: 0,
-      netLoan: 0,
-      installmentAmount: 0,
-      share: 0,
-      cd: 0,
-      shareRight: 0,
-      cdRight: 0,
-      lastSalary: 0,
-      mwf: 0,
-      payAmount: 0
-    });
-    this.givenMembers = [];
-    this.takenMembers = [];
-  }
-
-  onClose() {
-    if (confirm('Are you sure you want to close? Any unsaved changes will be lost.')) {
-      this.onClear();
-    }
-  }
-
-  private markFormGroupTouched(formGroup: FormGroup) {
-    Object.keys(formGroup.controls).forEach(field => {
-      const control = formGroup.get(field);
-      control?.markAsTouched({ onlySelf: true });
-    });
-  }
-}
-
-// Loan Summary Dialog Component
-@Component({
-  selector: 'loan-summary-dialog',
-  standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatTableModule, MatFormFieldModule, MatInputModule],
-  template: `
-    <div class="dialog-container">
-      <div class="dialog-header">
-        <h2 class="dialog-title">
-          <mat-icon>list</mat-icon>
-          Loan Summary
-        </h2>
-        <button mat-icon-button (click)="close()">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-
-      <div class="dialog-content">
-        <div class="search-container mb-4">
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-icon matPrefix>search</mat-icon>
-            <input matInput placeholder="Search loans..." (input)="applyFilter()">
-          </mat-form-field>
-        </div>
-
-        <div class="table-container">
-          <table mat-table [dataSource]="dataSource" class="loan-summary-table">
-            <ng-container matColumnDef="loanNo">
-              <th mat-header-cell *matHeaderCellDef>Loan No.</th>
-              <td mat-cell *matCellDef="let loan">{{loan.loanNo}}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="loanDate">
-              <th mat-header-cell *matHeaderCellDef>Loan Date</th>
-              <td mat-cell *matCellDef="let loan">{{loan.loanDate | date:'dd/MM/yyyy'}}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="amount">
-              <th mat-header-cell *matHeaderCellDef>Amount</th>
-              <td mat-cell *matCellDef="let loan">{{loan.amount | currency:'INR':'symbol':'1.0-0'}}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="member">
-              <th mat-header-cell *matHeaderCellDef>Member</th>
-              <td mat-cell *matCellDef="let loan">{{loan.member}}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="edpNo">
-              <th mat-header-cell *matHeaderCellDef>EDP No.</th>
-              <td mat-cell *matCellDef="let loan">{{loan.edpNo}}</td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
-                class="clickable-row" 
-                (click)="selectLoan(row)"></tr>
-          </table>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .dialog-container {
-      padding: 0;
-    }
-    .dialog-header {
-      padding: 20px 24px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .dialog-title {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
-    }
-    .dialog-content {
-      padding: 24px;
-    }
-    .table-container {
-      max-height: 400px;
-      overflow-y: auto;
-    }
-    .loan-summary-table {
-      width: 100%;
-    }
-    .w-full {
-      width: 100%;
-    }
-    .mb-4 {
-      margin-bottom: 16px;
-    }
-  `]
-})
-export class LoanSummaryDialog {
-  displayedColumns: string[] = ['loanNo', 'loanDate', 'amount', 'member', 'edpNo'];
-  dataSource = new MatTableDataSource<LoanSummary>([]);
-  searchTerm = '';
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: LoanSummary[], private dialogRef: MatDialogRef<LoanSummaryDialog>) {
-    this.dataSource.data = data;
-  }
-
-  applyFilter() {
-    this.dataSource.filter = this.searchTerm.trim().toLowerCase();
-  }
-
-  selectLoan(loan: LoanSummary) {
-    this.dialogRef.close(loan);
-  }
-
-  close() {
-    this.dialogRef.close();
-  }
-}
-
-// Employee Search Dialog Component
-@Component({
-  selector: 'employee-search-dialog',
-  standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatTableModule, MatFormFieldModule, MatInputModule],
-  template: `
-    <div class="dialog-container">
-      <div class="dialog-header">
-        <h2 class="dialog-title">
-          <mat-icon>search</mat-icon>
-          Employee Search
-        </h2>
-        <button mat-icon-button (click)="close()">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-
-      <div class="dialog-content">
-        <div class="search-container mb-4">
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-icon matPrefix>search</mat-icon>
-            <input matInput placeholder="Search employees..." (input)="applyFilter()">
-          </mat-form-field>
-        </div>
-
-        <div class="table-container">
-          <table mat-table [dataSource]="dataSource" class="employee-search-table">
-            <ng-container matColumnDef="edpNo">
-              <th mat-header-cell *matHeaderCellDef>EDP No.</th>
-              <td mat-cell *matCellDef="let employee">{{employee.edpNo}}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="memberName">
-              <th mat-header-cell *matHeaderCellDef>Member Name</th>
-              <td mat-cell *matCellDef="let employee">{{employee.memberName}}</td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
-                class="clickable-row" 
-                (click)="selectEmployee(row)"></tr>
-          </table>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .dialog-container {
-      padding: 0;
-    }
-    .dialog-header {
-      padding: 20px 24px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .dialog-title {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
-    }
-    .dialog-content {
-      padding: 24px;
-    }
-    .table-container {
-      max-height: 400px;
-      overflow-y: auto;
-    }
-    .employee-search-table {
-      width: 100%;
-    }
-    .clickable-row {
-      cursor: pointer;
-    }
-    .clickable-row:hover {
-      background-color: #f5f5f5;
-    }
-    .w-full {
-      width: 100%;
-    }
-    .mb-4 {
-      margin-bottom: 16px;
-    }
-  `]
-})
-export class EmployeeSearchDialog {
-  displayedColumns: string[] = ['edpNo', 'memberName'];
-  dataSource = new MatTableDataSource<Employee>([]);
-  searchTerm = '';
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: Employee[], private dialogRef: MatDialogRef<EmployeeSearchDialog>) {
-    this.dataSource.data = data;
-  }
-
-  applyFilter() {
-    this.dataSource.filter = this.searchTerm.trim().toLowerCase();
-  }
-
-  selectEmployee(employee: Employee) {
-    this.dialogRef.close(employee);
-  }
-
-  close() {
-    this.dialogRef.close();
-  }
+  recalculate() { }
 }

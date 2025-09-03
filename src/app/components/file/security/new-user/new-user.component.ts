@@ -69,7 +69,7 @@
 //       <!-- User Creation Form -->
 //       <div *ngIf="hasAccess">
 //         <form [formGroup]="userForm" class="form-container">
-          
+
 //           <!-- Basic Information Section -->
 //           <div class="form-section">
 //             <div class="form-section-header">
@@ -92,7 +92,7 @@
 //                     <span *ngIf="userForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</span>
 //                   </div>
 //                 </div>
-                
+
 //                 <div class="form-field">
 //                   <label class="form-label form-label-required">Password</label>
 //                   <input 
@@ -158,7 +158,7 @@
 //                     First name is required
 //                   </div>
 //                 </div>
-                
+
 //                 <div class="form-field">
 //                   <label class="form-label form-label-required">Last Name</label>
 //                   <input 
@@ -171,7 +171,7 @@
 //                     Last name is required
 //                   </div>
 //                 </div>
-                
+
 //                 <div class="form-field">
 //                   <label class="form-label form-label-required">Email Address</label>
 //                   <input 
@@ -185,7 +185,7 @@
 //                     <span *ngIf="userForm.get('email')?.errors?.['email']">Please enter a valid email</span>
 //                   </div>
 //                 </div>
-                
+
 //                 <div class="form-field">
 //                   <label class="form-label">Phone Number</label>
 //                   <input 
@@ -491,78 +491,108 @@ import { Subject } from 'rxjs';
         </div>
       </div>
 
-      <form *ngIf="hasAccess" [formGroup]="userForm" class="form-container">
-        <div class="form-grid form-grid-2">
-          <mat-form-field>
-            <mat-label>Username</mat-label>
-            <input matInput formControlName="username" autocomplete="username">
-          </mat-form-field>
+      <form *ngIf="hasAccess" [formGroup]="userForm" class="max-w-4xl mx-auto p-6 bg-white rounded-2xl shadow-md">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    
+    <!-- Username -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+      <input type="text" formControlName="username" autocomplete="username"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
 
-          <mat-form-field>
-            <mat-label>Password</mat-label>
-            <input matInput type="password" formControlName="password" autocomplete="new-password">
-          </mat-form-field>
+    <!-- Password -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+      <input type="password" formControlName="password" autocomplete="new-password"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
 
-          <mat-form-field>
-            <mat-label>Email</mat-label>
-            <input matInput type="email" formControlName="email">
-          </mat-form-field>
+    <!-- Email -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+      <input type="email" formControlName="email"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
 
-          <mat-form-field>
-            <mat-label>Phone</mat-label>
-            <input matInput type="tel" formControlName="phone">
-          </mat-form-field>
+    <!-- Phone -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+      <input type="tel" formControlName="phone"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
 
-          <mat-form-field>
-            <mat-label>EDP No</mat-label>
-            <input matInput formControlName="edpNo">
-          </mat-form-field>
+    <!-- EDP No -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">EDP No</label>
+      <input type="text" formControlName="edpNo"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
 
-          <mat-form-field>
-            <mat-label>Name</mat-label>
-            <input matInput formControlName="name">
-          </mat-form-field>
+    <!-- Name -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+      <input type="text" formControlName="name"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
 
-          <mat-form-field>
-            <mat-label>Office Address</mat-label>
-            <input matInput formControlName="addressOffice">
-          </mat-form-field>
+    <!-- Office Address -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Office Address</label>
+      <input type="text" formControlName="addressOffice"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
 
-          <mat-form-field>
-            <mat-label>Residential Address</mat-label>
-            <input matInput formControlName="addressResidential">
-          </mat-form-field>
+    <!-- Residential Address -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Residential Address</label>
+      <input type="text" formControlName="addressResidential"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
 
-          <mat-form-field>
-            <mat-label>Designation</mat-label>
-            <input matInput formControlName="designation">
-          </mat-form-field>
+    <!-- Designation -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Designation</label>
+      <input type="text" formControlName="designation"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
 
-          <mat-form-field>
-            <mat-label>Office Phone</mat-label>
-            <input matInput formControlName="phoneOffice">
-          </mat-form-field>
+    <!-- Office Phone -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Office Phone</label>
+      <input type="text" formControlName="phoneOffice"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
 
-          <mat-form-field>
-            <mat-label>Residential Phone</mat-label>
-            <input matInput formControlName="phoneResidential">
-          </mat-form-field>
+    <!-- Residential Phone -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Residential Phone</label>
+      <input type="text" formControlName="phoneResidential"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
 
-          <mat-form-field>
-            <mat-label>Mobile</mat-label>
-            <input matInput formControlName="mobile">
-          </mat-form-field>
-        </div>
+    <!-- Mobile -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Mobile</label>
+      <input type="text" formControlName="mobile"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
 
-        <div class="flex justify-end gap-3 mt-6">
-          <button mat-stroked-button type="button" (click)="resetForm()" [disabled]="submitting">
-            Reset
-          </button>
-          <button mat-raised-button color="primary" type="button" (click)="createUser()" [disabled]="submitting || userForm.invalid">
-            {{ submitting ? 'Registering...' : 'Register User' }}
-          </button>
-        </div>
-      </form>
+  </div>
+
+  <!-- Buttons -->
+  <div class="flex justify-end gap-4 mt-6">
+    <button type="button" (click)="resetForm()" [disabled]="submitting"
+      class="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100 disabled:opacity-50">
+      Reset
+    </button>
+    <button type="button" (click)="createUser()" [disabled]="submitting || userForm.invalid"
+      class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+      {{ submitting ? 'Registering...' : 'Register User' }}
+    </button>
+  </div>
+</form>
+
     </div>
   `
 })

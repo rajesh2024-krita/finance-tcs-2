@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/runner/workspace/SocietyManagement.csproj": {}
+    "C:\\Rajesh\\Angular\\ZestySmartProcedures\\fintcs-1w\\fintcs-1\\SocietyManagement.csproj": {}
   },
   "projects": {
-    "/home/runner/workspace/SocietyManagement.csproj": {
+    "C:\\Rajesh\\Angular\\ZestySmartProcedures\\fintcs-1w\\fintcs-1\\SocietyManagement.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/runner/workspace/SocietyManagement.csproj",
+        "projectUniqueName": "C:\\Rajesh\\Angular\\ZestySmartProcedures\\fintcs-1w\\fintcs-1\\SocietyManagement.csproj",
         "projectName": "SocietyManagement",
-        "projectPath": "/home/runner/workspace/SocietyManagement.csproj",
-        "packagesPath": "/home/runner/.nuget/packages/",
-        "outputPath": "/home/runner/workspace/obj/",
+        "projectPath": "C:\\Rajesh\\Angular\\ZestySmartProcedures\\fintcs-1w\\fintcs-1\\SocietyManagement.csproj",
+        "packagesPath": "C:\\Users\\citi_\\.nuget\\packages\\",
+        "outputPath": "C:\\Rajesh\\Angular\\ZestySmartProcedures\\fintcs-1w\\fintcs-1\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/runner/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\citi_\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -107,7 +107,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/nix/store/1d8g8d8xrrlxwfgbavgl4snymznfw5r7-dotnet-sdk-8.0.412/share/dotnet/sdk/8.0.412/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.413/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
