@@ -204,7 +204,7 @@ export interface ApiResponse<T> {
   providedIn: 'root'
 })
 export class MemberService {
-  private apiUrl = 'https://1d4tg1qv-5000.inc1.devtunnels.ms/api/Member';
+  private apiUrl = 'https://fintcsapi-1.onrender.com/api/Member';
 
   constructor(
     private http: HttpClient,

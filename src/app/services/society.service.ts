@@ -106,7 +106,7 @@ export interface ApiResponse<T> {
   providedIn: 'root'
 })
 export class SocietyService {
-  private readonly baseUrl = 'https://1d4tg1qv-5000.inc1.devtunnels.ms/api/Society';
+  private readonly baseUrl = 'https://fintcsapi-1.onrender.com/api/Society';
   private currentSocietySubject = new BehaviorSubject<SocietyDto | null>(null);
   
   public currentSociety$ = this.currentSocietySubject.asObservable();

@@ -172,7 +172,7 @@ export interface SocietyDropdownDto {
 @Injectable({  providedIn: 'root'
 })
 export class UserService {
-  private readonly baseUrl = `${'https://1d4tg1qv-5000.inc1.devtunnels.ms'}/api/user`;
+  private readonly baseUrl = `${'https://fintcsapi-1.onrender.com'}/api/user`;
 
   constructor(private http: HttpClient) {}
 
