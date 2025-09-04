@@ -30,7 +30,7 @@ import { AuthService } from '../../../services/auth.service';
           <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full shadow-lg mb-4">
             <mat-icon class="text-3xl text-primary-600">account_balance</mat-icon>
           </div>
-          <h1 class="text-3xl font-bold text-white mb-2">Financial Management System</h1>
+          <h1 class="text-3xl font-bold text-white mb-2">Fin TCS</h1>
           <p class="text-primary-100">Sign in to access your account</p>
         </div>
 
@@ -104,7 +104,7 @@ import { AuthService } from '../../../services/auth.service';
           </form>
 
           <!-- Demo Accounts -->
-          <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-600">
+          <!-- <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-600">
             <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Demo Accounts</h3>
             <div class="grid grid-cols-1 gap-2">
               <button
@@ -119,7 +119,7 @@ import { AuthService } from '../../../services/auth.service';
                 <mat-icon class="text-gray-400">arrow_forward</mat-icon>
               </button>
             </div>
-          </div>
+          </div> -->
         </div>
 
         <!-- Footer -->

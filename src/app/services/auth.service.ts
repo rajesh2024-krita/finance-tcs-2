@@ -55,7 +55,7 @@ export interface LoginRequest {
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   private isLoggedInSubject = new BehaviorSubject<boolean>(false);
-  private apiUrl = 'https://1d4tg1qv-5000.inc1.devtunnels.ms/api/Auth/login';
+  private apiUrl = 'https://fintcsapi-1.onrender.com/api/Auth/login';
 
   public currentUser$ = this.currentUserSubject.asObservable();
   public isLoggedIn$ = this.isLoggedInSubject.asObservable();
