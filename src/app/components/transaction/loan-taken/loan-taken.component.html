@@ -1,0 +1,115 @@
+<div class="loan-entry">
+  <h2>Loan Entry Form</h2>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button [class.active]="activeTab==='given'" (click)="activeTab='given'">Given</button>
+    <button [class.active]="activeTab==='taken'" (click)="activeTab='taken'">Taken</button>
+  </div>
+
+  <!-- Loan Form -->
+  <form [formGroup]="form" class="loan-form">
+    <div class="row">
+      <label>Loan No</label>
+      <input formControlName="loanNo" readonly />
+      <button type="button" (click)="generateLoanNo()">Generate</button>
+    </div>
+
+    <div class="row">
+      <label>Loan Date</label>
+      <input type="date" formControlName="loanDate" />
+    </div>
+
+    <div class="row">
+      <label>EDP No</label>
+      <select formControlName="edpNo" (change)="onEdpSelect()">
+        <option value="">--Select--</option>
+        <option *ngFor="let m of members" [value]="m.memNo">{{ m.memNo }}</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <label>Member</label>
+      <input formControlName="member" readonly />
+    </div>
+
+    <div class="row">
+      <label>Loan Type</label>
+      <select formControlName="loanType" (change)="onLoanTypeChange()">
+        <option>General</option>
+        <option>Custom</option>
+      </select>
+    </div>
+
+    <div class="row" *ngIf="isCustom()">
+      <label>Custom Type</label>
+      <input formControlName="customType" />
+    </div>
+
+    <div class="row">
+      <label>Loan Amount</label>
+      <input type="number" formControlName="loanAmount" />
+    </div>
+
+    <div class="row">
+      <label>Previous Loan</label>
+      <input type="number" formControlName="previousLoan" />
+    </div>
+
+    <div class="row">
+      <label>Installments</label>
+      <input type="number" formControlName="installments" />
+    </div>
+
+    <div class="row">
+      <label>Purpose</label>
+      <input formControlName="purpose" />
+    </div>
+
+    <div class="row">
+      <label>Authorized By</label>
+      <input formControlName="authorizedBy" />
+    </div>
+
+    <div class="row">
+      <label>Payment Mode</label>
+      <select formControlName="paymentMode" (change)="onPaymentModeChange()">
+        <option>Cash</option>
+        <option>Cheque</option>
+      </select>
+    </div>
+
+    <div *ngIf="isCheque()">
+      <div class="row">
+        <label>Bank</label>
+        <select formControlName="bank">
+          <option value="">--Select--</option>
+          <option *ngFor="let b of banks">{{ b }}</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>Cheque No</label>
+        <input formControlName="chequeNo" />
+      </div>
+      <div class="row">
+        <label>Cheque Date</label>
+        <input type="date" formControlName="chequeDate" />
+      </div>
+    </div>
+
+    <!-- Calculated Fields -->
+    <div class="calculated">
+      <p><strong>Net Loan:</strong> {{ formatCurrency(netLoan()) }}</p>
+      <p><strong>Installment Amount:</strong> {{ formatCurrency(installmentAmount()) }}</p>
+      <p><strong>New Loan Share:</strong> {{ formatCurrency(newLoanShare()) }}</p>
+      <p><strong>Pay Amount:</strong> {{ formatCurrency(payAmount()) }}</p>
+    </div>
+
+    <!-- Buttons -->
+    <div class="buttons">
+      <button type="button" (click)="onClear()">Clear</button>
+      <button type="button" (click)="onValidate()">Validate</button>
+      <button type="button" [disabled]="!canSave" (click)="onSave()">Save</button>
+    </div>
+  </form>
+</div>

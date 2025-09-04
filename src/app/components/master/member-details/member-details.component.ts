@@ -77,35 +77,39 @@ export class MemberDetailsComponent implements OnInit {
 
   private createMemberForm(): FormGroup {
     return this.fb.group({
-      memberNo: ['', Validators.required],
-      name: ['', Validators.required],
-      fhName: ['', Validators.required],
-      dateOfBirth: [''],
-      mobile: [''],
-      email: ['', Validators.email],
-      designation: [''],
-      dojJob: [''],
-      doRetirement: [''],
-      branch: [''],
-      dojSociety: [''],
-      officeAddress: [''],
-      residenceAddress: [''],
-      city: [''],
-      phoneOffice: [''],
-      phoneResidence: [''],
-      nominee: [''],
-      nomineeRelation: [''],
-      shareAmount: [0, [Validators.min(0)]],
-      cdAmount: [0, [Validators.min(0)]],
-      bankName: [''],
-      payableAt: [''],
-      accountNo: [''],
-      status: ['Active'],
-      shareDeduction: [0],
-      withdrawal: [0],
-      gLoanInstalment: [0],
-      eLoanInstalment: [0]
-    });
+  memberNo: ['', Validators.required],
+  name: ['', Validators.required],
+  fhName: ['', Validators.required],
+  dateOfBirth: [''],
+  mobile: [''],
+  email: ['', Validators.email],
+  city: [''],
+  status: ['Active'],
+  officeAddress: [''],
+  residenceAddress: [''],
+  designation: [''],
+  branch: [''],
+  dojJob: [''],
+  doRetirement: [''],
+  dojSociety: [''],
+  phoneOffice: [''],
+  phoneResidence: [''],
+  shareAmount: [0],
+  cdAmount: [0],
+  bankName: ['', Validators.required],
+  branchName: [''],
+  accountNo: ['', Validators.required],
+  accountHolderName: ['', Validators.required],
+  ifscCode: ['', Validators.required],
+  payableAt: [''],
+  shareDeduction: [0],
+  withdrawal: [0],
+  gLoanInstalment: [0],
+  eLoanInstalment: [0],
+  nominee: [''],
+  nomineeRelation: ['']
+});
+
   }
 
   loadMembers() {
@@ -142,24 +146,43 @@ export class MemberDetailsComponent implements OnInit {
     this.dataSource.data = filtered;
   }
 
-  openOffCanvas(mode: 'create' | 'edit', member?: Member) {
-    this.editMode.set(mode === 'edit');
+openOffCanvas(mode: 'create' | 'edit', member?: Member) {
+  this.editMode.set(mode === 'edit');
 
-    if (mode === 'edit' && member) {
-      this.currentMember.set(member);
-      this.populateForm(member);
-    } else {
-      this.currentMember.set(null);
-      this.memberForm.reset();
-      this.memberForm.patchValue({
-        shareAmount: 0,
-        cdAmount: 0,
-        status: 'Active'
-      });
-    }
-
-    this.offCanvasOpen.set(true);
+  if (mode === 'edit' && member) {
+    this.currentMember.set(member);
+    this.populateForm(member);
+  } else {
+    this.currentMember.set(null);
+    this.memberForm.reset();
+    this.memberForm.patchValue({
+      shareAmount: 0,
+      cdAmount: 0,
+      status: 'Active',
+      memberNo: this.generateNextMemberId(this.allMembers) // 👈 Auto ID here
+    });
   }
+
+  this.offCanvasOpen.set(true);
+}
+
+/** Generate next MEM_XXX ID */
+private generateNextMemberId(members: Member[]): string {
+  if (!members || members.length === 0) {
+    return 'MEM_001';
+  }
+
+  // Extract numbers from memNo/memberNo like "MEM_001" → 1
+  const ids = members
+    .map(m => parseInt((m.memNo || m.memberNo || '').replace('MEM_', ''), 10))
+    .filter(n => !isNaN(n));
+
+  const maxId = ids.length > 0 ? Math.max(...ids) : 0;
+  const nextId = maxId + 1;
+
+  return `MEM_${nextId.toString().padStart(3, '0')}`;
+}
+
 
   closeOffCanvas() {
     this.offCanvasOpen.set(false);
@@ -202,43 +225,43 @@ export class MemberDetailsComponent implements OnInit {
     });
   }
 
-  private transformFormDataToApi(formData: any): any {
+private toUtcString(date: any): string | undefined {
+  if (!date) return undefined;
+  return new Date(date).toISOString();
+}
+
+
+private transformFormDataToApi(formValue: any): Member {
+  
   return {
-    memNo: formData.memberNo,
-    name: formData.name,
-    fhName: formData.fhName,
-    dob: formData.dateOfBirth || null,
-    mobile: formData.mobile || null,
-    email: formData.email || null,
-    designation: formData.designation || null,
-    dojOrg: formData.dojJob || null,
-    dor: formData.doRetirement || null,
-    branch: formData.branch || null,
-    dojSociety: formData.dojSociety || null,
-    officeAddress: formData.officeAddress || null,
-    residenceAddress: formData.residenceAddress || null,
-    city: formData.city || null,
-    phoneOffice: formData.phoneOffice || null,
-    phoneRes: formData.phoneResidence || null,
-    nominee: formData.nominee || null,
-    nomineeRelation: formData.nomineeRelation || null,
-    shareAmount: formData.shareAmount || 0,
-    cdAmount: formData.cdAmount || 0,
-    status: formData.status || 'Active',
-    shareDeduction: formData.shareDeduction || 0,
-    withdrawal: formData.withdrawal || 0,
-    gLoanInstalment: formData.gLoanInstalment || 0,
-    eLoanInstalment: formData.eLoanInstalment || 0,
-    // Nested object as per schema
+    memNo: formValue.memberNo,
+    name: formValue.name,
+    fhName: formValue.fhName,
+    dob: this.toUtcString(formValue.dateOfBirth),
+    dojSociety: this.toUtcString(formValue.dojSociety),
+    dojOrg: this.toUtcString(formValue.dojJob),
+    dor: this.toUtcString(formValue.doRetirement),
+    email: formValue.email,
+    mobile: formValue.mobile,
+    designation: formValue.designation,
+    branch: formValue.branch,
+    officeAddress: formValue.officeAddress,
+    residenceAddress: formValue.residenceAddress,
+    city: formValue.city,
+    phoneOffice: formValue.phoneOffice,
+    phoneRes: formValue.phoneResidence,
+    nominee: formValue.nominee,
+    nomineeRelation: formValue.nomineeRelation,
     bankingDetails: {
-      bankName: formData.bankName || null,
-      accountNumber: formData.accountNo || null,
-      branchName: formData.payableAt || null,
-      ifscCode: formData.ifscCode || null,
-      accountHolderName: formData.accountHolderName || null
+      bankName: formValue.bankName,
+      branchName: formValue.branchName,
+      accountNumber: formValue.accountNo,
+      accountHolderName: formValue.accountHolderName,
+      ifscCode: formValue.ifscCode
     }
   };
 }
+
 
 
 

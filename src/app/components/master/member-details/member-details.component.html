@@ -143,11 +143,13 @@
                 <div class="form-field">
                   <label class="form-label form-label-required">Member Number</label>
                   <input 
-                    type="text" 
-                    class="form-input"
-                    placeholder="Enter member number"
-                    formControlName="memberNo" 
-                    required>
+                  type="text" 
+                  class="form-input"
+                  placeholder="Enter member number"
+                  formControlName="memberNo" 
+                  required
+                  readonly> <!-- 👈 lock editing -->
+
                   <div class="form-error" *ngIf="memberForm.get('memberNo')?.hasError('required') && memberForm.get('memberNo')?.touched">
                     Member number is required
                   </div>
@@ -321,102 +323,78 @@
           </div>
 
           <!-- Financial Details Section -->
-          <div class="form-section">
-            <div class="form-section-header">
-              <!-- <mat-icon>currency_rupee</mat-icon> -->
-              <span>Financial Details</span>
-            </div>
-            <div class="form-section-content">
-              <div class="form-grid form-grid-3">
-                <div class="form-field">
-                  <label class="form-label">Share Amount</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    placeholder="0.00"
-                    formControlName="shareAmount" 
-                    min="0">
-                </div>
+           <!-- Financial Details Section -->
+<div class="form-section">
+  <div class="form-section-header">
+    <span>Financial Details</span>
+  </div>
+  <div class="form-section-content">
+    <div class="form-grid form-grid-3">
 
-                <div class="form-field">
-                  <label class="form-label">CD Amount</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    placeholder="0.00"
-                    formControlName="cdAmount" 
-                    min="0">
-                </div>
+      <div class="form-field">
+        <label class="form-label">Share Amount</label>
+        <input type="number" class="form-input" placeholder="0.00" formControlName="shareAmount" min="0">
+      </div>
 
-                <div class="form-field">
-                  <label class="form-label">Bank Name</label>
-                  <input 
-                    type="text" 
-                    class="form-input"
-                    placeholder="Enter bank name"
-                    formControlName="bankName">
-                </div>
+      <div class="form-field">
+        <label class="form-label">CD Amount</label>
+        <input type="number" class="form-input" placeholder="0.00" formControlName="cdAmount" min="0">
+      </div>
 
-                <div class="form-field">
-                  <label class="form-label">Payable At</label>
-                  <input 
-                    type="text" 
-                    class="form-input"
-                    placeholder="Enter payable location"
-                    formControlName="payableAt">
-                </div>
+      <div class="form-field">
+        <label class="form-label form-label-required">Bank Name</label>
+        <input type="text" class="form-input" placeholder="Enter bank name" formControlName="bankName" required>
+      </div>
 
-                <div class="form-field">
-                  <label class="form-label">Account Number</label>
-                  <input 
-                    type="text" 
-                    class="form-input"
-                    placeholder="Enter account number"
-                    formControlName="accountNo">
-                </div>
+      <div class="form-field">
+        <label class="form-label">Branch Name</label>
+        <input type="text" class="form-input" placeholder="Enter branch name" formControlName="branchName">
+      </div>
 
-                <div class="form-field">
-                  <label class="form-label">Share Deduction</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    placeholder="0.00"
-                    formControlName="shareDeduction" 
-                    min="0">
-                </div>
+      <div class="form-field">
+        <label class="form-label form-label-required">Account Number</label>
+        <input type="text" class="form-input" placeholder="Enter account number" formControlName="accountNo" required>
+      </div>
 
-                <div class="form-field">
-                  <label class="form-label">Withdrawal</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    placeholder="0.00"
-                    formControlName="withdrawal" 
-                    min="0">
-                </div>
+      <div class="form-field">
+        <label class="form-label form-label-required">Account Holder Name</label>
+        <input type="text" class="form-input" placeholder="Enter account holder name" formControlName="accountHolderName" required>
+      </div>
 
-                <div class="form-field">
-                  <label class="form-label">G-Loan Instalment</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    placeholder="0.00"
-                    formControlName="gLoanInstalment" 
-                    min="0">
-                </div>
+      <div class="form-field">
+        <label class="form-label form-label-required">IFSC Code</label>
+        <input type="text" class="form-input" placeholder="Enter IFSC code" formControlName="ifscCode" required>
+      </div>
 
-                <div class="form-field">
-                  <label class="form-label">E-Loan Instalment</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    placeholder="0.00"
-                    formControlName="eLoanInstalment" 
-                    min="0">
-                </div>
-              </div>
-            </div>
-          </div>
+      <div class="form-field">
+        <label class="form-label">Payable At</label>
+        <input type="text" class="form-input" placeholder="Enter payable location" formControlName="payableAt">
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Share Deduction</label>
+        <input type="number" class="form-input" placeholder="0.00" formControlName="shareDeduction" min="0">
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Withdrawal</label>
+        <input type="number" class="form-input" placeholder="0.00" formControlName="withdrawal" min="0">
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">G-Loan Instalment</label>
+        <input type="number" class="form-input" placeholder="0.00" formControlName="gLoanInstalment" min="0">
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">E-Loan Instalment</label>
+        <input type="number" class="form-input" placeholder="0.00" formControlName="eLoanInstalment" min="0">
+      </div>
+    </div>
+  </div>
+</div>
+
+          
 
           <!-- Nominee Details Section -->
           <div class="form-section">
