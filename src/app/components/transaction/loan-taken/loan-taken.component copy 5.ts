@@ -250,9 +250,7 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
             <div class="grid grid-cols-1 gap-4">
               <div class="bg-white p-3 rounded-lg border">
                 <label class="block text-xs font-medium text-gray-500 mb-1">Share</label>
-                <div class="text-lg font-semibold" [class.text-blue-700]="selectedMember?.share >= 0" [class.text-red-600]="selectedMember?.share < 0">
-                  {{formatCurrency(selectedMember?.share ?? 0)}}
-                </div>
+                <div class="text-lg font-semibold text-blue-700">{{formatCurrency(selectedMember?.share ?? 0)}}</div>
               </div>
             </div>
 
@@ -277,10 +275,6 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
                   <label class="block text-xs font-medium text-gray-500 mb-1">Pay Amount (Auto)</label>
                   <div class="text-lg font-semibold text-green-600">{{formatCurrency(payAmount())}}</div>
                 </div>
-                <div class="bg-white p-3 rounded-lg border" *ngIf="hasNegativeShareAdjustment()">
-                  <label class="block text-xs font-medium text-gray-500 mb-1">Negative Share Adjustment</label>
-                  <div class="text-lg font-semibold text-red-600">-{{formatCurrency(negativeShareAdjustment())}}</div>
-                </div>
               </div>
             </div>
           </div>
@@ -289,7 +283,7 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
           <div class="bg-gray-50 p-4 rounded-lg border">
             <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
               Surety Information
             </h3>
@@ -486,20 +480,6 @@ export class LoanTakenComponent {
     return Math.round((extra + Number.EPSILON) * 100) / 100;
   }
   
-  // Calculate negative share adjustment for non-general loans
-  negativeShareAdjustment() {
-    if (this.isGeneralLoan()) return 0;
-    
-    const historyShare = this.selectedMember?.share ?? 0;
-    // Only apply adjustment if share is negative
-    return historyShare < 0 ? Math.abs(historyShare) : 0;
-  }
-  
-  // Check if there's a negative share adjustment
-  hasNegativeShareAdjustment() {
-    return !this.isGeneralLoan() && (this.selectedMember?.share ?? 0) < 0;
-  }
-  
   payAmount() {
     const loan = Number(this.form.get('loanAmount')!.value) || 0;
     const prev = Number(this.form.get('previousLoan')!.value) || 0;
@@ -510,9 +490,8 @@ export class LoanTakenComponent {
       return Math.round(((loan - prev) - newShare + Number.EPSILON) * 100) / 100;
     }
     
-    // For other loan types, subtract the previous loan and any negative share adjustment
-    const negativeAdjustment = this.negativeShareAdjustment();
-    return Math.round((loan - prev - negativeAdjustment + Number.EPSILON) * 100) / 100;
+    // For other loan types, just subtract the previous loan
+    return Math.round((loan - prev + Number.EPSILON) * 100) / 100;
   }
 
   enforceLoanRules() {
@@ -544,12 +523,6 @@ export class LoanTakenComponent {
       return { ok: false, message: 'Purpose is required for this loan type' };
     }
     
-    // Check if pay amount is negative after adjustments
-    const payAmt = this.payAmount();
-    if (payAmt < 0) {
-      return { ok: false, message: `Pay amount cannot be negative after adjustments. Current value: ${this.formatCurrency(payAmt)}` };
-    }
-    
     if (this.isCheque() && !this.form.get('chequeDate')!.value) 
       return { ok: false, message: 'Cheque date required' };
     
@@ -575,7 +548,6 @@ export class LoanTakenComponent {
       netLoan: this.netLoan(), 
       installmentAmount: this.installmentAmount(), 
       newLoanShare: this.newLoanShare(), 
-      negativeShareAdjustment: this.negativeShareAdjustment(),
       payAmount: this.payAmount() 
     };
     console.log('Saving Loan Payload', payload);
