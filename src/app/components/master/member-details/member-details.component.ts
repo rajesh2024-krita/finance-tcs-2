@@ -233,9 +233,9 @@ private toUtcString(date: any): string | undefined {
 }
 
 // Switch tabs
-  setTab(tab: string) {
-    this.activeTab = tab;
-  }
+  // setTab(tab: string) {
+  //   this.activeTab = tab;
+  // }
 
   // Reset or cancel
   resetForm() {
@@ -369,6 +369,38 @@ private transformFormDataToApi(formValue: any): Member {
           this.showSnackBar('Error deleting member');
         }
       });
+    }
+  }
+
+    setActiveTab(tab: string) {
+    this.activeTab = tab;
+  }
+
+  onPhotoUpload(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      console.log('Photo uploaded:', file.name);
+    }
+  }
+
+  onSignatureUpload(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      console.log('Signature uploaded:', file.name);
+    }
+  }
+
+  onClear() {
+    this.memberForm.reset();
+  }
+
+  onPrint() {
+    window.print();
+  }
+
+  onSave() {
+    if (this.memberForm.valid) {
+      console.log(this.memberForm.value);
     }
   }
 
