@@ -39,7 +39,6 @@
               class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               readonly />
           </div>
-          <div></div>
           <div>
             <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Full Name</label>
             <input type="text"
@@ -50,15 +49,11 @@
             <input type="text"
               class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
           </div>
-        </div>
-        <div class="grid grid-cols-1 gap-4">
           <div>
             <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Office Address</label>
             <input type="text"
               class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
           </div>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">City</label>
             <input type="text"
@@ -82,47 +77,18 @@
             <input type="text" formControlName="mobile" maxlength="10"
               class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
           </div>
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Phone(Off.)</label>
-            <input type="text" formControlName="designation"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Phone(Res.)</label>
-            <input type="text" formControlName="mobile" maxlength="10"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-        </div>  
-        <div class="grid grid-cols-1 gap-4">
-          <div>
+          <div class="col-span-2">
             <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Residence Address</label>
-            <input type="text" formControlName="residenceAddress"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+            <textarea rows="2" formControlName="residenceAddress"
+              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></textarea>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Date of Birth</label>
-            <input type="text" formControlName="designation"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Date of Joining Society</label>
-            <input type="text" formControlName="mobile" 
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Date of Releaving</label>
-            <input type="text" formControlName="designation"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-        </div>  
       </div>
 
       <!-- Opening Balance -->
       <div *ngIf="activeTab === 'opening'" class="space-y-6 bg-white p-6 border">
         <div>
-          <h3 class="text-indigo-600 font-semibold mb-3">Opening Balance</h3>
+          <div class="text-sm font-normal flex items-center gap-2 mb-4">Opening Balance</div>
           <div class="grid grid-cols-3 gap-4">
             <div>
               <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Share</label>
@@ -146,7 +112,7 @@
         </div>
 
         <div>
-          <h3 class="text-indigo-600 font-semibold mb-3">Bank Details</h3>
+          <div class="text-sm font-normal flex items-center gap-2 mb-4">Bank Details</div>
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Bank Name</label>
@@ -180,9 +146,9 @@
     </div>
 
     <!-- Photo & Signature -->
-    <div class="bg-white p-6 border">
-      <h3 class="text-indigo-600 font-semibold ">Photo & Signature</h3>
-      <div class="grid grid-cols-1 gap-4 ">
+    <div class="">
+      <h3 class="text-sm font-normal flex items-center gap-2 mt-2 mb-2">Photo & Signature</h3>
+      <div class="grid grid-cols-1 gap-4 bg-white p-6 border">
         <div>
           <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Member Photo</label>
 

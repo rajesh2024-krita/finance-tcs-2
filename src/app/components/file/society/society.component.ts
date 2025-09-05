@@ -420,20 +420,20 @@ import { of, Subject } from 'rxjs';
                       min="0"
                       [readonly]="!isEditing">
                       <select
-  formControlName="targetDropdown"
-  class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 
-         focus:ring-blue-500 focus:border-blue-500 
-         dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-         dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-  [disabled]="!isEditing">
+                        formControlName="targetDropdown"
+                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 
+                              focus:ring-blue-500 focus:border-blue-500 
+                              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
+                              dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        [disabled]="!isEditing">
 
-  <option value="" disabled>Select charge</option>
+                        <option value="" disabled>Select charge</option>
 
-  <!-- Loop through dropdownArray -->
-  <option *ngFor="let charge of []" [value]="charge">
-    {{ charge }}
-  </option>
-</select>
+                        <!-- Loop through dropdownArray -->
+                        <option *ngFor="let charge of []" [value]="charge">
+                          {{ charge }}
+                        </option>
+                      </select>
 
                       <select 
                         formControlName="chequeReturnCharge"
@@ -458,14 +458,6 @@ import { of, Subject } from 'rxjs';
            <!-- *ngIf="!isEditing && canEdit()"  -->
           <div class="">
             <div class="flex justify-end gap-3">
-              <button 
-                
-                type="button"
-                (click)="enableEdit()"
-                class="btn btn-primary text-xs">
-                <mat-icon>edit</mat-icon>
-                {{ societyData ? 'Edit Society Details' : 'Create Society' }}
-              </button>
               
               <!-- *ngIf="isEditing"  -->
               <div class="flex gap-3">
@@ -473,9 +465,9 @@ import { of, Subject } from 'rxjs';
                   type="button"
                   (click)="saveChanges()"
                   [disabled]="societyForm.invalid || submitting"
-                  class="bg-green-600 text-xs flex items-center rounded-md px-4 text-white">
-                  <!-- <mat-icon>save</mat-icon> -->
-                  {{ submitting ? 'Applying...' : (societyData ? 'Apply' : 'Create Society') }}
+                  class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium">
+                  <!-- <mat-icon>save</mat-icon> --> Save
+                  <!-- {{ submitting ? 'Applying...' : (societyData ? 'Apply' : 'Create Society') }} -->
                 </button>
               </div>
             </div>

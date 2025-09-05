@@ -7,31 +7,16 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="bg-white border rounded-lg shadow-sm overflow-hidden">
+    <div class="">
       <!-- Header Section -->
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-6 bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
-        <div class="mb-4 md:mb-0">  
-          <h2 class="text-2xl font-bold mb-1">Loan Entry Form</h2>
-          <p class="text-sm text-indigo-100 opacity-90">Create and manage loan applications</p>
-        </div>
-        <div class="flex flex-wrap gap-2 w-full md:w-auto">
-          <button (click)="onValidate()" class="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-medium transition-colors shadow-sm">
-            Validate
-          </button>
-          <button (click)="onSave()" [disabled]="!canSave" 
-            class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium transition-colors shadow-sm">
-            Save
-          </button>
-          <button (click)="onClear()" class="px-4 py-2 rounded-lg bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 font-medium transition-colors">
-            Clear
-          </button>
-        </div>
+      <div class="">
+        <div class="uppercase text-lg mb-2">Loan Entry</div>
       </div>
 
       <!-- Form Content -->
-      <form [formGroup]="form" (ngSubmit)="onSave()" class="space-y-6 p-6">
+      <form [formGroup]="form" (ngSubmit)="onSave()" class="space-y-6">
         <!-- Loan Type Section -->
-        <div class="bg-gray-50 p-4 rounded-lg border">
+        <div class="bg-white p-4 border">
           <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -40,9 +25,9 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
           </h3>
           <div class="grid grid-cols-1 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Loan Type</label>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Loan Type</label>
               <select formControlName="loanType" (change)="onLoanTypeChange()" 
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                 <option *ngFor="let type of loanTypes" [value]="type">{{type}}</option>
               </select>
             </div>
@@ -50,7 +35,7 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
         </div>
 
         <!-- Loan Details Section -->
-        <div class="bg-gray-50 p-4 rounded-lg border">
+        <div class="bg-white p-4 border">
           <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -58,49 +43,49 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
             Loan Details
           </h3>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-3 bg-white rounded-lg border">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-3 bg-white border">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Loan No.</label>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Loan No.</label>
               <div class="flex items-center gap-2">
                 <input formControlName="loanNo" 
-                  class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" />
+                  class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
               </div>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Loan Date</label>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Loan Date</label>
               <input type="date" formControlName="loanDate" 
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" />
+                class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
             </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">EDP No.</label>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">EDP No.</label>
               <select formControlName="edpNo" (change)="onEdpSelect()" 
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                 <option value="">-- Select Member --</option>
                 <option *ngFor="let m of members" [value]="m.memNo">{{ m.memNo }}</option>
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Name (member)</label>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Name (member)</label>
               <input formControlName="member" readonly 
-                class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-600" />
+                class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
             </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Loan Amount (₹)</label>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Loan Amount (₹)</label>
               <input type="number" formControlName="loanAmount" (input)="recalculate()" 
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" />
+                class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
             </div>
             
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Previous Loan (Remaining)</label>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Previous Loan (Remaining)</label>
               <input type="number" formControlName="previousLoan" (input)="recalculate()"
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" />
+                class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
             </div>
           </div>
         </div>
@@ -108,7 +93,7 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
         <!-- Loan Calculation Section -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Left Column -->
-          <div class="bg-gray-50 p-4 rounded-lg border">
+          <div class="bg-white p-4 border">
             <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -118,22 +103,20 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
             
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Net Loan (Auto)</label>
+                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Net Loan (Auto)</label>
                 <input [value]="formatCurrency(netLoan())" readonly 
-                  class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 font-medium text-blue-700" />
+                  class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
                   No. of Installments
                 </label>
                 <input
                   type="number"
                   formControlName="installments"
                   (input)="recalculate()"
-                  class="w-full p-3 border border-gray-300 rounded-lg 
-                        focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 
-                        transition-colors"
+                  class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 />
 
                 <!-- Error Message -->
@@ -145,21 +128,21 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
 
               
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Installment Amount (Auto)</label>
+                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Installment Amount (Auto)</label>
                 <input [value]="formatCurrency(installmentAmount())" readonly 
-                  class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 font-medium text-blue-700" />
+                  class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
               </div>
 
               <div class="sr-only">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Interest Rate (Auto)</label>
+                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Interest Rate (Auto)</label>
                 <input [value]="(interestRate*100).toFixed(2) + '%'" readonly 
-                  class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100" />
+                  class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
               </div>
             </div>
           </div>
 
           <!-- Right Column -->
-          <div class="bg-gray-50 p-4 rounded-lg border">
+          <div class="bg-white p-4 rounded-lg border">
             <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -169,68 +152,17 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
             
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Purpose</label>
+                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Purpose</label>
                 <textarea formControlName="purpose" rows="4" 
-                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"></textarea>
+                  class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></textarea>
               </div>
               
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
                   Authorized By <span class="text-xs text-gray-500">(In the case of Limit Exceed)</span>
                 </label>
                 <input formControlName="authorizedBy" 
-                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Payment Mode Section -->
-        <div class="bg-gray-50 p-4 rounded-lg border">
-          <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            </svg>
-            Payment Details
-          </h3>
-          
-          <div class="grid grid-cols-1 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Payment Mode</label>
-              <div class="flex flex-wrap gap-4">
-                <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                  <input type="radio" formControlName="paymentMode" value="Cash" (change)="onPaymentModeChange()" class="text-indigo-600 focus:ring-indigo-500" />
-                  <span>Cash</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                  <input type="radio" formControlName="paymentMode" value="Cheque" (change)="onPaymentModeChange()" class="text-indigo-600 focus:ring-indigo-500" />
-                  <span>Cheque</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                  <input type="radio" formControlName="paymentMode" value="Opening" (change)="onPaymentModeChange()" class="text-indigo-600 focus:ring-indigo-500" />
-                  <span>Opening</span>
-                </label>
-              </div>
-            </div>
-
-            <div *ngIf="isCheque()" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 p-4 bg-white rounded-lg border">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Bank</label>
-                <select formControlName="bank" 
-                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
-                  <option value="">-- Select Bank --</option>
-                  <option *ngFor="let b of banks" [value]="b">{{b}}</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Cheque No.</label>
-                <input formControlName="chequeNo" 
-                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Cheque Date</label>
-                <input type="date" formControlName="chequeDate" 
-                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" />
+                  class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
               </div>
             </div>
           </div>
@@ -239,7 +171,7 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
         <!-- Member Information Section -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Left Column: Member History -->
-          <div class="bg-gray-50 p-4 rounded-lg border">
+          <div class="bg-white p-4 border">
             <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -286,7 +218,7 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
           </div>
 
           <!-- Right Column: Surety Tables -->
-          <div class="bg-gray-50 p-4 rounded-lg border">
+          <div class="bg-white p-4 border">
             <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -326,7 +258,71 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
                 </table>
               </div>
             </div>
+            
           </div>
+        </div>
+        
+        <!-- Payment Mode Section -->
+        <div class="bg-white p-4 border">
+          <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+            Payment Details
+          </h3>
+          
+          <div class="grid grid-cols-1 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Payment Mode</label>
+              <div class="flex flex-wrap gap-4">
+                <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                  <input type="radio" formControlName="paymentMode" value="Cash" (change)="onPaymentModeChange()" class="text-indigo-600 focus:ring-indigo-500" />
+                  <span>Cash</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                  <input type="radio" formControlName="paymentMode" value="Cheque" (change)="onPaymentModeChange()" class="text-indigo-600 focus:ring-indigo-500" />
+                  <span>Cheque</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                  <input type="radio" formControlName="paymentMode" value="Opening" (change)="onPaymentModeChange()" class="text-indigo-600 focus:ring-indigo-500" />
+                  <span>Opening</span>
+                </label>
+              </div>
+            </div>
+
+            <div *ngIf="isCheque()" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 p-4 bg-white rounded-lg border">
+              <div>
+                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Bank</label>
+                <select formControlName="bank" 
+                  class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                  <option value="">-- Select Bank --</option>
+                  <option *ngFor="let b of banks" [value]="b">{{b}}</option>
+                </select>
+              </div>
+              <div>
+                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Cheque No.</label>
+                <input formControlName="chequeNo" 
+                  class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+              </div>
+              <div>
+                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Cheque Date</label>
+                <input type="date" formControlName="chequeDate" 
+                  class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end flex-wrap gap-2 w-full md:w-auto">
+          <button (click)="onClear()" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium">
+            Clear
+          </button>
+          <button (click)="onValidate()" class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium">
+            Validate
+          </button>
+          <button (click)="onSave()" [disabled]="!canSave" 
+            class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium">
+            Save
+          </button>
         </div>
       </form>
     </div>
