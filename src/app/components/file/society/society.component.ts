@@ -40,14 +40,13 @@ import { of, Subject } from 'rxjs';
   template: `
     <div class="animate-fade-in">
       <!-- Page Header -->
-      <div class="content-header">
-        <div class="breadcrumb">
+      <div class="">
+        <!-- <div class="breadcrumb">
           <span>File</span>
           <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
           <span class="breadcrumb-active">Society</span>
-        </div>
-        <h1 class="text-page-title">Society Management</h1>
-        <p class="text-body text-gray-600 dark:text-gray-400">Manage society information, interest rates, and limits</p>
+        </div> -->
+        <div class="uppercase text-lg mb-2">Society Details</div>
       </div>
 
       <!-- Loading State -->
@@ -191,18 +190,18 @@ import { of, Subject } from 'rxjs';
         <form [formGroup]="societyForm" class="form-container">
           
           <!-- Basic Information Section -->
-          <div class="form-section">
-            <div class="form-section-header">
-              <mat-icon>business</mat-icon>
+          <div class="form-section border">
+            <div class="text-sm font-normal flex items-end gap-2 px-6 mt-2">
+              <mat-icon class="text-indigo-500">business</mat-icon>
               <span>Basic Information</span>
             </div>
             <div class="form-section-content">
               <div class="form-grid form-grid-2">
                 <div class="form-field">
-                  <label class="form-label form-label-required">Society Name</label>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Name</label>
                   <input 
                     type="text" 
-                    class="form-input"
+                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     formControlName="societyName"
                     placeholder="Enter society name"
                     [readonly]="!isEditing">
@@ -213,10 +212,10 @@ import { of, Subject } from 'rxjs';
                 </div>
                 
                 <div class="form-field">
-                  <label class="form-label form-label-required">Registration Number</label>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Registration Number</label>
                   <input 
                     type="text" 
-                    class="form-input"
+                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     formControlName="registrationNumber"
                     placeholder="Enter registration number"
                     [readonly]="!isEditing">
@@ -227,13 +226,13 @@ import { of, Subject } from 'rxjs';
                 </div>
                 
                 <div class="form-field">
-                  <label class="form-label form-label-required">Address</label>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Address</label>
                   <textarea 
-                    class="form-textarea"
+                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     formControlName="address"
                     placeholder="Enter complete address"
                     [readonly]="!isEditing"
-                    rows="3"></textarea>
+                    rows="1"></textarea>
                   <div *ngIf="societyForm.get('address')?.invalid && societyForm.get('address')?.touched" 
                        class="form-error">
                     Address is required
@@ -241,10 +240,10 @@ import { of, Subject } from 'rxjs';
                 </div>
                 
                 <div class="form-field">
-                  <label class="form-label form-label-required">City</label>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">City</label>
                   <input 
                     type="text" 
-                    class="form-input"
+                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     formControlName="city"
                     placeholder="Enter city name"
                     [readonly]="!isEditing">
@@ -258,18 +257,18 @@ import { of, Subject } from 'rxjs';
           </div>
 
           <!-- Contact Information Section -->
-          <div class="form-section">
-            <div class="form-section-header">
-              <mat-icon>contact_phone</mat-icon>
+          <div class="form-section border">
+            <div class="text-sm font-normal flex items-end gap-2 px-6 mt-2">
+              <mat-icon class="text-indigo-500">contact_phone</mat-icon>
               <span>Contact Information</span>
             </div>
             <div class="form-section-content">
-              <div class="form-grid form-grid-2">
+              <div class="grid grid-cols-4 gap-4">
                 <div class="form-field">
-                  <label class="form-label form-label-required">Phone</label>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Phone</label>
                   <input 
                     type="tel" 
-                    class="form-input"
+                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     formControlName="phone"
                     placeholder="+91 9876543210"
                     [readonly]="!isEditing">
@@ -280,22 +279,22 @@ import { of, Subject } from 'rxjs';
                 </div>
                 
                 <div class="form-field">
-                  <label class="form-label">Fax</label>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Fax</label>
                   <input 
                     type="tel" 
-                    class="form-input"
+                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     formControlName="fax"
                     placeholder="+91 2234567890"
                     [readonly]="!isEditing">
                 </div>
                 
                 <div class="form-field">
-                  <label class="form-label form-label-required">Email</label>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Email</label>
                   <input 
                     type="email" 
-                    class="form-input"
+                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     formControlName="email"
-                    placeholder="info@society.com"
+                    placeholder="info@fintcs.com"
                     [readonly]="!isEditing">
                   <div *ngIf="societyForm.get('email')?.invalid && societyForm.get('email')?.touched" 
                        class="form-error">
@@ -304,10 +303,10 @@ import { of, Subject } from 'rxjs';
                 </div>
                 
                 <div class="form-field">
-                  <label class="form-label">Website</label>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Website</label>
                   <input 
                     type="url" 
-                    class="form-input"
+                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     formControlName="website"
                     placeholder="www.society.com"
                     [readonly]="!isEditing">
@@ -316,222 +315,151 @@ import { of, Subject } from 'rxjs';
             </div>
           </div>
 
-          <!-- Interest Rates Section -->
-          <div class="form-section">
-            <div class="form-section-header">
-              <mat-icon>trending_up</mat-icon>
-              <span>Interest Rates (%)</span>
+          <div class="w-full max-w-5xl mx-auto">
+            <!-- Tab Header -->
+            <div class="flex border-b border-gray-200">
+              <button 
+                class="px-6 py-3 text-sm font-medium focus:outline-none border-b-2 transition"
+                [ngClass]="isActive('interest') 
+                  ? 'border-indigo-500 text-indigo-600' 
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                (click)="setActiveTab('interest')">
+                Interest Rates
+              </button>
+
+              <button 
+                class="px-6 py-3 text-sm font-medium focus:outline-none border-b-2 transition"
+                [ngClass]="isActive('limits') 
+                  ? 'border-indigo-500 text-indigo-600' 
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                (click)="setActiveTab('limits')">
+                Financial Limits
+              </button>
             </div>
-            <div class="form-section-content">
-              <div class="form-grid form-grid-3">
-                <div class="form-field">
-                  <label class="form-label">Dividend</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
+
+            <!-- Tab Content -->
+            <div class="bg-white border p-6">
+              
+              <!-- Interest Tab -->
+              <div *ngIf="isActive('interest')">
+                <div class="text-sm font-normal flex items-center gap-2 mt-2 mb-2">
+                  <mat-icon class="text-indigo-500">trending_up</mat-icon>
+                  <span>Interest Rates (%)</span>
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                  <div>
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Dividend</label>
+                    <input type="number" class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="8.5"
                     formControlName="dividend"
-                    placeholder="8.5"
-                    step="0.1"
-                    min="0"
-                    max="100"
-                    [readonly]="!isEditing">
+                    >
+                  </div>
+                  <div>
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Overdraft (OD)</label>
+                    <input type="number" class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="12.0" formControlName="overdraft">
+                  </div>
+                  <div>
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Current Deposit (CD)</label>
+                    <input type="number" class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="6.5" formControlName="currentDeposit">
+                  </div>
+                  <div>
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Loan</label>
+                    <input type="number" class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="10.0" formControlName="loan">
+                  </div>
+                  <div>
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Emergency Loan</label>
+                    <input type="number" class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="15.0" formControlName="emergencyLoan">
+                  </div>
+                  <div>
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">LAS</label>
+                    <input type="number" class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="7.5" formControlName="las">
+                  </div>
                 </div>
-                
-                <div class="form-field">
-                  <label class="form-label">Overdraft (OD)</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    formControlName="overdraft"
-                    placeholder="12.0"
-                    step="0.1"
-                    min="0"
-                    max="100"
-                    [readonly]="!isEditing">
+              </div>
+
+              <!-- Financial Limits Tab -->
+              <div *ngIf="isActive('limits')">
+                <div class="text-sm font-normal flex items-center gap-2 mt-2 mb-2">
+                  <mat-icon class="text-indigo-500">account_balance</mat-icon>
+                  <span>Financial Limits</span>
                 </div>
-                
-                <div class="form-field">
-                  <label class="form-label">Current Deposit (CD)</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    formControlName="currentDeposit"
-                    placeholder="6.5"
-                    step="0.1"
-                    min="0"
-                    max="100"
-                    [readonly]="!isEditing">
-                </div>
-                
-                <div class="form-field">
-                  <label class="form-label">Loan</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    formControlName="loan"
-                    placeholder="10.0"
-                    step="0.1"
-                    min="0"
-                    max="100"
-                    [readonly]="!isEditing">
-                </div>
-                
-                <div class="form-field">
-                  <label class="form-label">Emergency Loan</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    formControlName="emergencyLoan"
-                    placeholder="15.0"
-                    step="0.1"
-                    min="0"
-                    max="100"
-                    [readonly]="!isEditing">
-                </div>
-                
-                <div class="form-field">
-                  <label class="form-label">LAS</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    formControlName="las"
-                    placeholder="7.5"
-                    step="0.1"
-                    min="0"
-                    max="100"
-                    [readonly]="!isEditing">
+                <div class="grid grid-cols-3 gap-4">
+                  <div>
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Share Limit (₹)</label>
+                    <input type="number" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="500000"  formControlName="shareLimit">
+                  </div>
+                  <div>
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Loan Limit (₹)</label>
+                    <input type="number" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="1000000" formControlName="loanLimit">
+                  </div>
+                  <div>
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Emergency Loan Limit (₹)</label>
+                    <input type="number" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="200000" formControlName="emergencyLoanLimit">
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Financial Limits Section -->
-          <div class="form-section">
-            <div class="form-section-header">
-              <mat-icon>account_balance</mat-icon>
-              <span>Financial Limits</span>
-            </div>
-            <div class="form-section-content">
-              <div class="form-grid form-grid-3">
-                <div class="form-field">
-                  <label class="form-label">Share Limit (₹)</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    formControlName="shareLimit"
-                    placeholder="500000"
-                    min="0"
-                    [readonly]="!isEditing">
-                </div>
-                
-                <div class="form-field">
-                  <label class="form-label">Loan Limit (₹)</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    formControlName="loanLimit"
-                    placeholder="1000000"
-                    min="0"
-                    [readonly]="!isEditing">
-                </div>
-                
-                <div class="form-field">
-                  <label class="form-label">Emergency Loan Limit (₹)</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    formControlName="emergencyLoanLimit"
-                    placeholder="200000"
-                    min="0"
-                    [readonly]="!isEditing">
-                </div>
-              </div>
-            </div>
-          </div>
 
           <!-- Additional Settings Section -->
           <div class="form-section">
-            <div class="form-section-header">
+            <!-- <div class="form-section-header">
               <mat-icon>settings</mat-icon>
               <span>Additional Settings</span>
-            </div>
-            <div class="form-section-content">
-              <div class="form-grid form-grid-4">
-                <div class="form-field">
-                  <label class="form-label">Cheque Bounce Charge (₹)</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    formControlName="chequeBounceCharge"
-                    placeholder="500"
-                    min="0"
-                    [readonly]="!isEditing">
-                </div>
-                
-                <div class="form-field">
-                  <label class="form-label">Cheque Return Charge (₹)</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    formControlName="chequeReturnCharge"
-                    placeholder="300"
-                    min="0"
-                    [readonly]="!isEditing">
-                </div>
-                
-                <div class="form-field">
-                  <label class="form-label">Cash (₹)</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    formControlName="cash"
-                    placeholder="1000"
-                    min="0"
-                    [readonly]="!isEditing">
-                </div>
-                
-                <div class="form-field">
-                  <label class="form-label">Bonus (₹)</label>
-                  <input 
-                    type="number" 
-                    class="form-input"
-                    formControlName="bonus"
-                    placeholder="2500"
-                    min="0"
-                    [readonly]="!isEditing">
+            </div> -->
+            <div class="form-section-content border">
+              <div class="">
+                <div class="w-full">
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Cheque Bounce Charge (₹)</label>
+                  <div class="flex justify-between gap-4">
+                    <input 
+                      type="number" 
+                      class="block p-2 w-1/2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      formControlName="chBounceCharge"
+                      placeholder="500"
+                      min="0"
+                      [readonly]="!isEditing">
+                      <select 
+                        formControlName="chequeReturnCharge"
+                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 
+                              focus:ring-blue-500 focus:border-blue-500 
+                              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
+                              dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        [disabled]="!isEditing">
+                        <option value="" disabled>Select charge</option>
+                        <!-- <option *ngFor="let charge of dropdownArray" [value]="charge">
+                          {{ charge }}
+                        </option> -->
+                      </select>
+
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Form Actions -->
-          <div class="card-actions">
+          <!-- Form Actions --> 
+           <!-- *ngIf="!isEditing && canEdit()"  -->
+          <div class="">
             <div class="flex justify-end gap-3">
               <button 
-                *ngIf="!isEditing && canEdit()" 
+                
                 type="button"
                 (click)="enableEdit()"
-                class="btn btn-primary">
+                class="btn btn-primary text-xs">
                 <mat-icon>edit</mat-icon>
                 {{ societyData ? 'Edit Society Details' : 'Create Society' }}
               </button>
               
-              <div *ngIf="isEditing" class="flex gap-3">
-                <button 
-                  type="button"
-                  (click)="cancelEdit()"
-                  [disabled]="submitting"
-                  class="btn btn-secondary">
-                  <mat-icon>close</mat-icon>
-                  Cancel
-                </button>
+              <!-- *ngIf="isEditing"  -->
+              <div class="flex gap-3">
                 <button 
                   type="button"
                   (click)="saveChanges()"
                   [disabled]="societyForm.invalid || submitting"
-                  class="btn btn-success">
-                  <mat-icon>save</mat-icon>
-                  {{ submitting ? 'Saving...' : (societyData ? 'Save Changes' : 'Create Society') }}
+                  class="bg-green-600 text-xs flex items-center rounded-md px-4 text-white">
+                  <!-- <mat-icon>save</mat-icon> -->
+                  {{ submitting ? 'Applying...' : (societyData ? 'Apply' : 'Create Society') }}
                 </button>
               </div>
             </div>
@@ -540,158 +468,6 @@ import { of, Subject } from 'rxjs';
       </div>
     </div>
   `,
-  styles: [`
-    .content-header {
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--color-border-primary);
-    }
-
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-      font-size: 0.875rem;
-      color: var(--color-text-muted);
-    }
-
-    .breadcrumb-separator {
-      font-size: 1rem;
-      color: var(--color-text-light);
-    }
-
-    .breadcrumb-active {
-      color: var(--color-text-primary);
-      font-weight: 500;
-    }
-
-    .loading-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
-    }
-
-    .border-l-4 {
-      border-left-width: 4px;
-    }
-
-    .border-l-orange-400 {
-      border-left-color: #fb923c;
-    }
-
-    .border-l-red-400 {
-      border-left-color: #f87171;
-    }
-
-    .border-l-blue-400 {
-      border-left-color: #60a5fa;
-    }
-
-    .grid {
-      display: grid;
-    }
-
-    .grid-cols-1 {
-      grid-template-columns: repeat(1, minmax(0, 1fr));
-    }
-
-    .grid-cols-2 {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .grid-cols-3 {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    @media (min-width: 768px) {
-      .md\\:grid-cols-2 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .lg\\:grid-cols-3 {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-    }
-
-    .gap-2 { gap: 0.5rem; }
-    .gap-3 { gap: 0.75rem; }
-    .gap-4 { gap: 1rem; }
-    .gap-6 { gap: 1.5rem; }
-
-    .space-y-2 > * + * { margin-top: 0.5rem; }
-    .space-y-3 > * + * { margin-top: 0.75rem; }
-
-    .mb-3 { margin-bottom: 0.75rem; }
-    .mb-4 { margin-bottom: 1rem; }
-    .mb-6 { margin-bottom: 1.5rem; }
-    .mt-4 { margin-top: 1rem; }
-
-    .p-3 { padding: 0.75rem; }
-    .pt-4 { padding-top: 1rem; }
-
-    .w-full { width: 100%; }
-    .h-2 { height: 0.5rem; }
-
-    .bg-gray-50 { background-color: #f9fafb; }
-    .bg-gray-200 { background-color: #e5e7eb; }
-
-    .dark .bg-gray-700 { background-color: #374151; }
-    .dark .bg-gray-800 { background-color: #1f2937; }
-
-    .rounded-full { border-radius: 9999px; }
-    .rounded-lg { border-radius: 0.5rem; }
-
-    .text-xs { font-size: 0.75rem; }
-    .text-sm { font-size: 0.875rem; }
-    .text-lg { font-size: 1.125rem; }
-
-    .font-medium { font-weight: 500; }
-
-    .text-gray-400 { color: #9ca3af; }
-    .text-gray-500 { color: #6b7280; }
-    .text-gray-600 { color: #4b5563; }
-    .text-green-500 { color: #10b981; }
-    .text-red-500 { color: #ef4444; }
-    .text-red-600 { color: #dc2626; }
-    .text-red-700 { color: #b91c1c; }
-
-    .transition-all { transition-property: all; }
-    .duration-300 { transition-duration: 300ms; }
-
-    .flex { display: flex; }
-    .items-center { align-items: center; }
-    .justify-between { justify-content: space-between; }
-    .justify-end { justify-content: flex-end; }
-
-    .border-t { border-top: 1px solid var(--color-border-primary); }
-
-    .text-center { text-align: center; }
-
-    .form-error {
-      color: var(--color-error);
-      font-size: 0.875rem;
-      margin-top: 0.25rem;
-    }
-
-    .btn-danger {
-      background-color: #ef4444;
-      color: white;
-      border: none;
-    }
-
-    .btn-danger:hover:not(:disabled) {
-      background-color: #dc2626;
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  `]
 })
 export class SocietyComponent implements OnInit {
   societyForm: FormGroup;
@@ -713,15 +489,24 @@ export class SocietyComponent implements OnInit {
     private societyService: SocietyService,
     private authService: AuthService,
     private router: Router,
-    
+
   ) {
     this.societyForm = this.createForm();
   }
 
   private isPendingEdit(obj: any): obj is SocietyEditPending {
-  return obj && typeof obj === 'object' && 'status' in obj;
-}
+    return obj && typeof obj === 'object' && 'status' in obj;
+  }
 
+  activeTab: string = 'interest'; // default tab
+
+  setActiveTab(tab: string) {
+    this.activeTab = tab;
+  }
+
+  isActive(tab: string): boolean {
+    return this.activeTab === tab;
+  }
 
   ngOnInit() {
     this.authService.currentUser$
@@ -765,30 +550,32 @@ export class SocietyComponent implements OnInit {
   }
 
   createForm(): FormGroup {
-    return this.fb.group({
-      societyName: ['', Validators.required],
-      registrationNumber: ['', Validators.required],
-      address: ['', Validators.required],
-      city: ['', Validators.required],
-      phone: ['', Validators.required],
-      fax: [''],
-      email: ['', [Validators.required, Validators.email]],
-      website: [''],
-      dividend: [0, [Validators.min(0), Validators.max(100)]],
-      overdraft: [0, [Validators.min(0), Validators.max(100)]],
-      currentDeposit: [0, [Validators.min(0), Validators.max(100)]],
-      loan: [0, [Validators.min(0), Validators.max(100)]],
-      emergencyLoan: [0, [Validators.min(0), Validators.max(100)]],
-      las: [0, [Validators.min(0), Validators.max(100)]],
-      shareLimit: [0, Validators.min(0)],
-      loanLimit: [0, Validators.min(0)],
-      emergencyLoanLimit: [0, Validators.min(0)],
-      chequeBounceCharge: [0, Validators.min(0)],
-      chequeReturnCharge: [0, Validators.min(0)],
-      cash: [0, Validators.min(0)],
-      bonus: [0, Validators.min(0)]
-    });
-  }
+  return this.fb.group({
+    societyName: ['', Validators.required],
+    registrationNumber: ['', Validators.required],
+    address: ['', Validators.required],
+    city: ['', Validators.required],
+    phone: ['', Validators.required],
+    fax: [''],
+    chBounceCharge: [''],
+    email: ['', [Validators.required, Validators.email]],
+    website: [''],
+    dividend: [0, [Validators.min(0), Validators.max(100)]],
+    overdraft: [0, [Validators.min(0), Validators.max(100)]],
+    currentDeposit: [0, [Validators.min(0), Validators.max(100)]],
+    loan: [0, [Validators.min(0), Validators.max(100)]],
+    emergencyLoan: [0, [Validators.min(0), Validators.max(100)]],
+    las: [0, [Validators.min(0), Validators.max(100)]],
+    shareLimit: [0, Validators.min(0)],
+    loanLimit: [0, Validators.min(0)],
+    emergencyLoanLimit: [0, Validators.min(0)],
+    chequeBounceCharge: [0, Validators.min(0)],
+    chequeReturnCharge: ['', Validators.required],  // dropdown selected value
+    cash: [0, Validators.min(0)],
+    bonus: [0, Validators.min(0)]
+  });
+}
+
 
   loadData() {
     this.loading = true;
@@ -832,32 +619,52 @@ export class SocietyComponent implements OnInit {
         this.pendingRequest = pendingEdits.find(edit => edit.status === 'Pending') || null;
       });
   }
-
   populateForm(society: SocietyDto) {
-    this.societyForm.patchValue({
-      societyName: society.societyName,
-      registrationNumber: society.registrationNumber,
-      address: society.address,
-      city: society.city,
-      phone: society.phone,
-      fax: society.fax || '',
-      email: society.email,
-      website: society.website || '',
-      dividend: society.dividend,
-      overdraft: society.overdraft,
-      currentDeposit: society.currentDeposit,
-      loan: society.loan,
-      emergencyLoan: society.emergencyLoan,
-      las: society.las,
-      shareLimit: society.shareLimit,
-      loanLimit: society.loanLimit,
-      emergencyLoanLimit: society.emergencyLoanLimit,
-      chequeBounceCharge: society.chequeBounceCharge,
-      chequeReturnCharge: society.chequeReturnCharge,
-      cash: society.cash,
-      bonus: society.bonus
-    });
+  // Parse the nested tabs JSON if available
+  let tabs: any = {};
+  if (society.tabs) {
+    try {
+      tabs = JSON.parse(society.tabs);
+    } catch (e) {
+      console.error('Error parsing society.tabs', e);
+    }
   }
+
+  this.societyForm.patchValue({
+    societyName: society.societyName,
+    registrationNumber: society.registrationNumber,
+    address: society.address,
+    city: society.city,
+    phone: society.phone,
+    fax: society.fax || '',
+    email: society.email,
+    website: society.website || '',
+
+    // Interest
+    dividend: tabs?.interest?.dividend ?? '',
+    overdraft: tabs?.interest?.od ?? '',
+    currentDeposit: tabs?.interest?.cd ?? '',
+    loan: tabs?.interest?.loan ?? '',
+    emergencyLoan: tabs?.interest?.emergencyLoan ?? '',
+    las: tabs?.interest?.las ?? '',
+
+    // Limits
+    shareLimit: tabs?.limit?.share ?? '',
+    loanLimit: tabs?.limit?.loan ?? '',
+    emergencyLoanLimit: tabs?.limit?.emergencyLoan ?? '',
+
+    // chequeBounceCharge: society.chequeBounceCharge ?? '',
+    chequeReturnCharge: society.chequeReturnCharge ?? '',
+    cash: society.cash ?? '',
+    bonus: society.bonus ?? '',
+
+    chBounceCharge: society.chBounceCharge ?? '',
+    // dropdownArray: society.dropdownArray ?? '',
+  });
+
+  console.log('societyForm == ', this.societyForm.value);
+}
+
 
   enableEdit() {
     this.isEditing = true;
@@ -897,17 +704,17 @@ export class SocietyComponent implements OnInit {
           this.isEditing = false;
 
           if (this.isPendingEdit(result)) {
-  this.snackBar.open('Changes submitted for approval', 'Close', { duration: 3000 });
-  this.pendingRequest = result;
-} else {
-  this.societyData = result as SocietyDto;
-  this.snackBar.open(
-    this.societyData ? 'Society updated successfully' : 'Society created successfully',
-    'Close',
-    { duration: 3000 }
-  );
-  this.societyService.setCurrentSociety(this.societyData);
-}
+            this.snackBar.open('Changes submitted for approval', 'Close', { duration: 3000 });
+            this.pendingRequest = result;
+          } else {
+            this.societyData = result as SocietyDto;
+            this.snackBar.open(
+              this.societyData ? 'Society updated successfully' : 'Society created successfully',
+              'Close',
+              { duration: 3000 }
+            );
+            this.societyService.setCurrentSociety(this.societyData);
+          }
 
         },
         error: (err) => {

@@ -41,12 +41,14 @@ import { MemberViewDialogComponent } from './member-view-dialog.component';
     MatTooltipModule
   ],
   templateUrl: './member-details.component.html',
-  styleUrls: ['./member-details.component.css']
+  // styleUrls: ['./member-details.component.css']
 })
 export class MemberDetailsComponent implements OnInit {
   memberForm: FormGroup;
   dataSource = new MatTableDataSource<Member>([]);
   displayedColumns: string[] = ['memberNo', 'name', 'mobile', 'status', 'actions'];
+
+  activeTab: string = 'general';
 
   // Signals for component state
   private offCanvasOpen = signal(false);
@@ -229,6 +231,17 @@ private toUtcString(date: any): string | undefined {
   if (!date) return undefined;
   return new Date(date).toISOString();
 }
+
+// Switch tabs
+  setTab(tab: string) {
+    this.activeTab = tab;
+  }
+
+  // Reset or cancel
+  resetForm() {
+    this.memberForm.reset();
+    this.activeTab = 'general';
+  }
 
 
 private transformFormDataToApi(formValue: any): Member {

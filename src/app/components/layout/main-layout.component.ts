@@ -1,4 +1,3 @@
-
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd, Event } from '@angular/router';
@@ -50,283 +49,49 @@ interface MenuItem {
           <!-- Sidebar Header -->
           <div class="sidebar-header">
             <div class="flex items-center space-x-3 p-4">
-              <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                <mat-icon class="text-white text-xl">account_balance</mat-icon>
+              <div class="">
+                <mat-icon class="text-white text-xl h-10 w-10">account_balance</mat-icon>
               </div>
-              <div class="flex-1">
-                <h2 class="text-white font-bold text-lg">FinTCS</h2>
-                <p class="text-white/70 text-xs">Financial Management</p>
+              <div class="">
+                <h2 class="text-white font-bold text-lg pt-3">FinTCS</h2>
               </div>
             </div>
           </div>
 
           <!-- Navigation Menu -->
           <nav class="sidebar-nav">
-            <!-- Dashboard Section -->
-            <div class="nav-section">
-              <div class="nav-section-header">Dashboard</div>
-              <a routerLink="/dashboard" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>dashboard</mat-icon>
-                <span>Overview</span>
-              </a>
-            </div>
-
-            <!-- File Management Section -->
-            <div class="nav-section">
-              <div class="nav-section-header">File Management</div>
-              
-              <a routerLink="/file/society" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>business</mat-icon>
-                <span>Society</span>
-              </a>
-
-              <div class="nav-group">
-                <div class="nav-group-header">Security</div>
-                <a routerLink="/file/security/new-user" 
-                   routerLinkActive="active" 
-                   class="nav-item nav-item-sub"
-                   (click)="closeMobileNav()">
-                  <mat-icon>person_add</mat-icon>
-                  <span>New User</span>
-                </a>
-                <a routerLink="/file/security/authority" 
-                   routerLinkActive="active" 
-                   class="nav-item nav-item-sub"
-                   (click)="closeMobileNav()">
-                  <mat-icon>security</mat-icon>
-                  <span>Authority</span>
-                </a>
-                <a routerLink="/file/security/my-rights" 
-                   routerLinkActive="active" 
-                   class="nav-item nav-item-sub"
-                   (click)="closeMobileNav()">
-                  <mat-icon>verified_user</mat-icon>
-                  <span>My Rights</span>
-                </a>
-                <a routerLink="/file/security/change-password" 
-                   routerLinkActive="active" 
-                   class="nav-item nav-item-sub"
-                   (click)="closeMobileNav()">
-                  <mat-icon>lock</mat-icon>
-                  <span>Change Password</span>
-                </a>
+            <!-- Render menu sections -->
+            <ng-container *ngFor="let section of menuSections">
+              <div class="nav-section">
+                <div class="nav-section-header">{{section.label}}</div>
+                
+                <!-- Render menu items -->
+                <ng-container *ngFor="let item of section.children">
+                  <!-- For items with children (submenus) -->
+                  <div *ngIf="item.children" class="nav-group">
+                    <div class="nav-group-header">{{item.label}}</div>
+                    <a *ngFor="let child of item.children" 
+                       [routerLink]="child.route" 
+                       routerLinkActive="active" 
+                       class="nav-item nav-item-sub"
+                       (click)="closeMobileNav()">
+                      <mat-icon>{{child.icon}}</mat-icon>
+                      <span>{{child.label}}</span>
+                    </a>
+                  </div>
+                  
+                  <!-- For regular items without children -->
+                  <a *ngIf="!item.children" 
+                     [routerLink]="item.route" 
+                     routerLinkActive="active" 
+                     class="nav-item"
+                     (click)="closeMobileNav()">
+                    <mat-icon>{{item.icon}}</mat-icon>
+                    <span>{{item.label}}</span>
+                  </a>
+                </ng-container>
               </div>
-
-              <a routerLink="/file/create-new-year" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>event</mat-icon>
-                <span>Create New Year</span>
-              </a>
-            </div>
-
-            <!-- Master Data Section -->
-            <div class="nav-section">
-              <div class="nav-section-header">Master Data</div>
-              
-              <a routerLink="/master/member-details" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>people</mat-icon>
-                <span>Member Details</span>
-              </a>
-
-              <a routerLink="/master/deposit-scheme" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>savings</mat-icon>
-                <span>Deposit Scheme</span>
-              </a>
-
-              <a routerLink="/master/interest-master" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>percent</mat-icon>
-                <span>Interest Master</span>
-              </a>
-
-              <a routerLink="/master/table" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>table_view</mat-icon>
-                <span>Table Master</span>
-              </a>
-            </div>
-
-            <!-- Transactions Section -->
-            <div class="nav-section">
-              <div class="nav-section-header">Transactions</div>
-              
-              <a routerLink="/transaction/deposit-receipt" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>receipt</mat-icon>
-                <span>Deposit Receipt</span>
-              </a>
-
-              <a routerLink="/transaction/deposit-payment" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>payment</mat-icon>
-                <span>Deposit Payment</span>
-              </a>
-              
-              <a routerLink="/transaction/monthly-demand" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>payment</mat-icon>
-                <span>Demand</span>
-              </a>
-
-              <a routerLink="/transaction/loan-taken" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>account_balance_wallet</mat-icon>
-                <span>Loan Taken</span>
-              </a>
-
-              <a routerLink="/transaction/deposit-slip" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>description</mat-icon>
-                <span>Deposit Slip</span>
-              </a>
-            </div>
-
-            <!-- Accounts Section -->
-            <div class="nav-section">
-              <div class="nav-section-header">Accounts</div>
-              
-              <a routerLink="/accounts/voucher-creation" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>note</mat-icon>
-                <span>Voucher</span>
-              </a>
-              
-              <a routerLink="/accounts/loan-receipt" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>note</mat-icon>
-                <span>Loan Receipt</span>
-              </a>
-
-              <a routerLink="/accounts/cash-book" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>book</mat-icon>
-                <span>Cash Book</span>
-              </a>
-
-              <a routerLink="/accounts/ledger" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>account_book</mat-icon>
-                <span>Ledger</span>
-              </a>
-
-              <a routerLink="/accounts/trial-balance" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>balance</mat-icon>
-                <span>Trial Balance</span>
-              </a>
-
-              <a routerLink="/accounts/profit-loss" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>trending_up</mat-icon>
-                <span>Profit & Loss</span>
-              </a>
-
-              <a routerLink="/accounts/balance-sheet" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>assessment</mat-icon>
-                <span>Balance Sheet</span>
-              </a>
-            </div>
-
-            <!-- Reports Section -->
-            <div class="nav-section">
-              <div class="nav-section-header">Reports</div>
-              
-              <a routerLink="/reports/employees" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>group</mat-icon>
-                <span>Employee Reports</span>
-              </a>
-
-              <a routerLink="/reports/loan" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>money</mat-icon>
-                <span>Loan Reports</span>
-              </a>
-
-              <a routerLink="/reports/opening-balance" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>start</mat-icon>
-                <span>Opening Balance</span>
-              </a>
-
-              <a routerLink="/reports/closing-balance" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>stop</mat-icon>
-                <span>Closing Balance</span>
-              </a>
-            </div>
-
-            <!-- System Section -->
-            <div class="nav-section">
-              <div class="nav-section-header">System</div>
-              
-              <a routerLink="/backup" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>backup</mat-icon>
-                <span>Backup</span>
-              </a>
-
-              <a routerLink="/admin" 
-                 routerLinkActive="active" 
-                 class="nav-item"
-                 (click)="closeMobileNav()">
-                <mat-icon>admin_panel_settings</mat-icon>
-                <span>Administration</span>
-              </a>
-            </div>
+            </ng-container>
           </nav>
         </mat-sidenav>
 
@@ -338,14 +103,6 @@ interface MenuItem {
               <mat-icon>menu</mat-icon>
             </button>
 
-            <!-- Breadcrumb -->
-            <!-- <div class="breadcrumb flex-1">
-              <ng-container *ngFor="let breadcrumb of breadcrumbs; let last = last">
-                <span [class.active]="last">{{ breadcrumb.label }}</span>
-                <mat-icon *ngIf="!last" class="separator text-sm">chevron_right</mat-icon>
-              </ng-container>
-            </div> -->
-
             <!-- Header Actions -->
             <div class="flex items-center space-x-2">
               <!-- Dark Mode Toggle -->
@@ -355,14 +112,6 @@ interface MenuItem {
                       class="header-action">
                 <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
               </button>
-
-              <!-- Notifications -->
-              <!-- <button mat-icon-button 
-                      [matMenuTriggerFor]="notificationMenu"
-                      matTooltip="Notifications"
-                      class="header-action">
-                <mat-icon matBadge="3" matBadgeColor="warn">notifications</mat-icon>
-              </button> -->
 
               <!-- User Menu -->
               <button mat-icon-button 
@@ -383,40 +132,6 @@ interface MenuItem {
         </mat-sidenav-content>
       </mat-sidenav-container>
     </div>
-
-    <!-- Notification Menu -->
-    <mat-menu #notificationMenu="matMenu" class="notification-menu">
-      <div class="menu-header">
-        <span class="text-section-header font-semibold">Notifications</span>
-        <button mat-button color="primary" class="text-xs">Mark all as read</button>
-      </div>
-      <mat-divider></mat-divider>
-      <button mat-menu-item>
-        <mat-icon>info</mat-icon>
-        <div class="ml-3">
-          <div class="text-body font-medium">New member registered</div>
-          <div class="text-caption text-gray-500">2 minutes ago</div>
-        </div>
-      </button>
-      <button mat-menu-item>
-        <mat-icon>warning</mat-icon>
-        <div class="ml-3">
-          <div class="text-body font-medium">Loan payment overdue</div>
-          <div class="text-caption text-gray-500">1 hour ago</div>
-        </div>
-      </button>
-      <button mat-menu-item>
-        <mat-icon>check_circle</mat-icon>
-        <div class="ml-3">
-          <div class="text-body font-medium">Backup completed successfully</div>
-          <div class="text-caption text-gray-500">3 hours ago</div>
-        </div>
-      </button>
-      <mat-divider></mat-divider>
-      <button mat-menu-item class="text-center">
-        <span class="text-primary">View all notifications</span>
-      </button>
-    </mat-menu>
 
     <!-- User Menu -->
     <mat-menu #userMenu="matMenu" class="user-menu">
@@ -565,23 +280,6 @@ interface MenuItem {
       margin-right: var(--spacing-md);
     }
 
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-      font-size: 14px;
-      color: var(--color-text-secondary);
-    }
-
-    .breadcrumb .separator {
-      color: var(--color-text-muted);
-    }
-
-    .breadcrumb .active {
-      color: var(--color-text-primary);
-      font-weight: 500;
-    }
-
     .header-action {
       width: 40px;
       height: 40px;
@@ -613,13 +311,11 @@ interface MenuItem {
       background: var(--color-bg-secondary);
     }
 
-    .notification-menu,
     .user-menu {
       min-width: 280px;
       max-width: 320px;
     }
 
-    .notification-menu .mat-mdc-menu-item,
     .user-menu .mat-mdc-menu-item {
       height: auto;
       min-height: 48px;
@@ -635,10 +331,6 @@ interface MenuItem {
 
       .content-professional {
         padding: var(--spacing-md);
-      }
-
-      .breadcrumb {
-        display: none;
       }
     }
 
@@ -656,6 +348,203 @@ export class MainLayoutComponent implements OnInit {
   isDarkMode = false;
   currentUser: any = null;
   breadcrumbs: { label: string; route?: string }[] = [];
+
+  // Define menu structure as an array
+  menuSections: MenuItem[] = [
+    {
+      label: 'Dashboard',
+      icon: '',
+      children: [
+        {
+          label: 'Overview',
+          icon: 'dashboard',
+          route: '/dashboard'
+        }
+      ]
+    },
+    {
+      label: 'File Management',
+      icon: '',
+      children: [
+        {
+          label: 'Society',
+          icon: 'business',
+          route: '/file/society'
+        },
+        // {
+        //   label: 'Security',
+        //   icon: 'security',
+        //   children: [
+        //     {
+        //       label: 'New User',
+        //       icon: 'person_add',
+        //       route: '/file/security/new-user'
+        //     },
+        //     {
+        //       label: 'Authority',
+        //       icon: 'security',
+        //       route: '/file/security/authority'
+        //     },
+        //     {
+        //       label: 'My Rights',
+        //       icon: 'verified_user',
+        //       route: '/file/security/my-rights'
+        //     },
+        //     {
+        //       label: 'Change Password',
+        //       icon: 'lock',
+        //       route: '/file/security/change-password'
+        //     }
+        //   ]
+        // },
+        // {
+        //   label: 'Create New Year',
+        //   icon: 'event',
+        //   route: '/file/create-new-year'
+        // }
+      ]
+    },
+    {
+      label: 'Master Data',
+      icon: '',
+      children: [
+        {
+          label: 'Member Details',
+          icon: 'people',
+          route: '/master/member-details'
+        },
+        // {
+        //   label: 'Deposit Scheme',
+        //   icon: 'savings',
+        //   route: '/master/deposit-scheme'
+        // },
+        // {
+        //   label: 'Interest Master',
+        //   icon: 'percent',
+        //   route: '/master/interest-master'
+        // },
+        // {
+        //   label: 'Table Master',
+        //   icon: 'table_view',
+        //   route: '/master/table'
+        // }
+      ]
+    },
+    {
+      label: 'Transactions',
+      icon: '',
+      children: [
+        // {
+        //   label: 'Deposit Receipt',
+        //   icon: 'receipt',
+        //   route: '/transaction/deposit-receipt'
+        // },
+        // {
+        //   label: 'Deposit Payment',
+        //   icon: 'payment',
+        //   route: '/transaction/deposit-payment'
+        // },
+        // {
+        //   label: 'Demand',
+        //   icon: 'payment',
+        //   route: '/transaction/monthly-demand'
+        // },
+        {
+          label: 'Loan Taken',
+          icon: 'account_balance_wallet',
+          route: '/transaction/loan-taken'
+        },
+        // {
+        //   label: 'Deposit Slip',
+        //   icon: 'description',
+        //   route: '/transaction/deposit-slip'
+        // }
+      ]
+    },
+    // {
+    //   label: 'Accounts',
+    //   icon: '',
+    //   children: [
+    //     {
+    //       label: 'Voucher',
+    //       icon: 'note',
+    //       route: '/accounts/voucher-creation'
+    //     },
+    //     {
+    //       label: 'Loan Receipt',
+    //       icon: 'note',
+    //       route: '/accounts/loan-receipt'
+    //     },
+    //     {
+    //       label: 'Cash Book',
+    //       icon: 'book',
+    //       route: '/accounts/cash-book'
+    //     },
+    //     {
+    //       label: 'Ledger',
+    //       icon: 'account_book',
+    //       route: '/accounts/ledger'
+    //     },
+    //     {
+    //       label: 'Trial Balance',
+    //       icon: 'balance',
+    //       route: '/accounts/trial-balance'
+    //     },
+    //     {
+    //       label: 'Profit & Loss',
+    //       icon: 'trending_up',
+    //       route: '/accounts/profit-loss'
+    //     },
+    //     {
+    //       label: 'Balance Sheet',
+    //       icon: 'assessment',
+    //       route: '/accounts/balance-sheet'
+    //     }
+    //   ]
+    // },
+    // {
+    //   label: 'Reports',
+    //   icon: '',
+    //   children: [
+    //     {
+    //       label: 'Employee Reports',
+    //       icon: 'group',
+    //       route: '/reports/employees'
+    //     },
+    //     {
+    //       label: 'Loan Reports',
+    //       icon: 'money',
+    //       route: '/reports/loan'
+    //     },
+    //     {
+    //       label: 'Opening Balance',
+    //       icon: 'start',
+    //       route: '/reports/opening-balance'
+    //     },
+    //     {
+    //       label: 'Closing Balance',
+    //       icon: 'stop',
+    //       route: '/reports/closing-balance'
+    //     }
+    //   ]
+    // },
+    // {
+    //   label: 'System',
+    //   icon: '',
+    //   children: [
+    //     {
+    //       label: 'Backup',
+    //       icon: 'backup',
+    //       route: '/backup'
+    //     },
+    //     {
+    //       label: 'Administration',
+    //       icon: 'admin_panel_settings',
+    //       route: '/admin'
+    //     }
+    //   ]
+    // }
+  ];
 
   constructor(
     private breakpointObserver: BreakpointObserver,

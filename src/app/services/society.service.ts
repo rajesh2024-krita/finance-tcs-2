@@ -24,11 +24,15 @@ export interface SocietyDto {
   loanLimit: number;
   emergencyLoanLimit: number;
   chequeBounceCharge: number;
+  chBounceCharge: number;
+  dropdownArray: string;
   chequeReturnCharge: number;
   cash: number;
   bonus: number;
   createdAt: Date;
   updatedAt: Date;
+  // 👇 Add this
+  tabs?: string;
 }
 
 export interface CreateSocietyDto {
