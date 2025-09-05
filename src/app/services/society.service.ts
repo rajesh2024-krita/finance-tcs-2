@@ -25,7 +25,8 @@ export interface SocietyDto {
   emergencyLoanLimit: number;
   chequeBounceCharge: number;
   chBounceCharge: number;
-  dropdownArray: string;
+  dropdownArray: string[];
+  targetDropdown: string;
   chequeReturnCharge: number;
   cash: number;
   bonus: number;
@@ -55,6 +56,8 @@ export interface CreateSocietyDto {
   emergencyLoanLimit: number;
   chequeBounceCharge: number;
   chequeReturnCharge: number;
+  dropdownArray: string[];
+  targetDropdown: string;
   cash: number;
   bonus: number;
 }
@@ -81,6 +84,8 @@ export interface SocietyEditPending {
   emergencyLoanLimit: number;
   chequeBounceCharge: number;
   chequeReturnCharge: number;
+  dropdownArray: string[];
+  targetDropdown: string;
   cash: number;
   bonus: number;
   status: 'Pending' | 'Approved' | 'Rejected';
@@ -137,6 +142,8 @@ export class SocietyService {
         if (response.success && response.data) {
           const society = response.data;
           this.currentSocietySubject.next(society);
+          console.log("society data in service = ", society );
+          
           return society;
         } else {
           throw new Error(response.message || 'Failed to fetch society data');

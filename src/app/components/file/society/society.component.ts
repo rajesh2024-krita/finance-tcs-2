@@ -419,6 +419,22 @@ import { of, Subject } from 'rxjs';
                       placeholder="500"
                       min="0"
                       [readonly]="!isEditing">
+                      <select
+  formControlName="targetDropdown"
+  class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 
+         focus:ring-blue-500 focus:border-blue-500 
+         dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
+         dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+  [disabled]="!isEditing">
+
+  <option value="" disabled>Select charge</option>
+
+  <!-- Loop through dropdownArray -->
+  <option *ngFor="let charge of []" [value]="charge">
+    {{ charge }}
+  </option>
+</select>
+
                       <select 
                         formControlName="chequeReturnCharge"
                         class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 
@@ -427,7 +443,7 @@ import { of, Subject } from 'rxjs';
                               dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         [disabled]="!isEditing">
                         <option value="" disabled>Select charge</option>
-                        <!-- <option *ngFor="let charge of dropdownArray" [value]="charge">
+                        <!-- <option *ngFor="let charge of []" [value]="charge">
                           {{ charge }}
                         </option> -->
                       </select>
@@ -558,6 +574,7 @@ export class SocietyComponent implements OnInit {
     phone: ['', Validators.required],
     fax: [''],
     chBounceCharge: [''],
+    targetDropdown: [''],
     email: ['', [Validators.required, Validators.email]],
     website: [''],
     dividend: [0, [Validators.min(0), Validators.max(100)]],
@@ -571,6 +588,7 @@ export class SocietyComponent implements OnInit {
     emergencyLoanLimit: [0, Validators.min(0)],
     chequeBounceCharge: [0, Validators.min(0)],
     chequeReturnCharge: ['', Validators.required],  // dropdown selected value
+    dropdownArray: [[]], // array of dropdown options
     cash: [0, Validators.min(0)],
     bonus: [0, Validators.min(0)]
   });
@@ -657,9 +675,9 @@ export class SocietyComponent implements OnInit {
     chequeReturnCharge: society.chequeReturnCharge ?? '',
     cash: society.cash ?? '',
     bonus: society.bonus ?? '',
-
     chBounceCharge: society.chBounceCharge ?? '',
-    // dropdownArray: society.dropdownArray ?? '',
+    targetDropdown: society.targetDropdown ?? '',
+    dropdownArray: society.dropdownArray ?? [],
   });
 
   console.log('societyForm == ', this.societyForm.value);
