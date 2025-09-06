@@ -1,183 +1,251 @@
 <div class="w-full text-sm">
   <!-- md:grid-cols-[65%_32%] gap-4 -->
   <div class="grid grid-cols-1 ">
-    <!-- Tab Content -->
-    <div class="">
-      <!-- Tabs -->
+    <form [formGroup]="memberForm">
+      <!-- Tab Content -->
       <div class="">
         <!-- Tabs -->
-        <ul class="flex space-x-6 text-sm font-medium border-b border-gray-200">
-          <li>
-            <button (click)="setActiveTab('general')"
-              [ngClass]="activeTab === 'general' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-              class="pb-3">
-              General
-            </button>
-          </li>
-          <li>
-            <button (click)="setActiveTab('opening')"
-              [ngClass]="activeTab === 'opening' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-              class="pb-3">
-              Photo & Opening Balance
-            </button>
-          </li>
-          <li>
-            <button (click)="setActiveTab('deduction')"
-              [ngClass]="activeTab === 'deduction' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-              class="pb-3">
-              Monthly Deduction
-            </button>
-          </li>
-        </ul>
-      </div>
-      <!-- General Tab -->
-      <div *ngIf="activeTab === 'general'" class="space-y-6 bg-white p-6 border">
-        <div class="grid grid-cols-1 gap-4">
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Member No</label>
-            <input type="text"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              readonly />
-          </div>
+        <div class="">
+          <!-- Tabs -->
+          <ul class="flex space-x-6 text-sm font-medium border-b border-gray-200">
+            <li>
+              <button (click)="setActiveTab('general')"
+                [ngClass]="activeTab === 'general' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                class="pb-3">
+                General
+              </button>
+            </li>
+            <li>
+              <button (click)="setActiveTab('opening')"
+                [ngClass]="activeTab === 'opening' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                class="pb-3">
+                Photo & Opening Balance
+              </button>
+            </li>
+            <li>
+              <button (click)="setActiveTab('deduction')"
+                [ngClass]="activeTab === 'deduction' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                class="pb-3">
+                Monthly Deduction
+              </button>
+            </li>
+          </ul>
         </div>
+        <!-- General Tab -->
+        <div *ngIf="activeTab === 'general'" class="space-y-6 bg-white p-6 border">
+          <!-- In your template, modify the Member No field section -->
+          <div class="grid grid-cols-1 gap-4">
+            <div class="flex items-end gap-2">
+              <div class="flex-grow">
+                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Member No</label>
+                <input type="text" formControlName="memberNo"
+                  class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  readonly />
+              </div>
+              <button type="button"
+                class="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium text-xs"
+                (click)="openMemberSelectionDialog()">
+                Select Member
+              </button>
+            </div>
+          </div>
 
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Full Name</label>
-            <input type="text"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Father/Husband Name</label>
-            <input type="text"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-        </div>
-        <div>
-          <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Office Address</label>
-          <input type="text"
-            class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">City</label>
-            <input type="text"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Branch</label>
-            <input type="text"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Designation</label>
-            <input type="text" formControlName="designation"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Mobile</label>
-            <input type="text" formControlName="mobile" maxlength="10"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Phone (Off.)</label>
-            <input type="text"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Phone (Res.)</label>
-            <input type="text" maxlength="10"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-        </div>
-        <div class="col-span-2">
-          <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Residence Address</label>
-          <textarea rows="2" formControlName="residenceAddress"
-            class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></textarea>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">DOB</label>
-            <input type="date"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">DOJ Society</label>
-            <input type="date" maxlength="10"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-4">
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Email</label>
-            <input type="email"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">DOJ</label>
-            <input type="text"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">DOR</label>
-            <input type="text"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Nominee</label>
-            <input type="text"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Nominee Relation</label>
-            <input type="text"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-        </div>
-      </div>
-
-      <!-- Opening Balance -->
-      <div *ngIf="activeTab === 'opening'" class="space-y-6 bg-white p-6 border">
-        <div>
-          <div class="text-sm font-normal flex items-center gap-2 mb-4">Opening Balance</div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Share</label>
-              <div class="flex gap-2">
-                <input type="number" formControlName="shareAmount"
-                  class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                <select formControlName="shareType"
-                  class="block p-2 w-1/2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                  <option value="Credit">Credit</option>
-                  <option value="Debit">Debit</option>
-                </select>
-              </div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Full Name</label>
+              <input type="text"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="name" />
             </div>
-            <div class="">
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Father/Husband Name</label>
+              <input type="text"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="fhName" />
+            </div>
+          </div>
+          <div>
+            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Office Address</label>
+            <input type="text"
+              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              formControlName="officeAddress" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">City</label>
+              <input type="text"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="city" />
+            </div>
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Branch</label>
+              <input type="text"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="branch" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Designation</label>
+              <input type="text" formControlName="designation"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="designation" />
+            </div>
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Mobile</label>
+              <input type="text" formControlName="mobile" maxlength="10"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="mobile" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Phone (Off.)</label>
+              <input type="text"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="phoneOffice" />
+            </div>
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Phone (Res.)</label>
+              <input type="text" maxlength="10"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="phoneResidence" />
+            </div>
+          </div>
+          <div class="col-span-2">
+            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Residence Address</label>
+            <textarea rows="2" formControlName="residenceAddress"
+              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">DOB</label>
+              <input type="date"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="dateOfBirth" />
+            </div>
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">DOJ Society</label>
+              <input type="date" maxlength="10"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="dojSociety" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4">
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Email</label>
+              <input type="email"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="email" />
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">DOJ</label>
+              <input type="text"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="dojJob" />
+            </div>
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">DOR</label>
+              <input type="text"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="doRetirement" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Nominee</label>
+              <input type="text"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="nominee" />
+            </div>
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Nominee Relation</label>
+              <input type="text"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="nomineeRelation" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Opening Balance -->
+        <div *ngIf="activeTab === 'opening'" class="space-y-6 bg-white p-6 border">
+          <div>
+            <div class="text-sm font-normal flex items-center gap-2 mb-4">Opening Balance</div>
+            <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">CD</label>
+                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Share</label>
                 <div class="flex gap-2">
-                  <input type="number" formControlName="cdAmount"
+                  <input type="number" formControlName="shareAmount"
                     class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                  <select formControlName="shareType"
+                  <select
                     class="block p-2 w-1/2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                     <option value="Credit">Credit</option>
                     <option value="Debit">Debit</option>
                   </select>
+                </div>
+              </div>
+              <div class="">
+                <div>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">CD</label>
+                  <div class="flex gap-2">
+                    <input type="number" formControlName="cdAmount"
+                      class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                    <select
+                      class="block p-2 w-1/2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                      <option value="Credit">Credit</option>
+                      <option value="Debit">Debit</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="">
+            <div class="text-sm font-normal flex items-center gap-2 mb-4">Bank Details</div>
+            <div class="grid md:grid-cols-2 grid-cols-1 gap-4">
+              <div class="grid grid-cols-1 gap-4">
+                <div>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Bank Name</label>
+                  <input type="text" formControlName="bankName"
+                    class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                </div>
+                <div>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Payable At</label>
+                  <input type="text"
+                    class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    formControlName="payableAt" />
+                </div>
+                <div>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Account No</label>
+                  <input type="text" formControlName="accountNo"
+                    class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    formControlName="accountNo" />
+                </div>
+              </div>
+              <div class="">
+                <div>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Status</label>
+                  <select
+                    class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <option value="Active">Active</option>
+                    <option value="In-Active">In-Active</option>
+                    <option value="Resignationn">Resignation</option>
+                  </select>
+                </div>
+                <div class="mt-4">
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Date</label>
+                  <input type="date" formControlName="stDate"
+                    class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                 </div>
               </div>
             </div>
@@ -185,123 +253,83 @@
 
         </div>
 
-        <div class="">
-          <div class="text-sm font-normal flex items-center gap-2 mb-4">Bank Details</div>
-          <div class="grid md:grid-cols-2 grid-cols-1 gap-4">
-            <div class="grid grid-cols-1 gap-4">
-              <div>
-                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Bank Name</label>
-                <input type="text" formControlName="bankName"
-                  class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-              </div>
-              <div>
-                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Payable At</label>
-                <input type="text"
-                  class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-              </div>
-              <div>
-                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Account No</label>
-                <input type="text" formControlName="accountNo"
-                  class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-              </div>
+        <!-- Monthly Deduction -->
+        <div *ngIf="activeTab === 'deduction'" class="space-y-6 bg-white p-6 border">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Share</label>
+              <input type="number" formControlName="shareDeduction"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
             </div>
-            <div class="">
-              <div>
-                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Status</label>
-                <select
-                  class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                  <option value="Active">Active</option>
-                  <option value="In-Active">In-Active</option>
-                  <option value="Resignationn">Resignation</option>
-                </select>
-              </div>
-              <div class="mt-4">
-                <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Date</label>
-                <input type="date"
-                  class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-              </div>
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Withdrawal</label>
+              <input type="number" formControlName="withdrawal"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">G loan Instalment</label>
+              <input type="number" formControlName="gLoanInstalment"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+            </div>
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">E loan Instalment</label>
+              <input type="number" formControlName="eLoanInstalment"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
             </div>
           </div>
         </div>
-
       </div>
 
-      <!-- Monthly Deduction -->
-      <div *ngIf="activeTab === 'deduction'" class="space-y-6 bg-white p-6 border">
-        <div class="grid grid-cols-2 gap-4">
+      <!-- Photo & Signature -->
+      <div class="">
+        <h3 class="text-sm font-normal flex items-center gap-2 mt-2 mb-2">Photo & Signature</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 border">
           <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Share</label>
-            <input type="number" formControlName="shareDeduction"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Member Photo</label>
+
+            <div class="flex items-center justify-center w-full">
+              <label for="dropzone-file"
+                class="flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                <div class="flex items-center justify-center mt-4 gap-4">
+                  <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+                  </svg>
+                  <p class="text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to
+                      upload</span> or drag and drop</p>
+                </div>
+                <input id="dropzone-file" type="file" class="hidden" />
+              </label>
+            </div>
+
           </div>
           <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Withdrawal</label>
-            <input type="number" formControlName="withdrawal"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Member Signature</label>
+
+            <div class="flex items-center justify-center w-full">
+              <label for="dropzone-file"
+                class="flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                <div class="flex items-center justify-center mt-4 gap-4">
+                  <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+                  </svg>
+                  <p class="text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to
+                      upload</span> or drag and drop</p>
+                </div>
+                <input id="dropzone-file" type="file" class="hidden" />
+              </label>
+            </div>
+
           </div>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">G loan Instalment</label>
-            <input type="number"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">E loan Instalment</label>
-            <input type="number"
-              class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-          </div>
+
         </div>
       </div>
-    </div>
-
-    <!-- Photo & Signature -->
-    <div class="">
-      <h3 class="text-sm font-normal flex items-center gap-2 mt-2 mb-2">Photo & Signature</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 border">
-        <div>
-          <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Member Photo</label>
-
-          <div class="flex items-center justify-center w-full">
-            <label for="dropzone-file"
-              class="flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-              <div class="flex items-center justify-center mt-4 gap-4">
-                <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
-                </svg>
-                <p class="text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to
-                    upload</span> or drag and drop</p>
-              </div>
-              <input id="dropzone-file" type="file" class="hidden" />
-            </label>
-          </div>
-
-        </div>
-        <div>
-          <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Member Signature</label>
-
-          <div class="flex items-center justify-center w-full">
-            <label for="dropzone-file"
-              class="flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-              <div class="flex items-center justify-center mt-4 gap-4">
-                <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
-                </svg>
-                <p class="text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to
-                    upload</span> or drag and drop</p>
-              </div>
-              <input id="dropzone-file" type="file" class="hidden" />
-            </label>
-          </div>
-
-        </div>
-
-      </div>
-    </div>
+    </form>
 
   </div>
 

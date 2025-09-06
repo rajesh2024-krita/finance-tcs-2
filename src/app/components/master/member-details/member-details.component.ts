@@ -18,6 +18,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MemberService, Member } from '../../../services/member.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MemberViewDialogComponent } from './member-view-dialog.component';
+import { MemberSelectDialogComponent } from './member-select-dialog.component';
 
 @Component({
   selector: 'app-member-details',
@@ -79,38 +80,38 @@ export class MemberDetailsComponent implements OnInit {
 
   private createMemberForm(): FormGroup {
     return this.fb.group({
-  memberNo: ['', Validators.required],
-  name: ['', Validators.required],
-  fhName: ['', Validators.required],
-  dateOfBirth: [''],
-  mobile: [''],
-  email: ['', Validators.email],
-  city: [''],
-  status: ['Active'],
-  officeAddress: [''],
-  residenceAddress: [''],
-  designation: [''],
-  branch: [''],
-  dojJob: [''],
-  doRetirement: [''],
-  dojSociety: [''],
-  phoneOffice: [''],
-  phoneResidence: [''],
-  shareAmount: [0],
-  cdAmount: [0],
-  bankName: ['', Validators.required],
-  branchName: [''],
-  accountNo: ['', Validators.required],
-  accountHolderName: ['', Validators.required],
-  ifscCode: ['', Validators.required],
-  payableAt: [''],
-  shareDeduction: [0],
-  withdrawal: [0],
-  gLoanInstalment: [0],
-  eLoanInstalment: [0],
-  nominee: [''],
-  nomineeRelation: ['']
-});
+      memberNo: ['', Validators.required],
+      name: ['', Validators.required],
+      fhName: ['', Validators.required],
+      dateOfBirth: [''],
+      mobile: [''],
+      email: ['', Validators.email],
+      city: [''],
+      status: ['Active'],
+      officeAddress: [''],
+      residenceAddress: [''],
+      designation: [''],
+      branch: [''],
+      dojJob: [''],
+      doRetirement: [''],
+      dojSociety: [''],
+      phoneOffice: [''],
+      phoneResidence: [''],
+      shareAmount: [0],
+      cdAmount: [0],
+      bankName: ['', Validators.required],
+      branchName: [''],
+      accountNo: ['', Validators.required],
+      accountHolderName: ['', Validators.required],
+      ifscCode: ['', Validators.required],
+      payableAt: [''],
+      shareDeduction: [0],
+      withdrawal: [0],
+      gLoanInstalment: [0],
+      eLoanInstalment: [0],
+      nominee: [''],
+      nomineeRelation: ['']
+    });
 
   }
 
@@ -119,6 +120,7 @@ export class MemberDetailsComponent implements OnInit {
       next: (response: any) => {
         // Check if response has data property or is the array itself
         const members = response.data || response;
+        console.log('members = ', members)
         this.allMembers = (Array.isArray(members) ? members : []).map((m: any) => ({
           ...m,
           memberNo: m.memNo || m.memberNo // Handle both cases
@@ -148,43 +150,59 @@ export class MemberDetailsComponent implements OnInit {
     this.dataSource.data = filtered;
   }
 
-openOffCanvas(mode: 'create' | 'edit', member?: Member) {
-  this.editMode.set(mode === 'edit');
+  openOffCanvas(mode: 'create' | 'edit', member?: Member) {
+    this.editMode.set(mode === 'edit');
 
-  if (mode === 'edit' && member) {
-    this.currentMember.set(member);
-    this.populateForm(member);
-  } else {
-    this.currentMember.set(null);
-    this.memberForm.reset();
-    this.memberForm.patchValue({
-      shareAmount: 0,
-      cdAmount: 0,
-      status: 'Active',
-      memberNo: this.generateNextMemberId(this.allMembers) // 👈 Auto ID here
+    if (mode === 'edit' && member) {
+      this.currentMember.set(member);
+      this.populateForm(member);
+    } else {
+      this.currentMember.set(null);
+      this.memberForm.reset();
+      this.memberForm.patchValue({
+        shareAmount: 0,
+        cdAmount: 0,
+        status: 'Active',
+        memberNo: this.generateNextMemberId(this.allMembers) // 👈 Auto ID here
+      });
+    }
+
+    this.offCanvasOpen.set(true);
+  }
+
+  /** Generate next MEM_XXX ID */
+  private generateNextMemberId(members: Member[]): string {
+    if (!members || members.length === 0) {
+      return 'MEM_001';
+    }
+
+    // Extract numbers from memNo/memberNo like "MEM_001" → 1
+    const ids = members
+      .map(m => parseInt((m.memNo || m.memberNo || '').replace('MEM_', ''), 10))
+      .filter(n => !isNaN(n));
+
+    const maxId = ids.length > 0 ? Math.max(...ids) : 0;
+    const nextId = maxId + 1;
+
+    return `MEM_${nextId.toString().padStart(3, '0')}`;
+  }
+
+  // Add this method to open the member selection dialog
+  openMemberSelectionDialog(): void {
+    const dialogRef = this.dialog.open(MemberSelectDialogComponent, {
+      width: '800px',
+      data: { members: this.allMembers }
+    });
+
+    dialogRef.afterClosed().subscribe((selectedMember: Member) => {
+      if (selectedMember) {
+        this.populateForm(selectedMember);
+        this.editMode.set(true);
+        this.currentMember.set(selectedMember);
+        this.offCanvasOpen.set(true);
+      }
     });
   }
-
-  this.offCanvasOpen.set(true);
-}
-
-/** Generate next MEM_XXX ID */
-private generateNextMemberId(members: Member[]): string {
-  if (!members || members.length === 0) {
-    return 'MEM_001';
-  }
-
-  // Extract numbers from memNo/memberNo like "MEM_001" → 1
-  const ids = members
-    .map(m => parseInt((m.memNo || m.memberNo || '').replace('MEM_', ''), 10))
-    .filter(n => !isNaN(n));
-
-  const maxId = ids.length > 0 ? Math.max(...ids) : 0;
-  const nextId = maxId + 1;
-
-  return `MEM_${nextId.toString().padStart(3, '0')}`;
-}
-
 
   closeOffCanvas() {
     this.offCanvasOpen.set(false);
@@ -223,16 +241,18 @@ private generateNextMemberId(members: Member[]): string {
       shareDeduction: member.shareDeduction || 0,
       withdrawal: member.withdrawal || 0,
       gLoanInstalment: member.gLoanInstalment || 0,
-      eLoanInstalment: member.eLoanInstalment || 0
+      eLoanInstalment: member.eLoanInstalment || 0,
+      stDate: member.stDate || 0,
     });
+    console.log('member == ', this.memberForm.value)
   }
 
-private toUtcString(date: any): string | undefined {
-  if (!date) return undefined;
-  return new Date(date).toISOString();
-}
+  private toUtcString(date: any): string | undefined {
+    if (!date) return undefined;
+    return new Date(date).toISOString();
+  }
 
-// Switch tabs
+  // Switch tabs
   // setTab(tab: string) {
   //   this.activeTab = tab;
   // }
@@ -244,36 +264,36 @@ private toUtcString(date: any): string | undefined {
   }
 
 
-private transformFormDataToApi(formValue: any): Member {
-  
-  return {
-    memNo: formValue.memberNo,
-    name: formValue.name,
-    fhName: formValue.fhName,
-    dob: this.toUtcString(formValue.dateOfBirth),
-    dojSociety: this.toUtcString(formValue.dojSociety),
-    dojOrg: this.toUtcString(formValue.dojJob),
-    dor: this.toUtcString(formValue.doRetirement),
-    email: formValue.email,
-    mobile: formValue.mobile,
-    designation: formValue.designation,
-    branch: formValue.branch,
-    officeAddress: formValue.officeAddress,
-    residenceAddress: formValue.residenceAddress,
-    city: formValue.city,
-    phoneOffice: formValue.phoneOffice,
-    phoneRes: formValue.phoneResidence,
-    nominee: formValue.nominee,
-    nomineeRelation: formValue.nomineeRelation,
-    bankingDetails: {
-      bankName: formValue.bankName,
-      branchName: formValue.branchName,
-      accountNumber: formValue.accountNo,
-      accountHolderName: formValue.accountHolderName,
-      ifscCode: formValue.ifscCode
-    }
-  };
-}
+  private transformFormDataToApi(formValue: any): Member {
+
+    return {
+      memNo: formValue.memberNo,
+      name: formValue.name,
+      fhName: formValue.fhName,
+      dob: this.toUtcString(formValue.dateOfBirth),
+      dojSociety: this.toUtcString(formValue.dojSociety),
+      dojOrg: this.toUtcString(formValue.dojJob),
+      dor: this.toUtcString(formValue.doRetirement),
+      email: formValue.email,
+      mobile: formValue.mobile,
+      designation: formValue.designation,
+      branch: formValue.branch,
+      officeAddress: formValue.officeAddress,
+      residenceAddress: formValue.residenceAddress,
+      city: formValue.city,
+      phoneOffice: formValue.phoneOffice,
+      phoneRes: formValue.phoneResidence,
+      nominee: formValue.nominee,
+      nomineeRelation: formValue.nomineeRelation,
+      bankingDetails: {
+        bankName: formValue.bankName,
+        branchName: formValue.branchName,
+        accountNumber: formValue.accountNo,
+        accountHolderName: formValue.accountHolderName,
+        ifscCode: formValue.ifscCode
+      }
+    };
+  }
 
 
 
@@ -372,7 +392,7 @@ private transformFormDataToApi(formValue: any): Member {
     }
   }
 
-    setActiveTab(tab: string) {
+  setActiveTab(tab: string) {
     this.activeTab = tab;
   }
 
