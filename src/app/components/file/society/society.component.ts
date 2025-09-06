@@ -72,119 +72,6 @@ import { of, Subject } from 'rxjs';
         </div>
       </div>
 
-      <!-- No Society for Super Admin - Create Option -->
-      <div *ngIf="!societyData && isSuperAdmin && !loading && !error" class="card mb-6 border-l-4 border-l-blue-400">
-        <div class="card-header bg-gradient-to-r from-blue-500 to-cyan-500">
-          <div class="card-title">
-            <mat-icon>business</mat-icon>
-            <span>Create New Society</span>
-          </div>
-        </div>
-        <div class="card-content">
-          <p class="text-body mb-4">No society data found. As a Super Admin, you can create a new society.</p>
-          <button (click)="enableEdit()" class="btn btn-primary">
-            <mat-icon>add</mat-icon>
-            Create New Society
-          </button>
-        </div>
-      </div>
-
-      <!-- Pending Approval Alert -->
-      <div *ngIf="pendingRequest && !loading" class="card mb-6 border-l-4 border-l-orange-400">
-        <div class="card-header bg-gradient-to-r from-orange-500 to-red-500">
-          <div class="card-title">
-            <mat-icon>pending_actions</mat-icon>
-            <span>Pending Approval Request</span>
-          </div>
-          <div class="flex items-center gap-2 text-sm">
-            <mat-icon class="text-lg">schedule</mat-icon>
-            <span>{{ pendingRequest.requestedAt | date:'short' }}</span>
-          </div>
-        </div>
-        <div class="card-content">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
-            <!-- Request Info -->
-            <div>
-              <h4 class="text-section-header mb-3">Request Details</h4>
-              <div class="space-y-2 text-body">
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Requested by:</span>
-                  <span class="font-medium">{{ pendingRequest.requestedByUserName }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Status:</span>
-                  <span class="badge badge-warning">{{ pendingRequest.status | titlecase }}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Approval Progress -->
-            <div>
-              <h4 class="text-section-header mb-3">Approval Progress</h4>
-              <div class="space-y-3">
-                <div class="flex justify-between text-body">
-                  <span>{{ getApprovedCount() }} of {{ getTotalRequired() }} approved</span>
-                  <span class="font-medium">{{ getApprovalProgress() | number:'1.0-0' }}%</span>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                  <div 
-                    class="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full transition-all duration-300"
-                    [style.width.%]="getApprovalProgress()">
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div>
-              <h4 class="text-section-header mb-3">Actions</h4>
-              <div class="space-y-2">
-                <button 
-                  *ngIf="canApprove()" 
-                  (click)="approvePendingEdit()"
-                  [disabled]="submitting"
-                  class="btn btn-success btn-sm w-full">
-                  <mat-icon class="text-sm">check_circle</mat-icon>
-                  Approve Changes
-                </button>
-                <button 
-                  *ngIf="canApprove()" 
-                  (click)="rejectPendingEdit()"
-                  [disabled]="submitting"
-                  class="btn btn-danger btn-sm w-full">
-                  <mat-icon class="text-sm">cancel</mat-icon>
-                  Reject Changes
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Approval Status List -->
-          <div class="border-t pt-4">
-            <h4 class="text-section-header mb-3">Approval Status</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              <div *ngFor="let approval of pendingRequest.approvals" 
-                   class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div class="flex items-center gap-3">
-                  <mat-icon [class]="approval.approved ? 'text-green-500' : 'text-gray-400'">
-                    {{ approval.approved ? 'check_circle' : 'schedule' }}
-                  </mat-icon>
-                  <div>
-                    <p class="font-medium text-sm">{{ approval.userName }}</p>
-                    <p class="text-xs text-gray-500">
-                      {{ approval.approved && approval.approvedAt ? (approval.approvedAt | date:'short') : 'Pending' }}
-                    </p>
-                  </div>
-                </div>
-                <span [class]="approval.approved ? 'badge badge-success' : 'badge badge-secondary'">
-                  {{ approval.approved ? 'Approved' : 'Pending' }}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Main Society Form -->
       <div *ngIf="(societyData || isSuperAdmin) && !loading">
         <form [formGroup]="societyForm" class="form-container">
@@ -419,35 +306,18 @@ import { of, Subject } from 'rxjs';
                       placeholder="500"
                       min="0"
                       [readonly]="!isEditing">
-                      <select
-                        formControlName="targetDropdown"
-                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 
-                              focus:ring-blue-500 focus:border-blue-500 
-                              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-                              dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        [disabled]="!isEditing">
-
-                        <option value="" disabled>Select charge</option>
-
-                        <!-- Loop through dropdownArray -->
-                        <option *ngFor="let charge of []" [value]="charge">
-                          {{ charge }}
-                        </option>
-                      </select>
-
-                      <select 
-                        formControlName="chequeReturnCharge"
-                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 
-                              focus:ring-blue-500 focus:border-blue-500 
-                              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-                              dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        [disabled]="!isEditing">
-                        <option value="" disabled>Select charge</option>
-                        <!-- <option *ngFor="let charge of []" [value]="charge">
-                          {{ charge }}
-                        </option> -->
-                      </select>
-
+                       <select
+                          formControlName="targetDropdown"
+                          class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 
+                                focus:ring-blue-500 focus:border-blue-500 
+                                dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
+                                dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          [disabled]="!isEditing">
+                          <option value="" disabled>Select charge</option>
+                          <option *ngFor="let charge of societyForm.get('dropdownArray')?.value" [value]="charge">
+                            {{ charge }}
+                          </option>
+                        </select>
                   </div>
                 </div>
               </div>
@@ -458,13 +328,14 @@ import { of, Subject } from 'rxjs';
            <!-- *ngIf="!isEditing && canEdit()"  -->
           <div class="">
             <div class="flex justify-end gap-3">
+              <!-- [disabled]="societyForm.invalid || submitting" -->
               
               <!-- *ngIf="isEditing"  -->
               <div class="flex gap-3">
                 <button 
                   type="button"
                   (click)="saveChanges()"
-                  [disabled]="societyForm.invalid || submitting"
+                  
                   class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium">
                   <!-- <mat-icon>save</mat-icon> --> Save
                   <!-- {{ submitting ? 'Applying...' : (societyData ? 'Apply' : 'Create Society') }} -->
@@ -558,33 +429,33 @@ export class SocietyComponent implements OnInit {
   }
 
   createForm(): FormGroup {
-  return this.fb.group({
-    societyName: ['', Validators.required],
-    registrationNumber: ['', Validators.required],
-    address: ['', Validators.required],
-    city: ['', Validators.required],
-    phone: ['', Validators.required],
-    fax: [''],
-    chBounceCharge: [''],
-    targetDropdown: [''],
-    email: ['', [Validators.required, Validators.email]],
-    website: [''],
-    dividend: [0, [Validators.min(0), Validators.max(100)]],
-    overdraft: [0, [Validators.min(0), Validators.max(100)]],
-    currentDeposit: [0, [Validators.min(0), Validators.max(100)]],
-    loan: [0, [Validators.min(0), Validators.max(100)]],
-    emergencyLoan: [0, [Validators.min(0), Validators.max(100)]],
-    las: [0, [Validators.min(0), Validators.max(100)]],
-    shareLimit: [0, Validators.min(0)],
-    loanLimit: [0, Validators.min(0)],
-    emergencyLoanLimit: [0, Validators.min(0)],
-    chequeBounceCharge: [0, Validators.min(0)],
-    chequeReturnCharge: ['', Validators.required],  // dropdown selected value
-    dropdownArray: [[]], // array of dropdown options
-    cash: [0, Validators.min(0)],
-    bonus: [0, Validators.min(0)]
-  });
-}
+    return this.fb.group({
+      societyName: ['', Validators.required],
+      registrationNumber: ['', Validators.required],
+      address: ['', Validators.required],
+      city: ['', Validators.required],
+      phone: ['', Validators.required],
+      fax: [''],
+      chBounceCharge: [''],
+      targetDropdown: [''],
+      email: ['', [Validators.required, Validators.email]],
+      website: [''],
+      dividend: [0, [Validators.min(0), Validators.max(100)]],
+      overdraft: [0, [Validators.min(0), Validators.max(100)]],
+      currentDeposit: [0, [Validators.min(0), Validators.max(100)]],
+      loan: [0, [Validators.min(0), Validators.max(100)]],
+      emergencyLoan: [0, [Validators.min(0), Validators.max(100)]],
+      las: [0, [Validators.min(0), Validators.max(100)]],
+      shareLimit: [0, Validators.min(0)],
+      loanLimit: [0, Validators.min(0)],
+      emergencyLoanLimit: [0, Validators.min(0)],
+      chequeBounceCharge: [0, Validators.min(0)],
+      chequeReturnCharge: ['', Validators.required],  // dropdown selected value
+      dropdownArray: this.fb.control<string[]>([]),
+      cash: [0, Validators.min(0)],
+      bonus: [0, Validators.min(0)]
+    });
+  }
 
 
   loadData() {
@@ -629,14 +500,44 @@ export class SocietyComponent implements OnInit {
         this.pendingRequest = pendingEdits.find(edit => edit.status === 'Pending') || null;
       });
   }
+
+  // Populate with backend data
   populateForm(society: SocietyDto) {
-  // Parse the nested tabs JSON if available
   let tabs: any = {};
   if (society.tabs) {
     try {
       tabs = JSON.parse(society.tabs);
     } catch (e) {
       console.error('Error parsing society.tabs', e);
+    }
+  }
+
+  // Parse dropdownArray
+  let parsedDropdownArray: string[] = [];
+  if (society.dropdownArray) {
+    try {
+      if (typeof society.dropdownArray === 'string') {
+        parsedDropdownArray = JSON.parse(society.dropdownArray);
+      } else {
+        parsedDropdownArray = society.dropdownArray;
+      }
+    } catch (e) {
+      console.error('Invalid JSON in dropdownArray:', e);
+    }
+  }
+
+  // Set targetDropdown value - ensure it matches one of the options
+  let targetValue = society.targetDropdown || '';
+  
+  // If we have a target value and dropdown options, ensure exact match
+  if (targetValue && parsedDropdownArray.length > 0) {
+    const exactMatch = parsedDropdownArray.find(item => item === targetValue);
+    if (!exactMatch) {
+      // If no exact match, try case-insensitive match
+      const caseInsensitiveMatch = parsedDropdownArray.find(
+        item => item.toLowerCase().trim() === targetValue.toLowerCase().trim()
+      );
+      targetValue = caseInsensitiveMatch || '';
     }
   }
 
@@ -650,29 +551,25 @@ export class SocietyComponent implements OnInit {
     email: society.email,
     website: society.website || '',
 
-    // Interest
-    dividend: tabs?.interest?.dividend ?? '',
-    overdraft: tabs?.interest?.od ?? '',
-    currentDeposit: tabs?.interest?.cd ?? '',
-    loan: tabs?.interest?.loan ?? '',
-    emergencyLoan: tabs?.interest?.emergencyLoan ?? '',
-    las: tabs?.interest?.las ?? '',
+    dividend: tabs?.interest?.dividend ?? society.dividend,
+    overdraft: tabs?.interest?.od ?? society.overdraft,
+    currentDeposit: tabs?.interest?.cd ?? society.currentDeposit,
+    loan: tabs?.interest?.loan ?? society.loan,
+    emergencyLoan: tabs?.interest?.emergencyLoan ?? society.emergencyLoan,
+    las: tabs?.interest?.las ?? society.las,
 
-    // Limits
-    shareLimit: tabs?.limit?.share ?? '',
-    loanLimit: tabs?.limit?.loan ?? '',
-    emergencyLoanLimit: tabs?.limit?.emergencyLoan ?? '',
+    shareLimit: tabs?.limit?.share ?? society.shareLimit,
+    loanLimit: tabs?.limit?.loan ?? society.loanLimit,
+    emergencyLoanLimit: tabs?.limit?.emergencyLoan ?? society.emergencyLoanLimit,
 
-    // chequeBounceCharge: society.chequeBounceCharge ?? '',
-    chequeReturnCharge: society.chequeReturnCharge ?? '',
-    cash: society.cash ?? '',
-    bonus: society.bonus ?? '',
-    chBounceCharge: society.chBounceCharge ?? '',
-    targetDropdown: society.targetDropdown ?? '',
-    dropdownArray: society.dropdownArray ?? [],
+    chequeReturnCharge: society.chequeReturnCharge ?? 0,
+    cash: society.cash ?? 0,
+    bonus: society.bonus ?? 0,
+    chBounceCharge: society.chBounceCharge ?? 0,
+    targetDropdown: targetValue, // Use the normalized value
+    
+    dropdownArray: parsedDropdownArray
   });
-
-  console.log('societyForm == ', this.societyForm.value);
 }
 
 
@@ -690,10 +587,10 @@ export class SocietyComponent implements OnInit {
   }
 
   saveChanges() {
-    if (this.societyForm.invalid) {
-      this.markFormGroupTouched(this.societyForm);
-      return;
-    }
+    // if (this.societyForm.invalid) {
+    //   this.markFormGroupTouched(this.societyForm);
+    //   return;
+    // }
 
     this.submitting = true;
     const formData = this.societyForm.value as CreateSocietyDto;
