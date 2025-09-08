@@ -1,4 +1,3 @@
-// src/app/components/file/society/society.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -14,7 +13,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { SocietyService, SocietyDto, SocietyEditPending, SocietyTabsDto, CreateSocietyDto } from '../../../services/society.service';
+import { SocietyService, SocietyDto, SocietyEditPending, CreateSocietyDto } from '../../../services/society.service';
 import { AuthService, User, UserRole } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 import { catchError, takeUntil, finalize } from 'rxjs/operators';
@@ -437,6 +436,7 @@ export class SocietyComponent implements OnInit {
       city: ['', Validators.required],
       phone: ['', Validators.required],
       fax: [''],
+      chBounceCharge: [''],
       targetDropdown: [''],
       email: ['', [Validators.required, Validators.email]],
       website: [''],
@@ -449,7 +449,7 @@ export class SocietyComponent implements OnInit {
       shareLimit: [0, Validators.min(0)],
       loanLimit: [0, Validators.min(0)],
       emergencyLoanLimit: [0, Validators.min(0)],
-      chBounceCharge: [0, Validators.min(0)],
+      chequeBounceCharge: [0, Validators.min(0)],
       chequeReturnCharge: ['', Validators.required],  // dropdown selected value
       dropdownArray: this.fb.control<string[]>([]),
       cash: [0, Validators.min(0)],
@@ -504,106 +504,75 @@ export class SocietyComponent implements OnInit {
   }
 
   // Populate with backend data
-populateForm(society: any) {
-  if (!society) {
-    console.warn("⚠️ No society data provided");
-    return;
-  }
-
-  try {
-    console.log("📥 Raw society data received:", society);
-
-    // ---------------- Tabs Extraction ----------------
-    let tabs: SocietyTabsDto = {
-      interest: { dividend: 0, od: 0, cd: 0, loan: 0, emergencyLoan: 0, las: 0 },
-      limit: { share: 0, loan: 0, emergencyLoan: 0 }
-    };
-
-    if (society.tabs) {
-      const parsedTabs = typeof society.tabs === "string"
-        ? JSON.parse(society.tabs)
-        : society.tabs;
-
-      console.log("🗂 Parsed tabs object:", parsedTabs);
-
-      if (parsedTabs.Interest) {
-        tabs.interest = {
-          dividend: parsedTabs.Interest.Dividend || 0,
-          od: parsedTabs.Interest.OD || 0,
-          cd: parsedTabs.Interest.CD || 0,
-          loan: parsedTabs.Interest.Loan || 0,
-          emergencyLoan: parsedTabs.Interest.EmergencyLoan || 0,
-          las: parsedTabs.Interest.LAS || 0
-        };
-      }
-
-      if (parsedTabs.Limit) {
-        tabs.limit = {
-          share: parsedTabs.Limit.Share || 0,
-          loan: parsedTabs.Limit.Loan || 0,
-          emergencyLoan: parsedTabs.Limit.EmergencyLoan || 0
-        };
-      }
-    } else {
-      console.log("ℹ️ No tabs data found in society");
-    }
-
-    // ---------------- Dropdown Array Extraction ----------------
-    let parsedDropdownArray: string[] = [];
+  populateForm(society: SocietyDto) {
+  let tabs: any = {};
+  if (society.tabs) {
     try {
-      parsedDropdownArray = typeof society.dropdownArray === "string"
-        ? JSON.parse(society.dropdownArray || "[]")
-        : society.dropdownArray || [];
-    } catch {
-      parsedDropdownArray = [];
+      tabs = JSON.parse(society.tabs);
+    } catch (e) {
+      console.error('Error parsing society.tabs', e);
     }
-    console.log("📌 Parsed dropdown array:", parsedDropdownArray);
-
-    // ---------------- Build Form Data ----------------
-    const formData = {
-      societyName: society.societyName || "",
-      registrationNumber: society.registrationNumber || "",
-      address: society.address || "",
-      city: society.city || "",
-      phone: society.phone || "",
-      fax: society.fax || "",
-      email: society.email || "",
-      website: society.website || "",
-
-      // Tabs
-      dividend: tabs.interest.dividend,
-      overdraft: tabs.interest.od,
-      currentDeposit: tabs.interest.cd,
-      loan: tabs.interest.loan,
-      emergencyLoan: tabs.interest.emergencyLoan,
-      las: tabs.interest.las,
-
-      shareLimit: tabs.limit.share,
-      loanLimit: tabs.limit.loan,
-      emergencyLoanLimit: tabs.limit.emergencyLoan,
-
-      // Charges and dropdowns
-      targetDropdown: society.targetDropdown || "",
-      dropdownArray: parsedDropdownArray,
-
-      // Other
-      chBounceCharge: society.chBounceCharge || 0,
-      chequeReturnCharge: society.chequeReturnCharge || 0,
-      cash: society.cash || 0,
-      bonus: society.bonus || 0
-    };
-
-    console.log("📝 Final form data to patch:", formData);
-
-    // ---------------- Patch Form ----------------
-    this.societyForm.patchValue(formData);
-
-  } catch (error) {
-    console.error("❌ Error parsing society data:", error);
-    this.error = "Failed to parse society data";
   }
-}
 
+  // Parse dropdownArray
+  let parsedDropdownArray: string[] = [];
+  if (society.dropdownArray) {
+    try {
+      if (typeof society.dropdownArray === 'string') {
+        parsedDropdownArray = JSON.parse(society.dropdownArray);
+      } else {
+        parsedDropdownArray = society.dropdownArray;
+      }
+    } catch (e) {
+      console.error('Invalid JSON in dropdownArray:', e);
+    }
+  }
+
+  // Set targetDropdown value - ensure it matches one of the options
+  let targetValue = society.targetDropdown || '';
+  
+  // If we have a target value and dropdown options, ensure exact match
+  if (targetValue && parsedDropdownArray.length > 0) {
+    const exactMatch = parsedDropdownArray.find(item => item === targetValue);
+    if (!exactMatch) {
+      // If no exact match, try case-insensitive match
+      const caseInsensitiveMatch = parsedDropdownArray.find(
+        item => item.toLowerCase().trim() === targetValue.toLowerCase().trim()
+      );
+      targetValue = caseInsensitiveMatch || '';
+    }
+  }
+
+  this.societyForm.patchValue({
+    societyName: society.societyName,
+    registrationNumber: society.registrationNumber,
+    address: society.address,
+    city: society.city,
+    phone: society.phone,
+    fax: society.fax || '',
+    email: society.email,
+    website: society.website || '',
+
+    dividend: tabs?.interest?.dividend ?? society.dividend,
+    overdraft: tabs?.interest?.od ?? society.overdraft,
+    currentDeposit: tabs?.interest?.cd ?? society.currentDeposit,
+    loan: tabs?.interest?.loan ?? society.loan,
+    emergencyLoan: tabs?.interest?.emergencyLoan ?? society.emergencyLoan,
+    las: tabs?.interest?.las ?? society.las,
+
+    shareLimit: tabs?.limit?.share ?? society.shareLimit,
+    loanLimit: tabs?.limit?.loan ?? society.loanLimit,
+    emergencyLoanLimit: tabs?.limit?.emergencyLoan ?? society.emergencyLoanLimit,
+
+    chequeReturnCharge: society.chequeReturnCharge ?? 0,
+    cash: society.cash ?? 0,
+    bonus: society.bonus ?? 0,
+    chBounceCharge: society.chBounceCharge ?? 0,
+    targetDropdown: targetValue, // Use the normalized value
+    
+    dropdownArray: parsedDropdownArray
+  });
+}
 
 
   enableEdit() {
@@ -620,25 +589,17 @@ populateForm(society: any) {
   }
 
   saveChanges() {
-    if (this.societyForm.invalid) {
-      this.markFormGroupTouched(this.societyForm);
-      return;
-    }
+    // if (this.societyForm.invalid) {
+    //   this.markFormGroupTouched(this.societyForm);
+    //   return;
+    // }
 
     this.submitting = true;
-    const formData = this.societyForm.value;
-    
-    // Prepare data for backend (convert dropdownArray to string if needed)
-    const saveData: any = {
-      ...formData,
-      dropdownArray: Array.isArray(formData.dropdownArray) 
-        ? JSON.stringify(formData.dropdownArray) 
-        : formData.dropdownArray
-    };
+    const formData = this.societyForm.value as CreateSocietyDto;
 
     const saveObservable = this.societyData
-      ? this.societyService.updateSociety(this.societyData.id, saveData)
-      : this.societyService.createSociety(saveData);
+      ? this.societyService.updateSociety(this.societyData.id, formData)
+      : this.societyService.createSociety(formData);
 
     saveObservable
       .pipe(
@@ -663,6 +624,7 @@ populateForm(society: any) {
             );
             this.societyService.setCurrentSociety(this.societyData);
           }
+
         },
         error: (err) => {
           console.error('Error saving society:', err);
