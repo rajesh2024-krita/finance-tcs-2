@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup, FormsModule } from '@angular/forms';
 import { LoanTakenService, MemberDto, LoanTakenCreateDto, SocietyLimitDto, Member } from '../../../services/loan-taken.service';
-import { max } from 'rxjs';
 
 @Component({
   selector: 'app-loan-entry-form',
@@ -343,13 +342,13 @@ import { max } from 'rxjs';
           </div>
         </div>
         <div class="flex justify-end flex-wrap gap-2 w-full md:w-auto">
-          <button type="button" (click)="onClear()" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium">
+          <button (click)="onClear()" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium">
             Clear
           </button>
-          <button type="button" (click)="onValidate()" class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium">
+          <button (click)="onValidate()" class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium">
             Validate
           </button>
-          <button type="submit" (click)="onSave()" [disabled]="!canSave" 
+          <button (click)="onSave()" [disabled]="!canSave" 
             class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium">
             Save
           </button>
@@ -491,13 +490,13 @@ export class LoanTakenComponent implements OnInit {
   getShareValue(member: Member | null): number {
     if (!member) return 0;
 
-    // console.log(typeof (member as any).share === 'number')
-    // console.log(member.bankingDetails.share)
+    console.log(typeof (member as any).share === 'number')
+    console.log(member.bankingDetails.share)
     // Handle both number and string share values
     if (typeof (member as any).share === 'number') {
       return (member as any).share;
     } else if (typeof member.bankingDetails?.share === 'string') {
-      // console.log('testing')
+      console.log('testing')
       return parseFloat(member.bankingDetails.share) || 0;
     }
     return member.bankingDetails.share;
@@ -648,7 +647,7 @@ export class LoanTakenComponent implements OnInit {
   }
 
   netLoan() {
-    return (Number(this.form.get('loanAmount')!.value) || 0) - (Number(this.form.get('previousLoan')!.value) || 0);
+    return (Number(this.form.get('loanAmount')!.value) || 0) + (Number(this.form.get('previousLoan')!.value) || 0);
   }
 
   installmentAmount() {
@@ -713,44 +712,39 @@ export class LoanTakenComponent implements OnInit {
     if (!this.selectedMember)
       return { ok: false, message: 'Select a valid member' };
 
-    // Society limit validation - THIS IS THE KEY FIX
+    // Society limit validation
+    const loanType = this.form.get('loanType')!.value;
     if (this.societyLimits) {
-      try {
-        const tabsObj = JSON.parse(this.societyLimits.tabs);
-        const loanType = this.form.get('loanType')!.value;
-        const loanAmount = Number(this.form.get('loanAmount')!.value) || 0;
-        const backLoanAmount = Number(tabsObj.Limit.Loan);
+      const limit = this.getLoanTypeLimit(loanType);
+      if (limit > 0 && loan > limit) {
+        return {
+          ok: false,
+          message: `Loan amount (₹${loan}) exceeds the society limit (₹${limit}) for ${loanType} loans`
+        };
+      }
 
-        console.log('tabsObj == ', tabsObj);
-        console.log('loanAmount == ', loanAmount);
-        console.log('backLoanAmount == ', backLoanAmount);
-
-        // Check if loan amount exceeds society limit and RETURN if it does
-        if (loanAmount > backLoanAmount) {
+      // Share limit validation for General loans
+      if (this.isGeneralLoan()) {
+        const shareLimit = this.getShareLimit();
+        const newShare = this.calculateNewLoanShare();
+        if (newShare > shareLimit) {
           return {
             ok: false,
-            message: `Loan amount cannot exceed ₹${backLoanAmount}. Current amount: ₹${loanAmount}`
+            message: `Required share (₹${newShare}) exceeds the society share limit (₹${shareLimit})`
           };
         }
+      }
+    }
 
-        // Get the appropriate limit based on loan type
-        let limit = 0;
-        switch (loanType) {
-          case 'General': limit = tabsObj.Limit?.loan || 0; break;
-          case 'Emergency': limit = tabsObj.Limit?.emergency || 0; break;
-          // Add other loan types as needed
-          default: limit = 0;
-        }
+    console.log('test = ', this.societyLimits)
 
-        if (limit > 0 && loanAmount > limit) {
-          return {
-            ok: false,
-            message: `Loan amount (₹${loanAmount}) exceeds the society limit (₹${limit}) for ${loanType} loans`
-          };
-        }
-      } catch (e) {
-        console.error('Error parsing society limits:', e);
-        return { ok: false, message: 'Error validating society limits' };
+    // 🔹 Extra rule: Emergency loan <= 100000 if society loan limit <= 200000
+    if (loanType === 'EmergencyLoan' && this.societyLimits?.limits?.loan <= 200000) {
+      if (loan > 100000) {
+        return {
+          ok: false,
+          message: `Emergency Loan cannot exceed ₹100000 when Society Loan limit is ₹200000 or less`
+        };
       }
     }
 
@@ -771,12 +765,9 @@ export class LoanTakenComponent implements OnInit {
     return { ok: true };
   }
 
-  calculateLoan() { }
-
   // Add these calculation methods that don't update the UI until validation
   calculateNewLoanShare(): number {
     if (!this.isGeneralLoan()) return 0;
-    console.log('calculateNewLoanShare')
 
     const loan = Number(this.form.get('loanAmount')!.value) || 0;
     const historyShare = this.getShareValue(this.selectedMember);
@@ -787,7 +778,6 @@ export class LoanTakenComponent implements OnInit {
 
   calculateNegativeShareAdjustment(): number {
     if (this.isGeneralLoan()) return 0;
-    console.log('calculateNegativeShareAdjustment')
 
     const historyShare = this.getShareValue(this.selectedMember);
     return historyShare < 0 ? Math.abs(historyShare) : 0;
@@ -796,7 +786,6 @@ export class LoanTakenComponent implements OnInit {
   calculatePayAmount(): number {
     const loan = Number(this.form.get('loanAmount')!.value) || 0;
     const prev = Number(this.form.get('previousLoan')!.value) || 0;
-    console.log('calculatePayAmount')
 
     if (this.isGeneralLoan()) {
       const newShare = this.calculateNewLoanShare();
@@ -836,7 +825,7 @@ export class LoanTakenComponent implements OnInit {
       return;
     }
 
-    // Update the validated values after successful validation
+    // Only update the validated values after successful validation
     this.validatedNewLoanShare = this.calculateNewLoanShare();
     this.validatedNegativeShareAdjustment = this.calculateNegativeShareAdjustment();
     this.validatedPayAmount = this.calculatePayAmount();

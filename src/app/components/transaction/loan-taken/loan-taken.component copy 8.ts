@@ -713,46 +713,66 @@ export class LoanTakenComponent implements OnInit {
     if (!this.selectedMember)
       return { ok: false, message: 'Select a valid member' };
 
-    // Society limit validation - THIS IS THE KEY FIX
+    // Society limit validation
+    const loanType = this.form.get('loanType')!.value;
     if (this.societyLimits) {
-      try {
-        const tabsObj = JSON.parse(this.societyLimits.tabs);
-        const loanType = this.form.get('loanType')!.value;
-        const loanAmount = Number(this.form.get('loanAmount')!.value) || 0;
-        const backLoanAmount = Number(tabsObj.Limit.Loan);
-
-        console.log('tabsObj == ', tabsObj);
-        console.log('loanAmount == ', loanAmount);
-        console.log('backLoanAmount == ', backLoanAmount);
-
-        // Check if loan amount exceeds society limit and RETURN if it does
-        if (loanAmount > backLoanAmount) {
-          return {
-            ok: false,
-            message: `Loan amount cannot exceed ₹${backLoanAmount}. Current amount: ₹${loanAmount}`
-          };
-        }
-
-        // Get the appropriate limit based on loan type
-        let limit = 0;
-        switch (loanType) {
-          case 'General': limit = tabsObj.Limit?.loan || 0; break;
-          case 'Emergency': limit = tabsObj.Limit?.emergency || 0; break;
-          // Add other loan types as needed
-          default: limit = 0;
-        }
-
-        if (limit > 0 && loanAmount > limit) {
-          return {
-            ok: false,
-            message: `Loan amount (₹${loanAmount}) exceeds the society limit (₹${limit}) for ${loanType} loans`
-          };
-        }
-      } catch (e) {
-        console.error('Error parsing society limits:', e);
-        return { ok: false, message: 'Error validating society limits' };
+      const limit = this.getLoanTypeLimit(loanType);
+      if (limit > 0 && loan > limit) {
+        return {
+          ok: false,
+          message: `Loan amount (₹${loan}) exceeds the society limit (₹${limit}) for ${loanType} loans`
+        };
       }
+
+      // Share limit validation for General loans
+      // if (this.isGeneralLoan()) {
+      //   const shareLimit = this.getShareLimit();
+      //   const newShare = this.calculateNewLoanShare();
+      //   if (newShare > shareLimit) {
+      //     return {
+      //       ok: false,
+      //       message: `Required share (₹${newShare}) exceeds the society share limit (₹${shareLimit})`
+      //     };
+      //   }
+      // }
+      const tabsObj = JSON.parse(this.societyLimits.tabs);
+      const loanAmount = Number(this.form.get('loanAmount')!.value) || 0;
+      const backLoanAmount = Number(tabsObj.Limit.Loan);
+
+      console.log('tabsObj == ', tabsObj)
+      console.log('loanAmount == ', loanAmount)
+      console.log('backLoanAmount == ', backLoanAmount)
+
+
+      if (loanAmount <= backLoanAmount) {
+        // ✅ Pass condition
+        console.log("Loan amount is valid");
+      } else {
+        // ❌ Exceeds limit
+        alert(`Loan amount cannot exceed ₹${loanAmount}`);
+      }
+
+      // console.log('this.societyLimits == ', tabsObj.Limit.Loan);
+      // if (max(tabsObj.Limit.Loan)) {
+      //   console.log('✅ Loan is within allowed limit');
+      // } else {
+      //   console.log('❌ Loan exceeds the maximum limit of 20000');
+      // }
+
+
     }
+
+    // console.log('test = ', this.societyLimits)
+
+    // 🔹 Extra rule: Emergency loan <= 100000 if society loan limit <= 200000
+    // if (loanType === 'EmergencyLoan' && this.societyLimits?.limits?.loan <= 200000) {
+    //   if (loan > 100000) {
+    //     return {
+    //       ok: false,
+    //       message: `Emergency Loan cannot exceed ₹100000 when Society Loan limit is ₹200000 or less`
+    //     };
+    //   }
+    // }
 
     // Check purpose is required for non-General loans
     if (!this.isGeneralLoan() && !this.form.get('purpose')?.value) {
@@ -830,20 +850,23 @@ export class LoanTakenComponent implements OnInit {
   onValidate() {
     const res = this.enforceLoanRules();
     if (!res.ok) {
-      alert(res.message);
-      this.canSave = false;
-      this.isValidated = false;
+      // alert(res.message);
+      // this.canSave = false;
+      // this.isValidated = false;
+      console.log('testing1')
       return;
     }
-
-    // Update the validated values after successful validation
+    
+    console.log('testing2')
+    // Only update the validated values after successful validation
     this.validatedNewLoanShare = this.calculateNewLoanShare();
     this.validatedNegativeShareAdjustment = this.calculateNegativeShareAdjustment();
     this.validatedPayAmount = this.calculatePayAmount();
-
+    
     alert('Validation successful');
-    this.canSave = true;
-    this.isValidated = true;
+    console.log('testing3')
+    // this.canSave = true;
+    // this.isValidated = true;
   }
 
   async onSave() {

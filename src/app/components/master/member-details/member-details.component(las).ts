@@ -18,7 +18,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MemberService, Member } from '../../../services/member.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MemberViewDialogComponent } from './member-view-dialog.component';
-import { MemberSelectDialogComponent } from './member-select-dialog.component';
 
 @Component({
   selector: 'app-member-details',
@@ -42,14 +41,12 @@ import { MemberSelectDialogComponent } from './member-select-dialog.component';
     MatTooltipModule
   ],
   templateUrl: './member-details.component.html',
-  // styleUrls: ['./member-details.component.css']
+  styleUrls: ['./member-details.component.css']
 })
 export class MemberDetailsComponent implements OnInit {
   memberForm: FormGroup;
   dataSource = new MatTableDataSource<Member>([]);
   displayedColumns: string[] = ['memberNo', 'name', 'mobile', 'status', 'actions'];
-
-  activeTab: string = 'general';
 
   // Signals for component state
   private offCanvasOpen = signal(false);
@@ -71,16 +68,6 @@ export class MemberDetailsComponent implements OnInit {
 
   ngOnInit() {
     this.loadMembers();
-
-    this.memberForm.get('status')?.valueChanges.subscribe(status => {
-    const doRetirementControl = this.memberForm.get('doRetirement');
-    if (status === 'Resignation' || status === 'In-Active') {
-      doRetirementControl?.enable();   // enable only if resigned
-    } else {
-      doRetirementControl?.disable();  // otherwise keep disabled
-      doRetirementControl?.reset();    // optional: clear old value
-    }
-  });
   }
 
   // Signal getters
@@ -90,49 +77,46 @@ export class MemberDetailsComponent implements OnInit {
 
   private createMemberForm(): FormGroup {
     return this.fb.group({
-      memberNo: ['', Validators.required],
-      name: ['', Validators.required],
-      fhName: ['', Validators.required],
-      dateOfBirth: [''],
-      mobile: [''],
-      email: ['', Validators.email],
-      city: [''],
-      status: ['Active'],
-      officeAddress: [''],
-      residenceAddress: [''],
-      designation: [''],
-      branch: [''],
-      dojJob: [''],
-      doRetirement: [{ value: '', disabled: true }],
-      dojSociety: [''],
-      phoneOffice: [''],
-      phoneResidence: [''],
-      shareAmount: [0],
-      cdAmount: [0],
-      bankName: ['', Validators.required],
-      branchName: [''],
-      accountNo: ['', Validators.required],
-      accountHolderName: ['', Validators.required],
-      ifscCode: ['', Validators.required],
-      payableAt: [''],
-      shareDeduction: [0],
-      withdrawal: [0],
-      gLoanInstalment: [0],
-      eLoanInstalment: [0],
-      nominee: [''],
-      nomineeRelation: [''],
-    });
+  memberNo: ['', Validators.required],
+  name: ['', Validators.required],
+  fhName: ['', Validators.required],
+  dateOfBirth: [''],
+  mobile: [''],
+  email: ['', Validators.email],
+  city: [''],
+  status: ['Active'],
+  officeAddress: [''],
+  residenceAddress: [''],
+  designation: [''],
+  branch: [''],
+  dojJob: [''],
+  doRetirement: [''],
+  dojSociety: [''],
+  phoneOffice: [''],
+  phoneResidence: [''],
+  shareAmount: [0],
+  cdAmount: [0],
+  bankName: ['', Validators.required],
+  branchName: [''],
+  accountNo: ['', Validators.required],
+  accountHolderName: ['', Validators.required],
+  ifscCode: ['', Validators.required],
+  payableAt: [''],
+  shareDeduction: [0],
+  withdrawal: [0],
+  gLoanInstalment: [0],
+  eLoanInstalment: [0],
+  nominee: [''],
+  nomineeRelation: ['']
+});
 
   }
-
-  
 
   loadMembers() {
     this.memberService.getAllMembers().subscribe({
       next: (response: any) => {
         // Check if response has data property or is the array itself
         const members = response.data || response;
-        console.log('members = ', members)
         this.allMembers = (Array.isArray(members) ? members : []).map((m: any) => ({
           ...m,
           memberNo: m.memNo || m.memberNo // Handle both cases
@@ -162,59 +146,43 @@ export class MemberDetailsComponent implements OnInit {
     this.dataSource.data = filtered;
   }
 
-  openOffCanvas(mode: 'create' | 'edit', member?: Member) {
-    this.editMode.set(mode === 'edit');
+openOffCanvas(mode: 'create' | 'edit', member?: Member) {
+  this.editMode.set(mode === 'edit');
 
-    if (mode === 'edit' && member) {
-      this.currentMember.set(member);
-      this.populateForm(member);
-    } else {
-      this.currentMember.set(null);
-      this.memberForm.reset();
-      this.memberForm.patchValue({
-        shareAmount: 0,
-        cdAmount: 0,
-        status: 'Active',
-        memberNo: this.generateNextMemberId(this.allMembers) // 👈 Auto ID here
-      });
-    }
-
-    this.offCanvasOpen.set(true);
-  }
-
-  /** Generate next MEM_XXX ID */
-  private generateNextMemberId(members: Member[]): string {
-    if (!members || members.length === 0) {
-      return 'MEM_001';
-    }
-
-    // Extract numbers from memNo/memberNo like "MEM_001" → 1
-    const ids = members
-      .map(m => parseInt((m.memNo || m.memberNo || '').replace('MEM_', ''), 10))
-      .filter(n => !isNaN(n));
-
-    const maxId = ids.length > 0 ? Math.max(...ids) : 0;
-    const nextId = maxId + 1;
-
-    return `MEM_${nextId.toString().padStart(3, '0')}`;
-  }
-
-  // Add this method to open the member selection dialog
-  openMemberSelectionDialog(): void {
-    const dialogRef = this.dialog.open(MemberSelectDialogComponent, {
-      width: '800px',
-      data: { members: this.allMembers }
-    });
-
-    dialogRef.afterClosed().subscribe((selectedMember: Member) => {
-      if (selectedMember) {
-        this.populateForm(selectedMember);
-        this.editMode.set(true);
-        this.currentMember.set(selectedMember);
-        this.offCanvasOpen.set(true);
-      }
+  if (mode === 'edit' && member) {
+    this.currentMember.set(member);
+    this.populateForm(member);
+  } else {
+    this.currentMember.set(null);
+    this.memberForm.reset();
+    this.memberForm.patchValue({
+      shareAmount: 0,
+      cdAmount: 0,
+      status: 'Active',
+      memberNo: this.generateNextMemberId(this.allMembers) // 👈 Auto ID here
     });
   }
+
+  this.offCanvasOpen.set(true);
+}
+
+/** Generate next MEM_XXX ID */
+private generateNextMemberId(members: Member[]): string {
+  if (!members || members.length === 0) {
+    return 'MEM_001';
+  }
+
+  // Extract numbers from memNo/memberNo like "MEM_001" → 1
+  const ids = members
+    .map(m => parseInt((m.memNo || m.memberNo || '').replace('MEM_', ''), 10))
+    .filter(n => !isNaN(n));
+
+  const maxId = ids.length > 0 ? Math.max(...ids) : 0;
+  const nextId = maxId + 1;
+
+  return `MEM_${nextId.toString().padStart(3, '0')}`;
+}
+
 
   closeOffCanvas() {
     this.offCanvasOpen.set(false);
@@ -224,63 +192,47 @@ export class MemberDetailsComponent implements OnInit {
   }
 
   populateForm(member: any) {
-  this.memberForm.patchValue({
-    memberNo: member.memNo || member.memberNo,
-    name: member.name,
-    fhName: member.fhName,
-    dateOfBirth: member.dob ? new Date(member.dob).toISOString().split('T')[0] : null,
-    mobile: member.mobile,
-    email: member.email,
-    designation: member.designation,
-    dojJob: member.dojOrg ? new Date(member.dojOrg).toISOString().split('T')[0] : null,
-    doRetirement: member.dor ? new Date(member.dor).toISOString().split('T')[0] : null,
-    dojSociety: member.dojSociety ? new Date(member.dojSociety).toISOString().split('T')[0] : null,
-    officeAddress: member.officeAddress,
-    residenceAddress: member.residenceAddress,
-    city: member.city,
-    phoneOffice: member.phoneOffice,
-    phoneResidence: member.phoneResidence || member.phoneRes,
-    nominee: member.nominee,
-    nomineeRelation: member.nomineeRelation,
-    shareAmount: member.bankingDetails?.share || 0,
-    cdAmount: member.cdAmount || 0,
-    bankName: member.bankName || (member.bankingDetails?.bankName),
-    payableAt: member.payableAt || member.branchName,
-    accountNo: member.accountNo || (member.bankingDetails?.accountNumber),
-    status: member.status || 'Active',
-    shareDeduction: member.shareDeduction || 0,
-    withdrawal: member.withdrawal || 0,
-    gLoanInstalment: member.gLoanInstalment || 0,
-    eLoanInstalment: member.eLoanInstalment || 0
-  });
-
-  // 👇 handle enable/disable based on existing member status
-  if (member.status === 'Resignation') {
-    this.memberForm.get('doRetirement')?.enable();
-  } else {
-    this.memberForm.get('doRetirement')?.disable();
+    // Map form field names to API field names
+    this.memberForm.patchValue({
+      memberNo: member.memNo || member.memberNo,
+      name: member.name,
+      fhName: member.fhName,
+      dateOfBirth: member.dob ? new Date(member.dob).toISOString().split('T')[0] : null,
+      mobile: member.mobile,
+      email: member.email,
+      designation: member.designation,
+      dojJob: member.dojOrg ? new Date(member.dojOrg).toISOString().split('T')[0] : null,
+      doRetirement: member.dor ? new Date(member.dor).toISOString().split('T')[0] : null,
+      branch: member.branch,
+      dojSociety: member.dojSociety ? new Date(member.dojSociety).toISOString().split('T')[0] : null,
+      officeAddress: member.officeAddress,
+      residenceAddress: member.residenceAddress,
+      city: member.city,
+      phoneOffice: member.phoneOffice,
+      phoneResidence: member.phoneResidence || member.phoneRes,
+      nominee: member.nominee,
+      nomineeRelation: member.nomineeRelation,
+      shareAmount: member.shareAmount || 0,
+      cdAmount: member.cdAmount || 0,
+      bankName: member.bankName || (member.bankingDetails?.bankName),
+      payableAt: member.payableAt || member.branchName,
+      accountNo: member.accountNo || (member.bankingDetails?.accountNumber),
+      status: member.status || 'Active',
+      shareDeduction: member.shareDeduction || 0,
+      withdrawal: member.withdrawal || 0,
+      gLoanInstalment: member.gLoanInstalment || 0,
+      eLoanInstalment: member.eLoanInstalment || 0
+    });
   }
+
+private toUtcString(date: any): string | undefined {
+  if (!date) return undefined;
+  return new Date(date).toISOString();
 }
 
 
-  private toUtcString(date: any): string | undefined {
-    if (!date) return undefined;
-    return new Date(date).toISOString();
-  }
-
-  // Switch tabs
-  // setTab(tab: string) {
-  //   this.activeTab = tab;
-  // }
-
-  // Reset or cancel
-  resetForm() {
-    this.memberForm.reset();
-    this.activeTab = 'general';
-  }
-
-
-  private transformFormDataToApi(formValue: any): Member {
+private transformFormDataToApi(formValue: any): Member {
+  
   return {
     memNo: formValue.memberNo,
     name: formValue.name,
@@ -288,7 +240,7 @@ export class MemberDetailsComponent implements OnInit {
     dob: this.toUtcString(formValue.dateOfBirth),
     dojSociety: this.toUtcString(formValue.dojSociety),
     dojOrg: this.toUtcString(formValue.dojJob),
-    dor: this.toUtcString(formValue.doRetirement), // 👈 mapped to backend
+    dor: this.toUtcString(formValue.doRetirement),
     email: formValue.email,
     mobile: formValue.mobile,
     designation: formValue.designation,
@@ -302,13 +254,13 @@ export class MemberDetailsComponent implements OnInit {
     nomineeRelation: formValue.nomineeRelation,
     bankingDetails: {
       bankName: formValue.bankName,
+      branchName: formValue.branchName,
       accountNumber: formValue.accountNo,
-      payableAt: formValue.payableAt,
-      share: formValue.share
+      accountHolderName: formValue.accountHolderName,
+      ifscCode: formValue.ifscCode
     }
   };
 }
-
 
 
 
@@ -404,38 +356,6 @@ export class MemberDetailsComponent implements OnInit {
           this.showSnackBar('Error deleting member');
         }
       });
-    }
-  }
-
-  setActiveTab(tab: string) {
-    this.activeTab = tab;
-  }
-
-  onPhotoUpload(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      console.log('Photo uploaded:', file.name);
-    }
-  }
-
-  onSignatureUpload(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      console.log('Signature uploaded:', file.name);
-    }
-  }
-
-  onClear() {
-    this.memberForm.reset();
-  }
-
-  onPrint() {
-    window.print();
-  }
-
-  onSave() {
-    if (this.memberForm.valid) {
-      console.log(this.memberForm.value);
     }
   }
 
