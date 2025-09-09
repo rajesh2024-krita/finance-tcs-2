@@ -71,6 +71,16 @@ export class MemberDetailsComponent implements OnInit {
 
   ngOnInit() {
     this.loadMembers();
+
+    this.memberForm.get('status')?.valueChanges.subscribe(status => {
+    const doRetirementControl = this.memberForm.get('doRetirement');
+    if (status === 'Resignation' || status === 'In-Active') {
+      doRetirementControl?.enable();   // enable only if resigned
+    } else {
+      doRetirementControl?.disable();  // otherwise keep disabled
+      doRetirementControl?.reset();    // optional: clear old value
+    }
+  });
   }
 
   // Signal getters
@@ -93,7 +103,7 @@ export class MemberDetailsComponent implements OnInit {
       designation: [''],
       branch: [''],
       dojJob: [''],
-      doRetirement: [''],
+      doRetirement: [{ value: '', disabled: true }],
       dojSociety: [''],
       phoneOffice: [''],
       phoneResidence: [''],
@@ -110,10 +120,12 @@ export class MemberDetailsComponent implements OnInit {
       gLoanInstalment: [0],
       eLoanInstalment: [0],
       nominee: [''],
-      nomineeRelation: ['']
+      nomineeRelation: [''],
     });
 
   }
+
+  
 
   loadMembers() {
     this.memberService.getAllMembers().subscribe({
@@ -212,40 +224,44 @@ export class MemberDetailsComponent implements OnInit {
   }
 
   populateForm(member: any) {
-    // Map form field names to API field names
-    this.memberForm.patchValue({
-      memberNo: member.memNo || member.memberNo,
-      name: member.name,
-      fhName: member.fhName,
-      dateOfBirth: member.dob ? new Date(member.dob).toISOString().split('T')[0] : null,
-      mobile: member.mobile,
-      email: member.email,
-      designation: member.designation,
-      dojJob: member.dojOrg ? new Date(member.dojOrg).toISOString().split('T')[0] : null,
-      doRetirement: member.dor ? new Date(member.dor).toISOString().split('T')[0] : null,
-      branch: member.branch,
-      dojSociety: member.dojSociety ? new Date(member.dojSociety).toISOString().split('T')[0] : null,
-      officeAddress: member.officeAddress,
-      residenceAddress: member.residenceAddress,
-      city: member.city,
-      phoneOffice: member.phoneOffice,
-      phoneResidence: member.phoneResidence || member.phoneRes,
-      nominee: member.nominee,
-      nomineeRelation: member.nomineeRelation,
-      shareAmount: member.shareAmount || 0,
-      cdAmount: member.cdAmount || 0,
-      bankName: member.bankName || (member.bankingDetails?.bankName),
-      payableAt: member.payableAt || member.branchName,
-      accountNo: member.accountNo || (member.bankingDetails?.accountNumber),
-      status: member.status || 'Active',
-      shareDeduction: member.shareDeduction || 0,
-      withdrawal: member.withdrawal || 0,
-      gLoanInstalment: member.gLoanInstalment || 0,
-      eLoanInstalment: member.eLoanInstalment || 0,
-      stDate: member.stDate || 0,
-    });
-    console.log('member == ', this.memberForm.value)
+  this.memberForm.patchValue({
+    memberNo: member.memNo || member.memberNo,
+    name: member.name,
+    fhName: member.fhName,
+    dateOfBirth: member.dob ? new Date(member.dob).toISOString().split('T')[0] : null,
+    mobile: member.mobile,
+    email: member.email,
+    designation: member.designation,
+    dojJob: member.dojOrg ? new Date(member.dojOrg).toISOString().split('T')[0] : null,
+    doRetirement: member.dor ? new Date(member.dor).toISOString().split('T')[0] : null,
+    dojSociety: member.dojSociety ? new Date(member.dojSociety).toISOString().split('T')[0] : null,
+    officeAddress: member.officeAddress,
+    residenceAddress: member.residenceAddress,
+    city: member.city,
+    phoneOffice: member.phoneOffice,
+    phoneResidence: member.phoneResidence || member.phoneRes,
+    nominee: member.nominee,
+    nomineeRelation: member.nomineeRelation,
+    shareAmount: member.bankingDetails?.share || 0,
+    cdAmount: member.cdAmount || 0,
+    bankName: member.bankName || (member.bankingDetails?.bankName),
+    payableAt: member.payableAt || member.branchName,
+    accountNo: member.accountNo || (member.bankingDetails?.accountNumber),
+    status: member.status || 'Active',
+    shareDeduction: member.shareDeduction || 0,
+    withdrawal: member.withdrawal || 0,
+    gLoanInstalment: member.gLoanInstalment || 0,
+    eLoanInstalment: member.eLoanInstalment || 0
+  });
+
+  // 👇 handle enable/disable based on existing member status
+  if (member.status === 'Resignation') {
+    this.memberForm.get('doRetirement')?.enable();
+  } else {
+    this.memberForm.get('doRetirement')?.disable();
   }
+}
+
 
   private toUtcString(date: any): string | undefined {
     if (!date) return undefined;
@@ -265,35 +281,34 @@ export class MemberDetailsComponent implements OnInit {
 
 
   private transformFormDataToApi(formValue: any): Member {
+  return {
+    memNo: formValue.memberNo,
+    name: formValue.name,
+    fhName: formValue.fhName,
+    dob: this.toUtcString(formValue.dateOfBirth),
+    dojSociety: this.toUtcString(formValue.dojSociety),
+    dojOrg: this.toUtcString(formValue.dojJob),
+    dor: this.toUtcString(formValue.doRetirement), // 👈 mapped to backend
+    email: formValue.email,
+    mobile: formValue.mobile,
+    designation: formValue.designation,
+    branch: formValue.branch,
+    officeAddress: formValue.officeAddress,
+    residenceAddress: formValue.residenceAddress,
+    city: formValue.city,
+    phoneOffice: formValue.phoneOffice,
+    phoneRes: formValue.phoneResidence,
+    nominee: formValue.nominee,
+    nomineeRelation: formValue.nomineeRelation,
+    bankingDetails: {
+      bankName: formValue.bankName,
+      accountNumber: formValue.accountNo,
+      payableAt: formValue.payableAt,
+      share: formValue.share
+    }
+  };
+}
 
-    return {
-      memNo: formValue.memberNo,
-      name: formValue.name,
-      fhName: formValue.fhName,
-      dob: this.toUtcString(formValue.dateOfBirth),
-      dojSociety: this.toUtcString(formValue.dojSociety),
-      dojOrg: this.toUtcString(formValue.dojJob),
-      dor: this.toUtcString(formValue.doRetirement),
-      email: formValue.email,
-      mobile: formValue.mobile,
-      designation: formValue.designation,
-      branch: formValue.branch,
-      officeAddress: formValue.officeAddress,
-      residenceAddress: formValue.residenceAddress,
-      city: formValue.city,
-      phoneOffice: formValue.phoneOffice,
-      phoneRes: formValue.phoneResidence,
-      nominee: formValue.nominee,
-      nomineeRelation: formValue.nomineeRelation,
-      bankingDetails: {
-        bankName: formValue.bankName,
-        branchName: formValue.branchName,
-        accountNumber: formValue.accountNo,
-        accountHolderName: formValue.accountHolderName,
-        ifscCode: formValue.ifscCode
-      }
-    };
-  }
 
 
 
