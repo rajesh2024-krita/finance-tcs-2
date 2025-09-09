@@ -38,10 +38,43 @@ export interface LoanTakenResponseDto {
 }
 
 export interface MemberDto {
-  id: number;
+id?: number;
   memNo: string;
+  memberNo?: string;
   name: string;
-  share: number;
+  fhName: string;
+  officeAddress?: string;
+  city?: string;
+  phoneOffice?: string;
+  branch?: string;
+  phoneRes?: string;
+  mobile?: string;
+  designation?: string;
+  residenceAddress?: string;
+  dob?: Date | string;
+  dojSociety?: Date | string;
+  dojOrg?: Date | string;
+  dor?: Date | string;
+  email?: string;
+  nominee?: string;
+  nomineeRelation?: string;
+  bankingDetails: {
+    bankName: string;
+    accountNumber: string;
+    ifscCode: string;
+    branchName: string;
+    accountHolderName: string;
+    share: number; // This is a string in the API response
+  };
+  status?: string;
+  shareAmount?: number;
+  cdAmount?: number;
+  bankName?: string;
+  accountNo?: string;
+  accountHolderName?: string;
+  dateOfBirth?: Date | string;
+  dojJob?: Date | string;
+  doRetirement?: Date | string;
 }
 
 export interface BankingDetails {
@@ -101,20 +134,72 @@ export interface ApiResponse<T> {
   errors?: string[];
 }
 
+export interface InterestRatesDto {
+  dividend: number;
+  od: number;
+  cd: number;
+  loan: number;
+  emergencyLoan: number;
+  las: number;
+}
+
+export interface LimitsDto {
+  share: number;
+  loan: number;
+  emergencyLoan: number;
+}
+
+export interface SocietyTabsDto {
+  interest: InterestRatesDto;
+  limit: LimitsDto;
+}
+
+// 🔹 LoanType schema for frontend
+export interface LoanTypeDto {
+  LoanType: string;
+  CompulsoryDeposit: number;
+  OptionalDeposit: number;
+  Share: number;
+  Limit: number;
+  Interest: number;
+  XTimes: number;
+}
+
 // Add to your DTO Interfaces section
 export interface SocietyLimitDto {
   id: number;
-  name: string;
-  limits: {
+    societyName: string;
+    registrationNumber: string;
+    address: string;
+    city: string;
+    phone: string;
+    fax?: string;
+    email: string;
+    website?: string;
+  
+    // Flat structure
+    dividend: number;
+    overdraft: number;
+    currentDeposit: number;
     loan: number;
-    emergency: number;
-    festival: number;
+    emergencyLoan: number;
     las: number;
-    laFdr: number;
-  };
-  createdAt: string;
-  updatedAt: string;
-  tabs: any;
+    shareLimit: number;
+    loanLimit: number;
+    emergencyLoanLimit: number;
+  
+    chBounceCharge: string;
+    targetDropdown: string;
+    dropdownArray: string[];
+  
+    // 🔹 New: LoanTypes array
+    loanTypes: any;
+  
+    // Original tabs structure
+    tabs?: any;
+  
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 // ------------ Service ------------

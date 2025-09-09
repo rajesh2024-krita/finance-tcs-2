@@ -621,42 +621,25 @@ export class LoanTakenComponent implements OnInit {
   isCheque() { return this.form.get('paymentMode')!.value === 'Cheque'; }
 
   // Reset validation status when form changes
-  // onLoanTypeChange() {
-  //   this.recalculate();
-  //   this.isValidated = false;
-
-  //   // Reset purpose validation based on loan type
-  //   if (this.isGeneralLoan()) {
-  //     this.form.get('purpose')?.clearValidators();
-  //   } else {
-  //     this.form.get('purpose')?.setValidators([Validators.required]);
-  //   }
-  //   this.form.get('purpose')?.updateValueAndValidity();
-  // }
-
-  getLoanTypeData(selectedLoanType: string) {
-    if (!this.societyLimits) return null;
-
-    const tabsLoanTypes = JSON.parse(this.societyLimits?.loanTypes);
-    return tabsLoanTypes.find((t: any) => t.LoanType === selectedLoanType) || null;
-  }
-
-
   onLoanTypeChange() {
-    const selectedLoanType = this.form.get('loanType')?.value;
-    const loanData = this.getLoanTypeData(selectedLoanType);
+    this.recalculate();
+    this.isValidated = false;
 
-    console.log("Selected LoanType Data ==>", loanData);
-    // Example: { LoanType: "Emergency Loan", CompulsoryDeposit: 0, Share: 10000, Limit: 100000, ... }
+    // Reset purpose validation based on loan type
+    if (this.isGeneralLoan()) {
+      this.form.get('purpose')?.clearValidators();
+    } else {
+      this.form.get('purpose')?.setValidators([Validators.required]);
+    }
+    this.form.get('purpose')?.updateValueAndValidity();
   }
-
 
   onPaymentModeChange() { }
 
   get interestRate() {
     // Different interest rates for different loan types
     switch (this.form.get('loanType')?.value) {
-      case 'General': return 0.09;
+      case 'General': return 0.07;
       case 'Emergency': return 0.09;
       case 'Festival': return 0.09;
       case 'LAS': return 0.09;
@@ -670,9 +653,7 @@ export class LoanTakenComponent implements OnInit {
   }
 
   installmentAmount() {
-    console.log('validatedPayAmount == ', this.validatedPayAmount)
-    // const loan = Number(this.form.get('loanAmount')!.value) || 0;
-    const loan = this.validatedPayAmount || 0;
+    const loan = Number(this.form.get('loanAmount')!.value) || 0;
     const n = Number(this.form.get('installments')!.value) || 1;
     if (n <= 0) return 0;
     return Math.round((((loan * this.interestRate) + loan) / n + Number.EPSILON) * 100) / 100;
@@ -743,21 +724,16 @@ export class LoanTakenComponent implements OnInit {
         const loanAmount = Number(this.form.get('loanAmount')!.value) || 0;
         const backLoanAmount = Number(tabsObj.Limit.Loan);
 
-
-        const selectedLoanType = this.form.get('loanType')?.value;
-        const selectLoanData = this.getLoanTypeData(selectedLoanType);
-        console.log('fun loaddata == ', selectLoanData)
-
-        // console.log('tabsLoanTypes == ', tabsLoanTypes);
-        // console.log('tabsObj == ', tabsObj);
-        // console.log('loanAmount == ', loanAmount);
-        // console.log('backLoanAmount == ', backLoanAmount);
+        console.log('tabsLoanTypes == ', tabsLoanTypes);
+        console.log('tabsObj == ', tabsObj);
+        console.log('loanAmount == ', loanAmount);
+        console.log('backLoanAmount == ', backLoanAmount);
 
         // Check if loan amount exceeds society limit and RETURN if it does
-        if (loanAmount > selectLoanData?.Limit) {
+        if (loanAmount > backLoanAmount) {
           return {
             ok: false,
-            message: `Loan amount cannot exceed ₹${selectLoanData.Limit}. Current amount: ₹${loanAmount}`
+            message: `Loan amount cannot exceed ₹${backLoanAmount}. Current amount: ₹${loanAmount}`
           };
         }
 
@@ -835,18 +811,13 @@ export class LoanTakenComponent implements OnInit {
     return Math.round((loan - prev - negativeAdjustment + Number.EPSILON) * 100) / 100;
   }
 
-  getLoanTypeLimit(selectedLoanType: string): number {
-    if (!this.societyLimits) return 0;
+  getLoanTypeLimit(loanType: string): number {
+  if (!this.loanTypes?.length) return 0;
 
-    const tabsLoanTypes = JSON.parse(this.societyLimits?.loanTypes);
-    console.log('tabsLoanTypes text == ', tabsLoanTypes)
-
-    // find the object that matches the selected loan type
-    const loanObj = tabsLoanTypes.find((t: any) => t.LoanType === selectedLoanType);
-
-    return loanObj ? loanObj.Limit : 0;
-  }
-
+  const selected = this.loanTypes.find(t => t.LoanType === loanType);
+  console.log('selected == ', selected)
+  return selected ? selected.Limit : 0;
+}
 
 
   getLoanTypeLimitDisplay(loanType: string): string {
@@ -855,27 +826,6 @@ export class LoanTakenComponent implements OnInit {
   }
 
   onValidate() {
-    const member: Member | null = this.selectedMember;
-    const loanType = this.form.get('loanType')?.value;
-
-    // ✅ Special check: General Loan + share = 0
-    if (loanType === 'General Loan') {
-      const shareValue = this.getShareValue(member);
-
-      if (shareValue === 0) {
-        const proceed = confirm(
-          "You don't have any share amount, so the amount will be deducted from loan amount.\n\nDo you want to continue?"
-        );
-
-        if (!proceed) {
-          this.canSave = false;
-          this.isValidated = false;
-          return; // stop validation
-        }
-      }
-    }
-
-    // ✅ Run loan rules
     const res = this.enforceLoanRules();
     if (!res.ok) {
       alert(res.message);
@@ -884,7 +834,7 @@ export class LoanTakenComponent implements OnInit {
       return;
     }
 
-    // ✅ Update values after successful validation
+    // Update the validated values after successful validation
     this.validatedNewLoanShare = this.calculateNewLoanShare();
     this.validatedNegativeShareAdjustment = this.calculateNegativeShareAdjustment();
     this.validatedPayAmount = this.calculatePayAmount();
@@ -893,7 +843,6 @@ export class LoanTakenComponent implements OnInit {
     this.canSave = true;
     this.isValidated = true;
   }
-
 
   async onSave() {
     if (!this.canSave) {

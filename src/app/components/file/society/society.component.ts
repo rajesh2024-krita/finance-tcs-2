@@ -206,46 +206,78 @@ import { of, Subject } from 'rxjs';
               </div>
 
               <!-- Tab content -->
-              <div *ngFor="let loanGroup of loanTypesFormArray.controls; let i = index" [hidden]="activeLoanTab !== i" [formGroupName]="i" class="border rounded p-4 mb-3 bg-gray-50">
-                <!-- Numeric fields in 3-column grid -->
+              <!-- Tab content -->
+              <div *ngFor="let loanGroup of loanTypesFormArray.controls; let i = index" 
+                  [hidden]="activeLoanTab !== i" 
+                  [formGroupName]="i" 
+                  class="border rounded p-4 mb-3 bg-gray-50">
+
                 <div class="grid grid-cols-3 gap-4">
+
+                  <!-- Interest -->
                   <div>
-                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Interest (%)</label>
-                    <input type="number" formControlName="interest" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+                      Interest (%)
+                    </label>
+                    <input type="number" formControlName="interest"
+                      class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
                   </div>
 
+                  <!-- Loan Limit -->
                   <div>
-                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Loan Limit</label>
-                    <input type="number" formControlName="limit" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+                      Loan Limit
+                    </label>
+                    <input type="number" formControlName="limit"
+                      class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
                   </div>
 
-                  <div>
-                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Compulsory Deposit</label>
-                    <input type="number" formControlName="compulsoryDeposit" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                  </div>
+                  <!-- Show remaining fields ONLY if General Loan -->
+                  <ng-container *ngIf="loanGroup.get('loanType')?.value === 'General Loan'">
+                    
+                    <div>
+                      <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+                        Compulsory Deposit
+                      </label>
+                      <input type="number" formControlName="compulsoryDeposit"
+                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
+                    </div>
 
-                  <div>
-                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Optional Deposit</label>
-                    <input type="number" formControlName="optionalDeposit" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                  </div>
+                    <div>
+                      <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+                        Optional Deposit
+                      </label>
+                      <input type="number" formControlName="optionalDeposit"
+                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
+                    </div>
 
-                  <div>
-                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Share Amount</label>
-                    <input type="number" formControlName="share" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                  </div>
+                    <div>
+                      <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+                        Share Amount
+                      </label>
+                      <input type="number" formControlName="share"
+                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
+                    </div>
 
-                  <div>
-                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">N Times of Share Amount</label>
-                    <input type="number" formControlName="xTimes" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                  </div>
+                    <div>
+                      <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+                        N Times of Share Amount
+                      </label>
+                      <input type="number" formControlName="xTimes"
+                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
+                    </div>
+
+                  </ng-container>
                 </div>
 
                 <div class="flex justify-end mt-2">
-                  <button type="button" (click)="removeLoanType(i)" class="text-red-500 hover:text-red-700 text-sm font-medium">
+                  <button type="button" (click)="removeLoanType(i)" 
+                    class="text-red-500 hover:text-red-700 text-sm font-medium">
                     Remove
                   </button>
                 </div>
               </div>
+
             </div>
           </div>
 
