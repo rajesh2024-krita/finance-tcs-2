@@ -1,7 +1,7 @@
 // src/app/components/file/society/society.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray, FormsModule, FormControl } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -36,7 +36,8 @@ import { of, Subject } from 'rxjs';
     MatProgressBarModule,
     MatChipsModule,
     MatBadgeModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    FormsModule
   ],
   template: `
     <div class="animate-fade-in">
@@ -176,111 +177,141 @@ import { of, Subject } from 'rxjs';
           </div>
 
 
-          <div class="p-4 bg-white shadow rounded-lg">
-            <h2 class="text-lg font-normal mb-4">Loan Types</h2>
+          <!-- Loan Types Section -->
+<div class="p-4 bg-white shadow rounded-lg">
+  <h2 class="text-lg font-normal mb-4">Loan Types</h2>
 
-            <div formArrayName="loanTypes">
-              <!-- Tab headers -->
-              <div class="flex mb-4 overflow-x-auto justify-between">
-                <div>
-                  <button
-                    *ngFor="let loanGroup of loanTypesFormArray.controls; let i = index"
-                    type="button"
-                    (click)="activeLoanTab = i"
-                    [ngClass]="{
-                      'border-b-2 border-blue-600 font-normal text-blue-600': activeLoanTab === i,
-                      'text-gray-600 hover:text-blue-600': activeLoanTab !== i
-                    }"
-                    class="px-4 py-2 focus:outline-none whitespace-nowrap"
-                  >
-                    {{ loanGroup.get('loanType')?.value || 'New Loan' }}
-                  </button>
-                </div>
-                <button
-                  type="button"
-                  (click)="addLoanType(); activeLoanTab = loanTypesFormArray.length - 1"
-                  class="ml-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs"
-                >
-                  + Add New Loan Type
-                </button>
-              </div>
+  <div formArrayName="loanTypes">
+    <!-- Tab headers -->
+    <div class="flex mb-4 overflow-x-auto justify-between">
+      <div>
+        <ng-container *ngFor="let loanGroup of loanTypesFormArray.controls; let i = index">
+          <button
+            type="button"
+            (click)="activeLoanTab = i"
+            (dblclick)="openRenamePopup(i)"
+            [ngClass]="{
+              'border-b-2 border-blue-600 font-normal text-blue-600': activeLoanTab === i,
+              'text-gray-600 hover:text-blue-600': activeLoanTab !== i
+            }"
+            class="px-4 py-2 focus:outline-none whitespace-nowrap"
+          >
+            {{ loanGroup.get('loanType')?.value || 'New Loan' }}
+          </button>
+        </ng-container>
+      </div>
 
-              <!-- Tab content -->
-              <!-- Tab content -->
-              <div *ngFor="let loanGroup of loanTypesFormArray.controls; let i = index" 
-                  [hidden]="activeLoanTab !== i" 
-                  [formGroupName]="i" 
-                  class="border rounded p-4 mb-3 bg-gray-50">
+      <button
+        type="button"
+        (click)="addLoanType(); activeLoanTab = loanTypesFormArray.length - 1"
+        class="ml-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs"
+      >
+        + Add New Loan Type
+      </button>
+    </div>
 
-                <div class="grid grid-cols-3 gap-4">
+    <!-- Rename Popup -->
+    <div
+      *ngIf="showRenamePopup"
+      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+    >
+      <div class="bg-white rounded-lg shadow-lg p-6 w-80">
+        <h3 class="text-lg font-semibold mb-4">Rename Loan Type</h3>
 
-                  <!-- Interest -->
-                  <div>
-                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
-                      Interest (%)
-                    </label>
-                    <input type="number" formControlName="interest"
-                      class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
-                  </div>
+        <input
+          type="text"
+          [formControl]="renameControl"
+          class="w-full px-3 py-2 border rounded mb-4 focus:outline-none focus:ring"
+          placeholder="Enter new loan name"
+        />
 
-                  <!-- Loan Limit -->
-                  <div>
-                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
-                      Loan Limit
-                    </label>
-                    <input type="number" formControlName="limit"
-                      class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
-                  </div>
+        <div class="flex justify-end gap-2">
+          <button
+            class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            (click)="closeRenamePopup()"
+          >
+            Cancel
+          </button>
+          <button
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            (click)="saveRename()"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
 
-                  <!-- Show remaining fields ONLY if General Loan -->
-                  <ng-container *ngIf="loanGroup.get('loanType')?.value === 'General Loan'">
-                    
-                    <div>
-                      <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
-                        Compulsory Deposit
-                      </label>
-                      <input type="number" formControlName="compulsoryDeposit"
-                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
+    <!-- Tab content -->
+    <div *ngFor="let loanGroup of loanTypesFormArray.controls; let i = index" 
+        [hidden]="activeLoanTab !== i" 
+        [formGroupName]="i" 
+        class="border rounded p-4 mb-3 bg-gray-50">
 
-                    <div>
-                      <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
-                        Optional Deposit
-                      </label>
-                      <input type="number" formControlName="optionalDeposit"
-                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
+      <div class="grid grid-cols-3 gap-4">
+        <!-- Interest -->
+        <div>
+          <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+            Interest (%)
+          </label>
+          <input type="number" formControlName="interest"
+            class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
+        </div>
 
-                    <div>
-                      <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
-                        Share Amount
-                      </label>
-                      <input type="number" formControlName="share"
-                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
+        <!-- Loan Limit -->
+        <div>
+          <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+            Loan Limit
+          </label>
+          <input type="number" formControlName="limit"
+            class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
+        </div>
 
-                    <div>
-                      <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
-                        N Times of Share Amount
-                      </label>
-                      <input type="number" formControlName="xTimes"
-                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-
-                  </ng-container>
-                </div>
-
-                <div class="flex justify-end mt-2">
-                  <button type="button" (click)="removeLoanType(i)" 
-                    class="text-red-500 hover:text-red-700 text-sm font-medium">
-                    Remove
-                  </button>
-                </div>
-              </div>
-
-            </div>
+        <!-- Show remaining fields ONLY if General Loan -->
+        <ng-container *ngIf="loanGroup.get('loanType')?.value === 'General Loan'">
+          <div>
+            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+              Compulsory Deposit
+            </label>
+            <input type="number" formControlName="compulsoryDeposit"
+              class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
+          <div>
+            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+              Optional Deposit
+            </label>
+            <input type="number" formControlName="optionalDeposit"
+              class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+
+          <div>
+            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+              Share Amount
+            </label>
+            <input type="number" formControlName="share"
+              class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+
+          <div>
+            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+              N Times of Share Amount
+            </label>
+            <input type="number" formControlName="xTimes"
+              class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="flex justify-end mt-2">
+        <button type="button" (click)="removeLoanType(i)" 
+          class="text-red-500 hover:text-red-700 text-sm font-medium">
+          Remove
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
           <!-- Additional Settings Section -->
           <div class="form-section">
             <!-- <div class="form-section-header">
@@ -354,6 +385,13 @@ export class SocietyComponent implements OnInit {
   currentUser: User | null = null;
   activeLoanTab: number = 0;
 
+  editingLoanIndex: number | null = null;
+  showRenamePopup = false;
+  renameValue = '';
+
+  renameControl = new FormControl('');
+
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -370,6 +408,29 @@ export class SocietyComponent implements OnInit {
 
   get loanTypesFormArray(): FormArray {
     return this.societyForm.get('loanTypes') as FormArray;
+  }
+
+  openRenamePopup(index: number) {
+    this.editingLoanIndex = index;
+    this.renameControl.setValue(
+      this.loanTypesFormArray.at(index).get('loanType')?.value || ''
+    );
+    this.showRenamePopup = true;
+  }
+
+  saveRename() {
+    if (this.editingLoanIndex !== null) {
+      this.loanTypesFormArray
+        .at(this.editingLoanIndex)
+        .get('loanType')
+        ?.setValue(this.renameControl.value);
+    }
+    this.closeRenamePopup();
+  }
+  closeRenamePopup() {
+    this.showRenamePopup = false;
+    this.editingLoanIndex = null;
+    this.renameValue = '';
   }
 
   addLoanType(loan?: Partial<LoanTypeDto>) {
@@ -406,6 +467,7 @@ export class SocietyComponent implements OnInit {
   isActive(tab: string): boolean {
     return this.activeTab === tab;
   }
+
 
   ngOnInit() {
     this.authService.currentUser$
@@ -681,18 +743,32 @@ export class SocietyComponent implements OnInit {
 
 
 
-  enableEdit() {
-    this.isEditing = true;
+  enableEdit(index: number) {
+    this.editingLoanIndex = index;
+    // optional: delay focus after input renders
+    setTimeout(() => {
+      const input = document.getElementById('loanInput' + index) as HTMLInputElement;
+      input?.focus();
+    });
+  }
+
+  saveEdit() {
+    this.editingLoanIndex = null;
   }
 
   cancelEdit() {
-    this.isEditing = false;
-    if (this.societyData) {
-      this.populateForm(this.societyData);
-    } else {
-      this.societyForm.reset();
-    }
+    this.editingLoanIndex = null;
   }
+
+
+  // cancelEdit() {
+  //   this.isEditing = false;
+  //   if (this.societyData) {
+  //     this.populateForm(this.societyData);
+  //   } else {
+  //     this.societyForm.reset();
+  //   }
+  // }
 
   saveChanges() {
     if (this.societyForm.invalid) {
