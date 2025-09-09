@@ -35,7 +35,7 @@
         <div *ngIf="activeTab === 'general'" class="space-y-6 bg-white p-6 border">
           <!-- In your template, modify the Member No field section -->
           <div class="grid grid-cols-1 gap-4">
-            <div class="grid grid-cols-2 gap-4 items-end">
+            <div class="flex items-end gap-2">
               <div class="flex-grow">
                 <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Member No</label>
                 <input type="text" formControlName="memberNo"
@@ -43,7 +43,7 @@
                   readonly />
               </div>
               <button type="button"
-                class="px-3 py-2 w-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium text-xs"
+                class="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium text-xs"
                 (click)="openMemberSelectionDialog()">
                 Select Member
               </button>
@@ -144,6 +144,20 @@
                 formControlName="email" />
             </div>
           </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">DOJ</label>
+              <input type="text"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="dojJob" />
+            </div>
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">DOR</label>
+              <input type="text"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                formControlName="doRetirement" />
+            </div>
+          </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div>
@@ -195,65 +209,49 @@
             </div>
 
           </div>
-      
-          <div class="space-y-6 bg-white mt-2 p-6 border">
-            <div class="">
-              <div class="text-sm font-normal flex items-center gap-2 mb-4">Bank Details</div>
-              <div class="grid md:grid-cols-1 grid-cols-1 gap-4">
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Bank Name</label>
-                    <input type="text" formControlName="bankName"
-                      class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                  </div>
-                  <div>
-                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Payable At</label>
-                    <input type="text"
-                      class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      formControlName="payableAt" />
-                  </div>
-                  <div>
-                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Account No</label>
-                    <input type="text" formControlName="accountNo"
-                      class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      formControlName="accountNo" />
-                  </div>
+
+          <div class="">
+            <div class="text-sm font-normal flex items-center gap-2 mb-4">Bank Details</div>
+            <div class="grid md:grid-cols-2 grid-cols-1 gap-4">
+              <div class="grid grid-cols-1 gap-4">
+                <div>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Bank Name</label>
+                  <input type="text" formControlName="bankName"
+                    class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                </div>
+                <div>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Payable At</label>
+                  <input type="text"
+                    class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    formControlName="payableAt" />
+                </div>
+                <div>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Account No</label>
+                  <input type="text" formControlName="accountNo"
+                    class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    formControlName="accountNo" />
                 </div>
               </div>
-            </div>  
-          </div>
-
-          <div class="space-y-6 bg-white mt-2 p-6 border">
-            <div class="">
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Status</label>
-                    <select
-                      formControlName="status"
-                      class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                      <option value="Active">Active</option>
-                      <option value="In-Active">In-Active</option>
-                      <option value="Resignation">Resignation</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Date</label>
-                    <input type="date" formControlName="doRetirement" 
-                      [disabled]="!(memberForm.get('status')?.value !== 'Active')"
-                      class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg 
-           bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 
-           dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-           dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
-           disabled:opacity-50 disabled:cursor-not-allowed" />
-                  </div>
+              <div class="">
+                <div>
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Status</label>
+                  <select
+                    class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <option value="Active">Active</option>
+                    <option value="In-Active">In-Active</option>
+                    <option value="Resignationn">Resignation</option>
+                  </select>
                 </div>
+                <div class="mt-4">
+                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Date</label>
+                  <input type="date" formControlName="stDate"
+                    class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                </div>
+              </div>
             </div>
-
           </div>
-          
-        </div>
 
-            
+        </div>
 
         <!-- Monthly Deduction -->
         <div *ngIf="activeTab === 'deduction'" class="space-y-6 bg-white p-6 border">
@@ -266,6 +264,18 @@
             <div>
               <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Withdrawal</label>
               <input type="number" formControlName="withdrawal"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">G loan Instalment</label>
+              <input type="number" formControlName="gLoanInstalment"
+                class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+            </div>
+            <div>
+              <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">E loan Instalment</label>
+              <input type="number" formControlName="eLoanInstalment"
                 class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
             </div>
           </div>
