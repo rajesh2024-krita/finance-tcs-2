@@ -19,12 +19,6 @@ import { max } from 'rxjs';
       <form [formGroup]="form" (ngSubmit)="onSave()" class="space-y-6">
         <!-- Loan Type Section -->
         <div class="bg-white p-4 border">
-          <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-            Loan Type
-          </h3>
           <div class="grid grid-cols-1 gap-4">
             <div>
               <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Loan Type</label>
@@ -51,7 +45,7 @@ import { max } from 'rxjs';
               <div class="flex items-center gap-2">
                 <input formControlName="loanNo" 
                   class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                <button type="button" (click)="generateLoanNo()" class="px-3 py-2 bg-blue-500 text-white rounded text-xs">
+                <button type="button" (click)="generateLoanNo()" class="w-1/3 px-3 py-2 bg-[#4f46e4] text-white rounded text-xs">
                   Generate
                 </button>
               </div>
@@ -84,8 +78,8 @@ import { max } from 'rxjs';
                 <button 
                   type="button" 
                   (click)="openMemberPopup()" 
-                  class="px-3 py-2 bg-blue-500 text-white rounded text-xs">
-                  Browse
+                  class="px-3 py-2 bg-[#4f46e4] text-white rounded text-xs w-1/3">
+                  Select member
                 </button>
               </div>
 
@@ -164,7 +158,7 @@ import { max } from 'rxjs';
           </div>
 
           <!-- Right Column -->
-          <div class="bg-white p-4 rounded-lg border">
+          <div class="bg-white p-4 border">
             <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -343,14 +337,14 @@ import { max } from 'rxjs';
           </div>
         </div>
         <div class="flex justify-end flex-wrap gap-2 w-full md:w-auto">
-          <button type="button" (click)="onClear()" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium">
+          <button type="button" (click)="onClear()" class=" text-xs px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium">
             Clear
           </button>
-          <button type="button" (click)="onValidate()" class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium">
+          <button type="button" (click)="onValidate()" class=" text-xs px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium">
             Validate
           </button>
           <button type="submit" (click)="onSave()" [disabled]="!canSave" 
-            class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium">
+            class=" text-xs px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium">
             Save
           </button>
         </div>
@@ -381,7 +375,7 @@ import { max } from 'rxjs';
                 <td class="p-2 text-sm">{{ m.name }}</td>
                 <td class="p-2 text-sm">{{ m.bankingDetails?.share }}</td>
                 <td class="p-2 text-center">
-                  <button (click)="selectMember(m)" class="px-3 py-1 bg-blue-500 text-white rounded text-xs">
+                  <button (click)="selectMember(m)" class="px-3 py-1 bg-[#4f46e4] text-white rounded text-xs">
                     Select
                   </button>
                 </td>

@@ -42,39 +42,11 @@ import { of, Subject } from 'rxjs';
     <div class="animate-fade-in">
       <!-- Page Header -->
       <div class="">
-        <!-- <div class="breadcrumb">
-          <span>File</span>
-          <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
-          <span class="breadcrumb-active">Society</span>
-        </div> -->
         <div class="uppercase text-lg mb-2">Society Details</div>
       </div>
 
-      <!-- Loading State -->
-      <div *ngIf="loading" class="loading-container">
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-        <p class="text-center mt-4">Loading society data...</p>
-      </div>
-
-      <!-- Error State -->
-      <div *ngIf="error && !loading" class="card mb-6 border-l-4 border-l-red-400">
-        <div class="card-content">
-          <div class="flex items-center gap-3">
-            <mat-icon class="text-red-500">error</mat-icon>
-            <div>
-              <h4 class="text-section-header text-red-700">Error Loading Society Data</h4>
-              <p class="text-body text-red-600">{{ error }}</p>
-            </div>
-          </div>
-          <button (click)="loadData()" class="btn btn-primary mt-4">
-            <mat-icon>refresh</mat-icon>
-            Retry
-          </button>
-        </div>
-      </div>
-
       <!-- Main Society Form -->
-      <div *ngIf="(societyData || isSuperAdmin) && !loading">
+      <div>
         <form [formGroup]="societyForm" class="form-container">
           
           <!-- Basic Information Section -->
@@ -204,99 +176,78 @@ import { of, Subject } from 'rxjs';
           </div>
 
 
+          <div class="p-4 bg-white shadow rounded-lg">
+            <h2 class="text-lg font-normal mb-4">Loan Types</h2>
 
+            <div formArrayName="loanTypes">
+              <!-- Tab headers -->
+              <div class="flex mb-4 overflow-x-auto justify-between">
+                <div>
+                  <button
+                    *ngFor="let loanGroup of loanTypesFormArray.controls; let i = index"
+                    type="button"
+                    (click)="activeLoanTab = i"
+                    [ngClass]="{
+                      'border-b-2 border-blue-600 font-normal text-blue-600': activeLoanTab === i,
+                      'text-gray-600 hover:text-blue-600': activeLoanTab !== i
+                    }"
+                    class="px-4 py-2 focus:outline-none whitespace-nowrap"
+                  >
+                    {{ loanGroup.get('loanType')?.value || 'New Loan' }}
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  (click)="addLoanType(); activeLoanTab = loanTypesFormArray.length - 1"
+                  class="ml-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs"
+                >
+                  + Add New Loan Type
+                </button>
+              </div>
 
+              <!-- Tab content -->
+              <div *ngFor="let loanGroup of loanTypesFormArray.controls; let i = index" [hidden]="activeLoanTab !== i" [formGroupName]="i" class="border rounded p-4 mb-3 bg-gray-50">
+                <!-- Numeric fields in 3-column grid -->
+                <div class="grid grid-cols-3 gap-4">
+                  <div>
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Interest (%)</label>
+                    <input type="number" formControlName="interest" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                  </div>
 
+                  <div>
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Loan Limit</label>
+                    <input type="number" formControlName="limit" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                  </div>
 
-<div class="p-4 bg-white shadow rounded-lg">
-  <h2 class="text-lg font-semibold mb-4">Loan Types</h2>
+                  <div>
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Compulsory Deposit</label>
+                    <input type="number" formControlName="compulsoryDeposit" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                  </div>
 
-  <div formArrayName="loanTypes">
-    <!-- Tab headers -->
-    <div class="flex border-b mb-4 overflow-x-auto">
-      <button
-        *ngFor="let loanGroup of loanTypesFormArray.controls; let i = index"
-        type="button"
-        (click)="activeLoanTab = i"
-        [ngClass]="{
-          'border-b-2 border-blue-600 font-semibold': activeLoanTab === i,
-          'text-gray-600 hover:text-blue-600': activeLoanTab !== i
-        }"
-        class="px-4 py-2 focus:outline-none whitespace-nowrap"
-      >
-        {{ loanGroup.get('loanType')?.value || 'New Loan' }}
-      </button>
-      <button
-        type="button"
-        (click)="addLoanType(); activeLoanTab = loanTypesFormArray.length - 1"
-        class="ml-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-      >
-        + Add New Loan Type
-      </button>
-    </div>
+                  <div>
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Optional Deposit</label>
+                    <input type="number" formControlName="optionalDeposit" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                  </div>
 
-    <!-- Tab content -->
-    <div *ngFor="let loanGroup of loanTypesFormArray.controls; let i = index" [hidden]="activeLoanTab !== i" [formGroupName]="i" class="border rounded p-4 mb-3 bg-gray-50">
-      <!-- Numeric fields in 3-column grid -->
-      <div class="grid grid-cols-3 gap-4">
-        <div>
-          <label class="block text-sm font-medium">Interest (%)</label>
-          <input type="number" formControlName="interest" class="mt-1 block w-full border rounded px-2 py-1" />
-        </div>
+                  <div>
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Share Amount</label>
+                    <input type="number" formControlName="share" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                  </div>
 
-        <div>
-          <label class="block text-sm font-medium">Limit</label>
-          <input type="number" formControlName="limit" class="mt-1 block w-full border rounded px-2 py-1" />
-        </div>
+                  <div>
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">X Times</label>
+                    <input type="number" formControlName="xTimes" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                  </div>
+                </div>
 
-        <div>
-          <label class="block text-sm font-medium">Compulsory Deposit</label>
-          <input type="number" formControlName="compulsoryDeposit" class="mt-1 block w-full border rounded px-2 py-1" />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium">Optional Deposit</label>
-          <input type="number" formControlName="optionalDeposit" class="mt-1 block w-full border rounded px-2 py-1" />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium">Share</label>
-          <input type="number" formControlName="share" class="mt-1 block w-full border rounded px-2 py-1" />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium">X Times</label>
-          <input type="number" formControlName="xTimes" class="mt-1 block w-full border rounded px-2 py-1" />
-        </div>
-      </div>
-
-      <div class="flex justify-end mt-2">
-        <button type="button" (click)="removeLoanType(i)" class="text-red-500 hover:text-red-700 text-sm font-medium">
-          Remove
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          
-
+                <div class="flex justify-end mt-2">
+                  <button type="button" (click)="removeLoanType(i)" class="text-red-500 hover:text-red-700 text-sm font-medium">
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <!-- Additional Settings Section -->
           <div class="form-section">
@@ -391,7 +342,7 @@ export class SocietyComponent implements OnInit {
 
   addLoanType(loan?: Partial<LoanTypeDto>) {
     console.log('Adding loan type:', loan);
-    
+
     const group = this.fb.group({
       loanType: [loan?.LoanType || '', Validators.required],
       interest: [loan?.Interest || 0, [Validators.min(0), Validators.max(100)]],
@@ -405,9 +356,9 @@ export class SocietyComponent implements OnInit {
   }
 
 
-removeLoanType(index: number) {
-  this.loanTypesFormArray.removeAt(index);
-}
+  removeLoanType(index: number) {
+    this.loanTypesFormArray.removeAt(index);
+  }
 
 
   private isPendingEdit(obj: any): obj is SocietyEditPending {
@@ -466,35 +417,35 @@ removeLoanType(index: number) {
   }
 
   createForm(): FormGroup {
-  return this.fb.group({
-    societyName: ['', Validators.required],
-    registrationNumber: ['', Validators.required],
-    address: ['', Validators.required],
-    city: ['', Validators.required],
-    phone: ['', Validators.required],
-    fax: [''],
-    targetDropdown: [''],
-    email: ['', [Validators.required, Validators.email]],
-    website: [''],
-    dividend: [0, [Validators.min(0), Validators.max(100)]],
-    overdraft: [0, [Validators.min(0), Validators.max(100)]],
-    currentDeposit: [0, [Validators.min(0), Validators.max(100)]],
-    loan: [0, [Validators.min(0), Validators.max(100)]],
-    emergencyLoan: [0, [Validators.min(0), Validators.max(100)]],
-    las: [0, [Validators.min(0), Validators.max(100)]],
-    shareLimit: [0, Validators.min(0)],
-    loanLimit: [0, Validators.min(0)],
-    emergencyLoanLimit: [0, Validators.min(0)],
-    chBounceCharge: [0, Validators.min(0)],
-    chequeReturnCharge: ['', Validators.required],  // dropdown selected value
-    dropdownArray: this.fb.control<string[]>([]),
-    cash: [0, Validators.min(0)],
-    bonus: [0, Validators.min(0)],
+    return this.fb.group({
+      societyName: ['', Validators.required],
+      registrationNumber: ['', Validators.required],
+      address: ['', Validators.required],
+      city: ['', Validators.required],
+      phone: ['', Validators.required],
+      fax: [''],
+      targetDropdown: [''],
+      email: ['', [Validators.required, Validators.email]],
+      website: [''],
+      dividend: [0, [Validators.min(0), Validators.max(100)]],
+      overdraft: [0, [Validators.min(0), Validators.max(100)]],
+      currentDeposit: [0, [Validators.min(0), Validators.max(100)]],
+      loan: [0, [Validators.min(0), Validators.max(100)]],
+      emergencyLoan: [0, [Validators.min(0), Validators.max(100)]],
+      las: [0, [Validators.min(0), Validators.max(100)]],
+      shareLimit: [0, Validators.min(0)],
+      loanLimit: [0, Validators.min(0)],
+      emergencyLoanLimit: [0, Validators.min(0)],
+      chBounceCharge: [0, Validators.min(0)],
+      chequeReturnCharge: ['', Validators.required],  // dropdown selected value
+      dropdownArray: this.fb.control<string[]>([]),
+      cash: [0, Validators.min(0)],
+      bonus: [0, Validators.min(0)],
 
-    // 🔹 Add this
-    loanTypes: this.fb.array([])  
-  });
-}
+      // 🔹 Add this
+      loanTypes: this.fb.array([])
+    });
+  }
 
 
 
@@ -518,11 +469,11 @@ removeLoanType(index: number) {
       .subscribe(society => {
         if (society) {
           console.log('📊 Raw society data:', society);
-          
+
           this.societyData = society;
           this.populateForm(society);
           this.loadPendingRequests();
-          
+
           // Extract and console loanTypes as array of objects
           this.extractAndLogLoanTypes(society);
         }
@@ -532,7 +483,7 @@ removeLoanType(index: number) {
   private extractAndLogLoanTypes(society: any) {
     try {
       let parsedLoanTypes: LoanTypeDto[] = [];
-      
+
       if (society.loanTypes) {
         if (typeof society.loanTypes === 'string') {
           // Parse the stringified JSON array
@@ -543,8 +494,8 @@ removeLoanType(index: number) {
         }
         this.loanTypes = parsedLoanTypes; // Store for later use if needed
         console.log('✅ Successfully parsed loanTypes:', this.loanTypes);
-        
-        
+
+
         // Optional: Log each loan type individually for better readability
         parsedLoanTypes.forEach((loanType, index) => {
           console.log(`📋 Loan Type ${index + 1}:`, loanType);
@@ -577,123 +528,123 @@ removeLoanType(index: number) {
   }
 
   // Populate with backend data
-populateForm(society: any) {
-  if (!society) {
-    console.warn("⚠️ No society data provided");
-    return;
-  }
-
-  try {
-    console.log("📥 Raw society data received:", society);
-
-    // ---------------- Tabs Extraction ----------------
-    let tabs: SocietyTabsDto = {
-      interest: { dividend: 0, od: 0, cd: 0, loan: 0, emergencyLoan: 0, las: 0 },
-      limit: { share: 0, loan: 0, emergencyLoan: 0 }
-    };
-
-    if (society.tabs) {
-      const parsedTabs = typeof society.tabs === "string"
-        ? JSON.parse(society.tabs)
-        : society.tabs;
-
-      console.log("🗂 Parsed tabs object:", parsedTabs);
-
-      if (parsedTabs.Interest) {
-        tabs.interest = {
-          dividend: parsedTabs.Interest.Dividend || 0,
-          od: parsedTabs.Interest.OD || 0,
-          cd: parsedTabs.Interest.CD || 0,
-          loan: parsedTabs.Interest.Loan || 0,
-          emergencyLoan: parsedTabs.Interest.EmergencyLoan || 0,
-          las: parsedTabs.Interest.LAS || 0
-        };
-      }
-
-      if (parsedTabs.Limit) {
-        tabs.limit = {
-          share: parsedTabs.Limit.Share || 0,
-          loan: parsedTabs.Limit.Loan || 0,
-          emergencyLoan: parsedTabs.Limit.EmergencyLoan || 0
-        };
-      }
-    } else {
-      console.log("ℹ️ No tabs data found in society");
+  populateForm(society: any) {
+    if (!society) {
+      console.warn("⚠️ No society data provided");
+      return;
     }
 
-    // ---------------- Dropdown Array Extraction ----------------
-    let parsedDropdownArray: string[] = [];
     try {
-      parsedDropdownArray = typeof society.dropdownArray === "string"
-        ? JSON.parse(society.dropdownArray || "[]")
-        : society.dropdownArray || [];
-    } catch {
-      parsedDropdownArray = [];
-    }
-    console.log("📌 Parsed dropdown array:", parsedDropdownArray);
+      console.log("📥 Raw society data received:", society);
 
-    // ---------------- LoanTypes Extraction ----------------
-    let parsedLoanTypes: LoanTypeDto[] = [];
-    console.log("🔍 checks ypes data:", society.loanTypes);
-    
-    if (society.loanTypes) {
-      if (typeof society.loanTypes === "string") {
-        parsedLoanTypes = JSON.parse(society. loanTypes);
-      } else if (Array.isArray(society.loanTypes)) {
-        parsedLoanTypes = society.loanTypes;
+      // ---------------- Tabs Extraction ----------------
+      let tabs: SocietyTabsDto = {
+        interest: { dividend: 0, od: 0, cd: 0, loan: 0, emergencyLoan: 0, las: 0 },
+        limit: { share: 0, loan: 0, emergencyLoan: 0 }
+      };
+
+      if (society.tabs) {
+        const parsedTabs = typeof society.tabs === "string"
+          ? JSON.parse(society.tabs)
+          : society.tabs;
+
+        console.log("🗂 Parsed tabs object:", parsedTabs);
+
+        if (parsedTabs.Interest) {
+          tabs.interest = {
+            dividend: parsedTabs.Interest.Dividend || 0,
+            od: parsedTabs.Interest.OD || 0,
+            cd: parsedTabs.Interest.CD || 0,
+            loan: parsedTabs.Interest.Loan || 0,
+            emergencyLoan: parsedTabs.Interest.EmergencyLoan || 0,
+            las: parsedTabs.Interest.LAS || 0
+          };
+        }
+
+        if (parsedTabs.Limit) {
+          tabs.limit = {
+            share: parsedTabs.Limit.Share || 0,
+            loan: parsedTabs.Limit.Loan || 0,
+            emergencyLoan: parsedTabs.Limit.EmergencyLoan || 0
+          };
+        }
+      } else {
+        console.log("ℹ️ No tabs data found in society");
       }
+
+      // ---------------- Dropdown Array Extraction ----------------
+      let parsedDropdownArray: string[] = [];
+      try {
+        parsedDropdownArray = typeof society.dropdownArray === "string"
+          ? JSON.parse(society.dropdownArray || "[]")
+          : society.dropdownArray || [];
+      } catch {
+        parsedDropdownArray = [];
+      }
+      console.log("📌 Parsed dropdown array:", parsedDropdownArray);
+
+      // ---------------- LoanTypes Extraction ----------------
+      let parsedLoanTypes: LoanTypeDto[] = [];
+      console.log("🔍 checks ypes data:", society.loanTypes);
+
+      if (society.loanTypes) {
+        if (typeof society.loanTypes === "string") {
+          parsedLoanTypes = JSON.parse(society.loanTypes);
+        } else if (Array.isArray(society.loanTypes)) {
+          parsedLoanTypes = society.loanTypes;
+        }
+      }
+      console.log("💰 Parsed loanTypes:", parsedLoanTypes);
+      this.loanTypes = parsedLoanTypes;
+
+      // Clear existing FormArray before populating
+      this.loanTypesFormArray.clear();
+      parsedLoanTypes.forEach(loan => this.addLoanType(loan));
+
+      // ---------------- Build Form Data ----------------
+      const formData = {
+        societyName: society.societyName || "",
+        registrationNumber: society.registrationNumber || "",
+        address: society.address || "",
+        city: society.city || "",
+        phone: society.phone || "",
+        fax: society.fax || "",
+        email: society.email || "",
+        website: society.website || "",
+
+        // Tabs
+        dividend: tabs.interest.dividend,
+        overdraft: tabs.interest.od,
+        currentDeposit: tabs.interest.cd,
+        loan: tabs.interest.loan,
+        emergencyLoan: tabs.interest.emergencyLoan,
+        las: tabs.interest.las,
+
+        shareLimit: tabs.limit.share,
+        loanLimit: tabs.limit.loan,
+        emergencyLoanLimit: tabs.limit.emergencyLoan,
+
+        // Charges and dropdowns
+        targetDropdown: society.targetDropdown || "",
+        dropdownArray: parsedDropdownArray,
+
+        // Other
+        chBounceCharge: society.chBounceCharge || 0,
+        chequeReturnCharge: society.chequeReturnCharge || 0,
+        cash: society.cash || 0,
+        bonus: society.bonus || 0
+      };
+
+      console.log("📝 Final form data to patch:", formData);
+
+      // ---------------- Patch Form ----------------
+      this.societyForm.patchValue(formData);
+
+    } catch (error) {
+      console.error("❌ Error parsing society data:", error);
+      this.error = "Failed to parse society data";
     }
-    console.log("💰 Parsed loanTypes:", parsedLoanTypes);
-    this.loanTypes = parsedLoanTypes;
-
-    // Clear existing FormArray before populating
-    this.loanTypesFormArray.clear();
-    parsedLoanTypes.forEach(loan => this.addLoanType(loan));
-
-    // ---------------- Build Form Data ----------------
-    const formData = {
-      societyName: society.societyName || "",
-      registrationNumber: society.registrationNumber || "",
-      address: society.address || "",
-      city: society.city || "",
-      phone: society.phone || "",
-      fax: society.fax || "",
-      email: society.email || "",
-      website: society.website || "",
-
-      // Tabs
-      dividend: tabs.interest.dividend,
-      overdraft: tabs.interest.od,
-      currentDeposit: tabs.interest.cd,
-      loan: tabs.interest.loan,
-      emergencyLoan: tabs.interest.emergencyLoan,
-      las: tabs.interest.las,
-
-      shareLimit: tabs.limit.share,
-      loanLimit: tabs.limit.loan,
-      emergencyLoanLimit: tabs.limit.emergencyLoan,
-
-      // Charges and dropdowns
-      targetDropdown: society.targetDropdown || "",
-      dropdownArray: parsedDropdownArray,
-
-      // Other
-      chBounceCharge: society.chBounceCharge || 0,
-      chequeReturnCharge: society.chequeReturnCharge || 0,
-      cash: society.cash || 0,
-      bonus: society.bonus || 0
-    };
-
-    console.log("📝 Final form data to patch:", formData);
-
-    // ---------------- Patch Form ----------------
-    this.societyForm.patchValue(formData);
-
-  } catch (error) {
-    console.error("❌ Error parsing society data:", error);
-    this.error = "Failed to parse society data";
   }
-}
 
 
 
@@ -719,12 +670,12 @@ populateForm(society: any) {
 
     this.submitting = true;
     const formData = this.societyForm.value;
-    
+
     // Prepare data for backend (convert dropdownArray to string if needed)
     const saveData: any = {
       ...formData,
-      dropdownArray: Array.isArray(formData.dropdownArray) 
-        ? JSON.stringify(formData.dropdownArray) 
+      dropdownArray: Array.isArray(formData.dropdownArray)
+        ? JSON.stringify(formData.dropdownArray)
         : formData.dropdownArray
     };
 

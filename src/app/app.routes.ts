@@ -77,7 +77,7 @@ export const routes: Routes = [
       // Master Data
       {
         path: 'master/member-details',
-        loadComponent: () => import('./components/master/member-details/member-details.component(las)').then(m => m.MemberDetailsComponent)
+        loadComponent: () => import('./components/master/member-details/member-details.component').then(m => m.MemberDetailsComponent)
       },
       {
         path: 'master/table',

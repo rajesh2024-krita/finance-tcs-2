@@ -67,7 +67,7 @@ interface MenuItem {
                   >
                     <div routerLinkActive="h-4 border-l-4 border-black block mr-6" class="hover:text-black hover:h-4 hover:border-l-4 hover:border-black hover:block hover:mr-6"></div>
                     <mat-icon routerLinkActive="bg-white text-black " class="">{{item.icon}}</mat-icon>
-                    <span>{{item.label}}</span>
+                    <span routerLinkActive="bg-white text-black ">{{item.label}}</span>
                   </a>
                 </ng-container>
               </div>
