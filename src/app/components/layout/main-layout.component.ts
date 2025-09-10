@@ -171,26 +171,26 @@ export class MainLayoutComponent implements OnInit {
 
     this.currentUser = this.authService.getCurrentUser();
 
-    // if (this.currentUser) {
-    //   this.checkTokenExpiry();
-    // }
+    if (this.currentUser) {
+      this.checkTokenExpiry();
+    }
   }
 
-  // checkTokenExpiry() {
-  //   const expiresAt = new Date(this.currentUser.expiresAt).getTime();
-  //   const now = new Date().getTime();
+  checkTokenExpiry() {
+    const expiresAt = new Date(this.currentUser.expiresAt).getTime();
+    const now = new Date().getTime();
 
-  //   if (now >= expiresAt) {
-  //     // Token expired -> logout immediately
-  //     this.authService.logout();
-  //   } else {
-  //     // Token still valid -> set timeout to auto-logout
-  //     const timeout = expiresAt - now;
-  //     setTimeout(() => {
-  //       this.authService.logout();
-  //     }, timeout);
-  //   }
-  // }
+    if (now >= expiresAt) {
+      // Token expired -> logout immediately
+      this.authService.logout();
+    } else {
+      // Token still valid -> set timeout to auto-logout
+      const timeout = expiresAt - now;
+      setTimeout(() => {
+        this.authService.logout();
+      }, timeout);
+    }
+  }
 
   closeMobileNav() {
     if (this.isMobile) {

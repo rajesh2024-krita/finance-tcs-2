@@ -1,12 +1,7 @@
-// member-select-dialog.component.ts
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
+import { FormsModule } from '@angular/forms';
 import { Member } from '../../../services/member.service';
 
 @Component({
@@ -15,80 +10,77 @@ import { Member } from '../../../services/member.service';
   imports: [
     CommonModule,
     MatDialogModule,
-    MatTableModule,
-    MatButtonModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatIconModule
+    FormsModule
   ],
   template: `
-    <div class="p-4 w-full max-w-4xl">
-      <h2 class="text-xl font-bold mb-4">Select Member</h2>
-      
-      <div class="mb-4">
-        <mat-form-field appearance="outline" class="w-full">
-          <input matInput placeholder="Search members..." (input)="onSearch($event)" />
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg w-full max-w-2xl max-h-96 overflow-hidden flex flex-col">
+        <div class="bg-[#4f46e4] px-6 py-3 text-white">  
+          <h3 class="text-lg font-semibold">Select Member</h3>
+        </div>
+
+        <div class="p-6">
+        
+        <!-- Search -->
+        <div class="mb-4">
+          <input type="text" placeholder="Search members..." [(ngModel)]="memberSearchTerm"
+            (input)="filterMembers()" class="w-full p-2 border rounded">
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-y-auto flex-grow">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="p-2 text-left text-xs font-medium text-gray-500">MemNo</th>
+                <th class="p-2 text-left text-xs font-medium text-gray-500">Name</th>
+                <th class="p-2 text-left text-xs font-medium text-gray-500">Share</th>
+                <th class="p-2 text-xs font-medium text-gray-500">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <tr *ngFor="let m of filteredMembers" class="hover:bg-gray-50">
+                <td class="p-2 text-sm">{{ m.memNo || m.memberNo }}</td>
+                <td class="p-2 text-sm">{{ m.name }}</td>
+                <td class="p-2 text-sm">{{ m.bankingDetails?.share }}</td>
+                <td class="p-2 text-center">
+                  <button (click)="selectMember(m)" class="px-3 py-1 bg-[#4f46e4] text-white rounded text-xs">
+                    Select
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-4 flex justify-end">
+          <button (click)="onCancel()" class="px-4 py-2 bg-gray-300 rounded mr-2">Cancel</button>
+        </div>
       </div>
-      
-      <div class="max-h-96 overflow-y-auto">
-        <table mat-table [dataSource]="filteredMembers" class="w-full">
-          <!-- Member Number Column -->
-          <ng-container matColumnDef="memberNo">
-            <th mat-header-cell *matHeaderCellDef>Member No.</th>
-            <td mat-cell *matCellDef="let member">{{ member.memNo || member.memberNo }}</td>
-          </ng-container>
-
-          <!-- Name Column -->
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Name</th>
-            <td mat-cell *matCellDef="let member">{{ member.name }}</td>
-          </ng-container>
-
-          <!-- Mobile Column -->
-          <ng-container matColumnDef="mobile">
-            <th mat-header-cell *matHeaderCellDef>Mobile</th>
-            <td mat-cell *matCellDef="let member">{{ member.mobile }}</td>
-          </ng-container>
-
-          <!-- Action Column -->
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Action</th>
-            <td mat-cell *matCellDef="let member">
-              <button mat-raised-button color="primary" (click)="selectMember(member)">
-                Select
-              </button>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-      </div>
-
-      <div class="flex justify-end mt-4">
-        <button mat-button (click)="onCancel()">Cancel</button>
       </div>
     </div>
   `
 })
-export class MemberSelectDialogComponent {
-  displayedColumns: string[] = ['memberNo', 'name', 'mobile', 'actions'];
+export class MemberSelectDialogComponent implements OnInit {
   filteredMembers: Member[] = [];
+  memberSearchTerm: string = '';
 
   constructor(
     public dialogRef: MatDialogRef<MemberSelectDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { members: Member[] }
-  ) {
-    this.filteredMembers = [...data.members];
+  ) {}
+
+  ngOnInit(): void {
+    // Load all members by default
+    this.filteredMembers = [...this.data.members];
   }
 
-  onSearch(event: any): void {
-    const searchValue = event.target.value.toLowerCase();
-    this.filteredMembers = this.data.members.filter(member => 
-      member.name.toLowerCase().includes(searchValue) ||
-      (member.memNo || member.memberNo || '').toLowerCase().includes(searchValue) ||
+  filterMembers(): void {
+    const searchValue = this.memberSearchTerm.toLowerCase();
+    this.filteredMembers = this.data.members.filter(member =>
+      (member.name || '').toLowerCase().includes(searchValue) ||
+      (member.memNo || member.memberNo || '').toString().toLowerCase().includes(searchValue) ||
       (member.mobile || '').includes(searchValue)
     );
   }

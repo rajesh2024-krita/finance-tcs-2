@@ -357,9 +357,12 @@ import { max } from 'rxjs';
     </div>
 
     <!-- Member Selection Popup -->
-    <div *ngIf="showMemberPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-6 w-full max-w-2xl max-h-96 overflow-hidden flex flex-col">
-        <h3 class="text-lg font-semibold mb-4">Select Member</h3>
+    <div *ngIf="showMemberPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center  z-[9999]">
+      <div class="bg-white rounded-lg  w-full max-w-2xl max-h-96 overflow-hidden flex flex-col">
+        <div class="bg-[#4f46e4] px-6 py-3 text-white">  
+          <h3 class="text-lg font-semibold">Select Member</h3>
+        </div>
+        <div class="p-6">
         <div class="mb-4">
           <input type="text" placeholder="Search members..." [(ngModel)]="memberSearchTerm" 
             (input)="filterMembers()" class="w-full p-2 border rounded">
@@ -390,6 +393,7 @@ import { max } from 'rxjs';
         </div>
         <div class="mt-4 flex justify-end">
           <button (click)="showMemberPopup = false" class="px-4 py-2 bg-gray-300 rounded mr-2">Cancel</button>
+        </div>
         </div>
       </div>
     </div>
