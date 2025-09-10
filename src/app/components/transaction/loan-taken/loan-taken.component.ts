@@ -145,8 +145,13 @@ import { max } from 'rxjs';
               
               <div>
                 <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Installment Amount (Auto)</label>
-                <input [value]="formatCurrency(installmentAmount())" readonly 
-                  class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                <input 
+  [value]="isValidated ? formatCurrency(installmentAmount()) : ''" 
+  readonly
+  class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs 
+         focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 
+         dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+
               </div>
 
               <div class="sr-only">
@@ -656,9 +661,9 @@ export class LoanTakenComponent implements OnInit {
   get interestRate() {
     // Different interest rates for different loan types
     switch (this.form.get('loanType')?.value) {
-      case 'General': return 0.09;
-      case 'Emergency': return 0.09;
-      case 'Festival': return 0.09;
+      case 'General Loan': return 0.07;
+      case 'Emergency Loan': return 0.09;
+      case 'Festival Loan': return 0.09;
       case 'LAS': return 0.09;
       case 'LA FDR': return 0.09;
       default: return 0.07;
@@ -669,14 +674,32 @@ export class LoanTakenComponent implements OnInit {
     return (Number(this.form.get('loanAmount')!.value) || 0) - (Number(this.form.get('previousLoan')!.value) || 0);
   }
 
+  // installmentAmount() {
+  //   console.log('validatedPayAmount == ', this.validatedPayAmount)
+  //   // const loan = Number(this.form.get('loanAmount')!.value) || 0;
+  //   // const loan = this.validatedPayAmount || 0;
+  //   const loan = (Number(this.form.get('loanAmount')!.value)) - this.validatedNewLoanShare;
+  //   console.log('loan == ', loan)
+  //   const n = Number(this.form.get('installments')!.value) || 1;
+  //   if (n <= 0) return 0;
+  //   return Math.round((((loan) + loan) / n + Number.EPSILON) * 100) / 100;
+  //   // return Math.round((((loan * this.interestRate) + loan) / n + Number.EPSILON) * 100) / 100;
+  // }
+
   installmentAmount() {
-    console.log('validatedPayAmount == ', this.validatedPayAmount)
-    // const loan = Number(this.form.get('loanAmount')!.value) || 0;
-    const loan = this.validatedPayAmount || 0;
+    console.log('validatedPayAmount == ', this.validatedPayAmount);
+
+    // loan = entered loan amount - new loan share
+    const loan = (Number(this.form.get('loanAmount')!.value) || 0) - (this.validatedNewLoanShare || 0);
+    console.log('loan == ', loan);
+
     const n = Number(this.form.get('installments')!.value) || 1;
     if (n <= 0) return 0;
-    return Math.round((((loan * this.interestRate) + loan) / n + Number.EPSILON) * 100) / 100;
+
+    // Divide loan equally into installments (no interest included)
+    return Math.round((loan / n + Number.EPSILON) * 100) / 100;
   }
+
 
   newLoanShare() {
     // Only calculate for General loans
