@@ -113,6 +113,7 @@ export class AuthService {
           username: data.username,
           email: data.email,
           role: data.role,
+          expiresAt: data.expiresAt,
         };
 
         console.log('user = ', user)
