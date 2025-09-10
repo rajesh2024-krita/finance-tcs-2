@@ -140,6 +140,8 @@ export class MemberDetailsComponent implements OnInit {
           ...m,
           memberNo: m.memNo || m.memberNo // Handle both cases
         }));
+        console.log('this.allMembers = ', this.allMembers );
+        
         this.dataSource.data = this.allMembers;
       },
       error: (error) => {
@@ -234,6 +236,7 @@ export class MemberDetailsComponent implements OnInit {
     dateOfBirth: member.dob ? new Date(member.dob).toISOString().split('T')[0] : null,
     mobile: member.mobile,
     email: member.email,
+    branch: member.branch,
     designation: member.designation,
     dojJob: member.dojOrg ? new Date(member.dojOrg).toISOString().split('T')[0] : null,
     doRetirement: member.dor ? new Date(member.dor).toISOString().split('T')[0] : null,
@@ -241,6 +244,9 @@ export class MemberDetailsComponent implements OnInit {
     officeAddress: member.officeAddress,
     residenceAddress: member.residenceAddress,
     city: member.city,
+    email2: member.email2,
+    mobile2: member.mobile2,
+    pincode: member.pincode,
     phoneOffice: member.phoneOffice,
     phoneResidence: member.phoneResidence || member.phoneRes,
     nominee: member.nominee,
@@ -256,6 +262,9 @@ export class MemberDetailsComponent implements OnInit {
     gLoanInstalment: member.gLoanInstalment || 0,
     eLoanInstalment: member.eLoanInstalment || 0
   });
+
+  console.log('Populated form with member:', member );
+  
 
   // 👇 handle enable/disable based on existing member status
   if (member.status === 'Resignation') {
@@ -294,6 +303,11 @@ export class MemberDetailsComponent implements OnInit {
     dor: this.toUtcString(formValue.doRetirement), // 👈 mapped to backend
     email: formValue.email,
     mobile: formValue.mobile,
+    mobile2: formValue.mobile2,
+    email2: formValue.email2,
+    status: formValue.status,
+    pincode: formValue.pincode,
+    cdAmount: formValue.cdAmount,
     designation: formValue.designation,
     branch: formValue.branch,
     officeAddress: formValue.officeAddress,

@@ -21,6 +21,9 @@ export interface Member {
   fhName: string;
   officeAddress?: string;
   city?: string;
+  mobile2?:string;
+  email2?:string;
+  pincode:string;
   phoneOffice?: string;
   branch?: string;
   phoneRes?: string;
@@ -156,6 +159,9 @@ export class MemberService {
       branch: member.branch,
       phoneRes: member.phoneRes,
       mobile: member.mobile,
+      mobile2:member.mobile2,
+      email2:member.email2,
+      pincode:member.pincode,
       designation: member.designation,
       residenceAddress: member.residenceAddress,
       dob: member.dob instanceof Date ? member.dob.toISOString() : member.dob,
