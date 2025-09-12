@@ -28,7 +28,7 @@ import { Member } from '../../../services/member.service';
         </div>
 
         <!-- Table -->
-        <div class="overflow-y-auto flex-grow">
+        <div class="overflow-y-auto h-40 flex-grow">
           <table class="w-full">
             <thead class="bg-gray-50">
               <tr>

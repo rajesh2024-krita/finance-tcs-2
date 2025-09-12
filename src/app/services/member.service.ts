@@ -65,6 +65,7 @@ export interface ApiResponse<T> {
   providedIn: 'root'
 })
 export class MemberService {
+  // private apiUrl = 'http://localhost:5000/api/Member';
   private apiUrl = 'https://fintcsapi-1.onrender.com/api/Member';
 
   constructor(
@@ -103,8 +104,36 @@ export class MemberService {
       );
   }
 
+  // createMember(member: Member): Observable<Member> {
+  //   const memberData = this.prepareMemberData(member);
+  //   return this.http.post<ApiResponse<Member>>(this.apiUrl, memberData, { headers: this.getHeaders() })
+  //     .pipe(
+  //       map(response => response.data),
+  //       catchError(this.handleError)
+  //     );
+  // }
+
   createMember(member: Member): Observable<Member> {
     const memberData = this.prepareMemberData(member);
+
+    // 🔹 Ensure date fields are in proper ISO string format
+    memberData.dob = member.dob ? new Date(member.dob).toISOString() : null;
+    memberData.dojSociety = member.dojSociety ? new Date(member.dojSociety).toISOString() : null;
+    memberData.dojOrg = member.dojOrg
+      ? new Date(member.dojOrg).toISOString()
+      : (member.dojSociety ? new Date(member.dojSociety).toISOString() : null);
+    memberData.dor = member.dor
+      ? new Date(member.dor).toISOString()
+      : new Date("2040-12-31").toISOString(); // fallback default
+
+    // 🔹 Fix share (ensure string)
+    if (member.bankingDetails) {
+      memberData.bankingDetails = {
+        ...member.bankingDetails,
+        share: member.bankingDetails.share?.toString()
+      };
+    }
+
     return this.http.post<ApiResponse<Member>>(this.apiUrl, memberData, { headers: this.getHeaders() })
       .pipe(
         map(response => response.data),
@@ -112,8 +141,11 @@ export class MemberService {
       );
   }
 
+
   updateMember(id: number, member: Member): Observable<Member> {
     const memberData = this.prepareMemberData(member);
+    console.log(memberData);
+    
     return this.http.put<ApiResponse<Member>>(`${this.apiUrl}/${id}`, memberData, { headers: this.getHeaders() })
       .pipe(
         map(response => response.data),

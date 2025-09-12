@@ -90,7 +90,7 @@ export class MemberDetailsComponent implements OnInit {
 
   private createMemberForm(): FormGroup {
     return this.fb.group({
-      memberNo: ['', Validators.required],
+      memberNo: [''],
       name: ['', Validators.required],
       fhName: ['', Validators.required],
       dateOfBirth: [''],
@@ -113,10 +113,7 @@ export class MemberDetailsComponent implements OnInit {
       shareAmount: [0],
       cdAmount: [0],
       bankName: ['', Validators.required],
-      branchName: [''],
       accountNo: ['', Validators.required],
-      accountHolderName: ['', Validators.required],
-      ifscCode: ['', Validators.required],
       payableAt: [''],
       shareDeduction: [0],
       withdrawal: [0],
@@ -127,8 +124,6 @@ export class MemberDetailsComponent implements OnInit {
     });
 
   }
-
-  
 
   loadMembers() {
     this.memberService.getAllMembers().subscribe({
@@ -141,7 +136,6 @@ export class MemberDetailsComponent implements OnInit {
           memberNo: m.memNo || m.memberNo // Handle both cases
         }));
         console.log('this.allMembers = ', this.allMembers );
-        
         this.dataSource.data = this.allMembers;
       },
       error: (error) => {
@@ -254,7 +248,7 @@ export class MemberDetailsComponent implements OnInit {
     shareAmount: member.bankingDetails?.share || 0,
     cdAmount: member.cdAmount || 0,
     bankName: member.bankName || (member.bankingDetails?.bankName),
-    payableAt: member.payableAt || member.branchName,
+    payableAt: member.bankingDetails.payableAt || member.bankingDetails.branchName,
     accountNo: member.accountNo || (member.bankingDetails?.accountNumber),
     status: member.status || 'Active',
     shareDeduction: member.shareDeduction || 0,
@@ -450,11 +444,78 @@ export class MemberDetailsComponent implements OnInit {
     window.print();
   }
 
-  onSave() {
-    if (this.memberForm.valid) {
-      console.log(this.memberForm.value);
+  onSave(): void {
+    const formValue = this.memberForm.value;
+    console.log("Form Value:", formValue);
+
+    const currentId = this.currentMember()?.id;
+
+    // 🔹 Map form values into Member object
+    const memberData: Member = {
+      id: currentId,
+      memNo: formValue.memberNo, // backend will auto-generate for create
+      memberNo: formValue.memberNo,
+      name: formValue.name,
+      fhName: formValue.fhName,
+      officeAddress: formValue.officeAddress,
+      city: formValue.city,
+      mobile: formValue.mobile,
+      mobile2: formValue.mobile2,
+      email: formValue.email,
+      email2: formValue.email2,
+      pincode: formValue.pincode,
+      designation: formValue.designation,
+      residenceAddress: formValue.residenceAddress,
+      dob: formValue.dateOfBirth,
+      dojSociety: formValue.dojSociety,
+      dojOrg: formValue.dojJob,
+      dor: formValue.doRetirement,
+      nominee: formValue.nominee,
+      nomineeRelation: formValue.nomineeRelation,
+      branch: formValue.branch,
+      phoneOffice: formValue.phoneOffice,
+      phoneRes: formValue.phoneResidence,
+      bankingDetails: {
+        bankName: formValue.bankName,
+        accountNumber: formValue.accountNo,
+        payableAt: formValue.payableAt,
+        share: formValue.shareAmount || 0
+      }
+    };
+
+    if (!currentId) {
+      // 🔹 Create Member
+      console.log("Creating new member:", memberData);
+      this.memberService.createMember(memberData).subscribe({
+        next: (res) => {
+          console.log("Create successful:", res);
+          this.showSnackBar("Member created successfully!");
+          this.loadMembers();
+          this.closeOffCanvas();
+        },
+        error: (err) => {
+          console.error("Create failed:", err);
+          this.showSnackBar("Failed to create member: " + err.message);
+        }
+      });
+    } else {
+      // 🔹 Update Member
+      console.log("Updating member:", memberData);
+      this.memberService.updateMember(currentId, memberData).subscribe({
+        next: (res) => {
+          console.log("Update successful:", res);
+          this.showSnackBar("Member updated successfully!");
+          this.loadMembers();
+          this.closeOffCanvas();
+        },
+        error: (err) => {
+          console.error("Update failed:", err);
+          this.showSnackBar("Failed to update member: " + err.message);
+        }
+      });
     }
   }
+
 
   private showSnackBar(message: string) {
     this.snackBar.open(message, 'Close', {
