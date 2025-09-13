@@ -12,19 +12,15 @@ export interface LoanTakenCreateDto {
   loanType: string;
   customType?: string;
   memberNo: string;
-  memberName: string;
   loanAmount: number;
-  newLoanShare : number;
   previousLoan: number;
   installments: number;
-  negativeShareAdjustment:number;
   purpose?: string;
   authorizedBy?: string;
   paymentMode: string;
   bank?: string;
   chequeNo?: string;
   chequeDate?: string | null;
-  payAmount:number;
 }
 
 export interface LoanTakenResponseDto {
@@ -278,11 +274,10 @@ export class LoanTakenService {
     );
   }
 
-
   // 📌 Get loan by Id
   getLoanById(id: number): Observable<LoanTakenResponseDto> {
     const headers = this.getHeaders();
-    const url = `${this.baseUrl}/${id}`;
+    const url = `${this.baseUrl}/${id}`;   // ✅ GET /api/LoanTaken/{id}
 
     return this.http.get<ApiResponse<LoanTakenResponseDto>>(url, { headers }).pipe(
       map(res => {
@@ -295,6 +290,7 @@ export class LoanTakenService {
       })
     );
   }
+
 
   // Add to the LoanTakenService class
   getSocietyLimits(): Observable<SocietyLimitDto> {

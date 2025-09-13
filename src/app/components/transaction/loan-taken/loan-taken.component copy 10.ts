@@ -1,8 +1,7 @@
-// src/app/components/transaction/loan-taken
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup, FormsModule } from '@angular/forms';
-import { LoanTakenService, MemberDto, LoanTakenResponseDto, LoanTakenCreateDto, SocietyLimitDto, Member } from '../../../services/loan-taken.service';
+import { LoanTakenService, MemberDto, LoanTakenCreateDto, SocietyLimitDto, Member } from '../../../services/loan-taken.service';
 import { max } from 'rxjs';
 
 @Component({
@@ -44,10 +43,10 @@ import { max } from 'rxjs';
             <div>
               <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Loan No.</label>
               <div class="flex items-center gap-2">
-                <input formControlName="loanNo" readonly
+                <input formControlName="loanNo" 
                   class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                <button type="button" (click)="openLoanPopup()" class="w-1/3 px-3 py-2 bg-[#4f46e4] text-white rounded text-xs">
-                  Select Loan
+                <button type="button" (click)="generateLoanNo()" class="w-1/3 px-3 py-2 bg-[#4f46e4] text-white rounded text-xs">
+                  Generate
                 </button>
               </div>
             </div>
@@ -66,7 +65,7 @@ import { max } from 'rxjs';
                 <!-- Member Number Input -->
                 <input 
                   type="text" 
-                  formControlName="memberNo" 
+                  formControlName="edpNo" 
                   placeholder="Enter Member No" 
                   class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs 
                         focus:ring-blue-500 focus:border-blue-500 
@@ -291,49 +290,6 @@ import { max } from 'rxjs';
             
           </div>
         </div>
-
-        <div *ngIf="showLoanPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
-          <div class="bg-white rounded-lg w-full max-w-2xl max-h-96 overflow-hidden flex flex-col">
-            <div class="bg-[#4f46e4] px-6 py-3 text-white">  
-              <h3 class="text-lg font-semibold">Select Loan</h3>
-            </div>
-            <div class="p-6">
-              <div class="mb-4">
-                <input type="text" placeholder="Search loans..." [(ngModel)]="loanSearchTerm" 
-                  (input)="filterLoans()" class="w-full p-2 border rounded">
-              </div>
-              <div class="overflow-y-auto flex-grow">
-                <table class="w-full">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th class="p-2 text-left text-xs font-medium text-gray-500">Loan No</th>
-                      <th class="p-2 text-left text-xs font-medium text-gray-500">Member No</th>
-                      <th class="p-2 text-left text-xs font-medium text-gray-500">Loan Type</th>
-                      <th class="p-2 text-left text-xs font-medium text-gray-500">Loan Amount</th>
-                      <th class="p-2 text-xs font-medium text-gray-500">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-gray-200">
-                    <tr *ngFor="let loan of filteredLoans" class="hover:bg-gray-50">
-                      <td class="p-2 text-sm">{{ loan.loanNo }}</td>
-                      <td class="p-2 text-sm">{{ loan.memberNo }}</td>
-                      <td class="p-2 text-sm">{{ loan.loanType }}</td>
-                      <td class="p-2 text-sm">{{ formatCurrency(loan.loanAmount) }}</td>
-                      <td class="p-2 text-center">
-                        <button (click)="selectLoan(loan)" class="px-3 py-1 bg-[#4f46e4] text-white rounded text-xs">
-                          Select
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="mt-4 flex justify-end">
-                <button (click)="showLoanPopup = false" class="px-4 py-2 bg-gray-300 rounded mr-2">Cancel</button>
-              </div>
-            </div>
-          </div>
-        </div>
         
         <!-- Payment Mode Section -->
         <div class="bg-white p-4 border">
@@ -448,12 +404,8 @@ export class LoanTakenComponent implements OnInit {
   canSave = false;
   activeTab: 'given' | 'taken' = 'given';
   showMemberPopup = false;
-  showLoanPopup = false; // New property for loan popup
   memberSearchTerm = '';
-  loanSearchTerm = ''; // New property for loan search
   filteredMembers: Member[] = [];
-  filteredLoans: LoanTakenResponseDto[] = []; // New property for filtered loans
-  allLoans: LoanTakenResponseDto[] = []; // New property for all loans
   societyLimits: SocietyLimitDto | null = null;
 
   isValidated = false;
@@ -461,7 +413,10 @@ export class LoanTakenComponent implements OnInit {
   validatedPayAmount = 0;
   validatedNegativeShareAdjustment = 0;
 
+  // Loan types array
+  // loanTypes = ['General', 'Emergency', 'Festival', 'LAS', 'LA FDR'];
   loanTypes: any[] = [];
+
   members: Member[] = [];
   banks = ['State Bank', 'HDFC', 'ICICI', 'Axis Bank'];
 
@@ -475,27 +430,21 @@ export class LoanTakenComponent implements OnInit {
   ) {
     const today = new Date().toISOString().split('T')[0];
     this.form = this.fb.group({
-      loanNo: [''], // optional
+      loanNo: [this.generateLoanNoStr()],
       loanDate: [today, Validators.required],
+      edpNo: [''],
       loanType: ['General', Validators.required],
-      customType: [''], // optional
-      memberNo: ['', Validators.required],
       memberName: ['', Validators.required],
-      loanAmount: [0, [Validators.required, Validators.min(1)]],
-      newLoanShare: [0, [Validators.required, Validators.min(0)]],
+      loanAmount: [0, [Validators.required, Validators.min(0)]],
       previousLoan: [0, [Validators.min(0)]],
-      negativeShareAdjustment: [0, [Validators.required]],
       installments: [60, [Validators.required, Validators.min(1), Validators.max(60)]],
       purpose: [''],
       authorizedBy: [''],
       paymentMode: ['Cash'],
       bank: [''],
       chequeNo: [''],
-      chequeDate: [null],
-      payAmount: [0, [Validators.required, Validators.min(0)]],
+      chequeDate: ['']
     });
-
-
 
     // Add custom validator for installments
     this.form.get('installments')?.setValidators([
@@ -512,62 +461,13 @@ export class LoanTakenComponent implements OnInit {
   async ngOnInit() {
     await this.loadMembers();
     await this.loadSocietyLimits();
-    await this.loadLoans(); // Load existing loans
-    
     this.loanService?.getSocietyLimits().subscribe((res: any) => {
       if (res?.loanTypes) {
-        this.loanTypes = JSON.parse(res.loanTypes);
+        this.loanTypes = JSON.parse(res.loanTypes);  // already array of objects
         console.log('Loan Types ==>', this.loanTypes);
       }
     });
   }
-
-  // New method to load existing loans
-  async loadLoans() {
-    try {
-      this.allLoans = await this.loanService?.getLoans().toPromise() || [];
-      this.filteredLoans = [...this.allLoans];
-    } catch (error) {
-      console.error('Error loading loans:', error);
-      alert('Failed to load loans');
-    }
-  }
-
-  // New method to open loan selection popup
-  openLoanPopup() {
-    this.showLoanPopup = true;
-    this.loanSearchTerm = '';
-    this.filterLoans();
-  }
-
-  // New method to filter loans based on search term
-  filterLoans() {
-    if (!this.loanSearchTerm) {
-      this.filteredLoans = [...this.allLoans];
-      return;
-    }
-
-    const term = this.loanSearchTerm.toLowerCase();
-    this.filteredLoans = this.allLoans.filter(loan =>
-      loan.loanNo.toLowerCase().includes(term) ||
-      loan.memberNo.toLowerCase().includes(term) ||
-      loan.loanType.toLowerCase().includes(term)
-    );
-  }
-
-  // New method to select a loan
-  selectLoan(loan: LoanTakenResponseDto) {
-    this.form.patchValue({
-      loanNo: loan.loanNo,
-      loanDate: loan.loanDate.split('T')[0], // Format date if needed
-      loanType: loan.loanType,
-      loanAmount: loan.loanAmount,
-      // You might want to populate other fields based on the selected loan
-    });
-    
-    this.showLoanPopup = false;
-  }
-
 
   async loadMembers() {
     try {
@@ -661,7 +561,7 @@ export class LoanTakenComponent implements OnInit {
   // Reset validation when member changes
   selectMember(member: Member) {
     this.form.patchValue({
-      memberNo: member.memNo,
+      edpNo: member.memNo,
       memberName: member.name
     });
     this.selectedMember = member;
@@ -690,29 +590,24 @@ export class LoanTakenComponent implements OnInit {
     this.form.reset({
       loanNo: this.generateLoanNoStr(),
       loanDate: today,
+      edpNo: '',
       loanType: 'General',
-      customType: '',
-      memberNo: '',
       memberName: '',
       loanAmount: 0,
-      newLoanShare: 0,
       previousLoan: 0,
-      negativeShareAdjustment: 0,
       installments: 60,
       purpose: '',
       authorizedBy: '',
       paymentMode: 'Cash',
       bank: '',
       chequeNo: '',
-      chequeDate: null,
-      payAmount: 0
+      chequeDate: ''
     });
     this.selectedMember = null;
     this.givenSurety = [];
     this.takenSurety = [];
     this.canSave = false;
   }
-
 
   formatCurrency(v: number | string) {
     const numValue = typeof v === 'string' ? parseFloat(v) || 0 : v;
@@ -733,6 +628,20 @@ export class LoanTakenComponent implements OnInit {
   }
 
   isCheque() { return this.form.get('paymentMode')!.value === 'Cheque'; }
+
+  // Reset validation status when form changes
+  // onLoanTypeChange() {
+  //   this.recalculate();
+  //   this.isValidated = false;
+
+  //   // Reset purpose validation based on loan type
+  //   if (this.isGeneralLoan()) {
+  //     this.form.get('purpose')?.clearValidators();
+  //   } else {
+  //     this.form.get('purpose')?.setValidators([Validators.required]);
+  //   }
+  //   this.form.get('purpose')?.updateValueAndValidity();
+  // }
 
   getLoanTypeData(selectedLoanType: string) {
     if (!this.societyLimits) return null;
@@ -769,6 +678,18 @@ export class LoanTakenComponent implements OnInit {
     return (Number(this.form.get('loanAmount')!.value) || 0) - (Number(this.form.get('previousLoan')!.value) || 0);
   }
 
+  // installmentAmount() {
+  //   console.log('validatedPayAmount == ', this.validatedPayAmount)
+  //   // const loan = Number(this.form.get('loanAmount')!.value) || 0;
+  //   // const loan = this.validatedPayAmount || 0;
+  //   const loan = (Number(this.form.get('loanAmount')!.value)) - this.validatedNewLoanShare;
+  //   console.log('loan == ', loan)
+  //   const n = Number(this.form.get('installments')!.value) || 1;
+  //   if (n <= 0) return 0;
+  //   return Math.round((((loan) + loan) / n + Number.EPSILON) * 100) / 100;
+  //   // return Math.round((((loan * this.interestRate) + loan) / n + Number.EPSILON) * 100) / 100;
+  // }
+
   installmentAmount() {
     console.log('validatedPayAmount == ', this.validatedPayAmount);
 
@@ -782,6 +703,7 @@ export class LoanTakenComponent implements OnInit {
     // Divide loan equally into installments (no interest included)
     return Math.round((loan / n + Number.EPSILON) * 100) / 100;
   }
+
 
   newLoanShare() {
     // Only calculate for General loans
@@ -952,6 +874,8 @@ export class LoanTakenComponent implements OnInit {
     return loanObj ? loanObj.Limit : 0;
   }
 
+
+
   getLoanTypeLimitDisplay(loanType: string): string {
     const limit = this.getLoanTypeLimit(loanType);
     return limit > 0 ? this.formatCurrency(limit) : 'No limit';
@@ -997,6 +921,7 @@ export class LoanTakenComponent implements OnInit {
     this.isValidated = true;
   }
 
+
   async onSave() {
     if (!this.canSave) {
       alert('Please validate before saving');
@@ -1005,26 +930,20 @@ export class LoanTakenComponent implements OnInit {
 
     try {
       const dto: LoanTakenCreateDto = {
-      loanNo: this.form.get('loanNo')!.value,
-      loanDate: this.form.get('loanDate')!.value, // ensure format
-      loanType: this.form.get('loanType')!.value,
-      customType: this.form.get('customType')?.value || null,
-      memberNo: this.form.get('memberNo')!.value,
-      memberName: this.form.get('memberName')!.value,
-      loanAmount: Number(this.form.get('loanAmount')!.value),
-      newLoanShare: Number(this.validatedNewLoanShare),
-      previousLoan: Number(this.form.get('previousLoan')!.value),
-      installments: Number(this.form.get('installments')!.value),
-      negativeShareAdjustment: Number(this.validatedNegativeShareAdjustment),
-      purpose: this.form.get('purpose')?.value || null,
-      authorizedBy: this.form.get('authorizedBy')?.value || null,
-      paymentMode: this.form.get('paymentMode')!.value,
-      bank: this.form.get('bank')?.value || null,
-      chequeNo: this.form.get('chequeNo')?.value || null,
-      chequeDate: this.form.get('chequeDate')?.value || null,
-      payAmount: Number(this.validatedPayAmount)
-    };
-
+        loanNo: this.form.get('loanNo')!.value,
+        loanDate: this.form.get('loanDate')!.value,
+        loanType: this.form.get('loanType')!.value,
+        memberNo: this.form.get('edpNo')!.value,
+        loanAmount: Number(this.form.get('loanAmount')!.value),
+        previousLoan: Number(this.form.get('previousLoan')!.value),
+        installments: Number(this.form.get('installments')!.value),
+        purpose: this.form.get('purpose')!.value,
+        authorizedBy: this.form.get('authorizedBy')!.value,
+        paymentMode: this.form.get('paymentMode')!.value,
+        bank: this.form.get('bank')!.value,
+        chequeNo: this.form.get('chequeNo')!.value,
+        chequeDate: this.form.get('chequeDate')!.value || null
+      };
 
       const result = await this.loanService?.createLoan(dto).toPromise();
       alert('Loan saved successfully!');
@@ -1037,7 +956,6 @@ export class LoanTakenComponent implements OnInit {
       alert(`Failed to save loan: ${error.message || 'Unknown error'}`);
     }
   }
-
 
   recalculate() {
     const loan = Number(this.form.get('loanAmount')!.value) || 0;

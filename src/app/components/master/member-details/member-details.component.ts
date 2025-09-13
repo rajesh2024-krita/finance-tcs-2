@@ -99,6 +99,7 @@ export class MemberDetailsComponent implements OnInit {
       email: ['', Validators.email],
       email2: ['', Validators.email],
       city: [''],
+      cdAmount: ['0'],
       pincode: [''],
       status: ['Active'],
       officeAddress: [''],
@@ -111,7 +112,6 @@ export class MemberDetailsComponent implements OnInit {
       phoneOffice: [''],
       phoneResidence: [''],
       shareAmount: [0],
-      cdAmount: [0],
       bankName: ['', Validators.required],
       accountNo: ['', Validators.required],
       payableAt: [''],
@@ -246,7 +246,7 @@ export class MemberDetailsComponent implements OnInit {
     nominee: member.nominee,
     nomineeRelation: member.nomineeRelation,
     shareAmount: member.bankingDetails?.share || 0,
-    cdAmount: member.cdAmount || 0,
+    cdAmount: member.cdAmount || "0",
     bankName: member.bankName || (member.bankingDetails?.bankName),
     payableAt: member.bankingDetails.payableAt || member.bankingDetails.branchName,
     accountNo: member.accountNo || (member.bankingDetails?.accountNumber),
@@ -459,6 +459,7 @@ export class MemberDetailsComponent implements OnInit {
       fhName: formValue.fhName,
       officeAddress: formValue.officeAddress,
       city: formValue.city,
+      cdAmount: formValue.cdAmount || "0",
       mobile: formValue.mobile,
       mobile2: formValue.mobile2,
       email: formValue.email,
@@ -475,6 +476,7 @@ export class MemberDetailsComponent implements OnInit {
       branch: formValue.branch,
       phoneOffice: formValue.phoneOffice,
       phoneRes: formValue.phoneResidence,
+      status:formValue.status,
       bankingDetails: {
         bankName: formValue.bankName,
         accountNumber: formValue.accountNo,
@@ -500,7 +502,7 @@ export class MemberDetailsComponent implements OnInit {
       });
     } else {
       // 🔹 Update Member
-      console.log("Updating member:", memberData);
+      console.log("Updating member:", memberData.cdAmount);
       this.memberService.updateMember(currentId, memberData).subscribe({
         next: (res) => {
           console.log("Update successful:", res);

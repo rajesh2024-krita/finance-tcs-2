@@ -108,7 +108,7 @@ export class MemberDetailsComponent implements OnInit {
       phoneOffice: [''],
       phoneResidence: [''],
       shareAmount: [0],
-      cdAmount: [0],
+      cdAmount: ['0'],
       bankName: ['', Validators.required],
       branchName: [''],
       accountNo: ['', Validators.required],
@@ -243,7 +243,7 @@ export class MemberDetailsComponent implements OnInit {
     nominee: member.nominee,
     nomineeRelation: member.nomineeRelation,
     shareAmount: member.bankingDetails?.share || 0,
-    cdAmount: member.cdAmount || 0,
+    cdAmount: member.cdAmount || "0",
     bankName: member.bankName || (member.bankingDetails?.bankName),
     payableAt: member.payableAt || member.branchName,
     accountNo: member.accountNo || (member.bankingDetails?.accountNumber),
@@ -290,14 +290,19 @@ export class MemberDetailsComponent implements OnInit {
     dojOrg: this.toUtcString(formValue.dojJob),
     dor: this.toUtcString(formValue.doRetirement), // 👈 mapped to backend
     email: formValue.email,
+    email2: formValue.email2,
+    status: formValue.status,
     mobile: formValue.mobile,
+    mobile2: formValue.mobile2,
     designation: formValue.designation,
     branch: formValue.branch,
     officeAddress: formValue.officeAddress,
     residenceAddress: formValue.residenceAddress,
     city: formValue.city,
+    cdAmount: formValue.cdAmount,
     phoneOffice: formValue.phoneOffice,
     phoneRes: formValue.phoneResidence,
+    pincode: formValue.pincode,
     nominee: formValue.nominee,
     nomineeRelation: formValue.nomineeRelation,
     bankingDetails: {
@@ -317,7 +322,7 @@ export class MemberDetailsComponent implements OnInit {
     if (this.memberForm.valid) {
       this.submitting.set(true);
       const formData = this.transformFormDataToApi(this.memberForm.value);
-
+      console.log('Transformed form data:', formData);
       if (this.isEditMode()) {
         const currentMember = this.currentMember();
         if (currentMember) {
