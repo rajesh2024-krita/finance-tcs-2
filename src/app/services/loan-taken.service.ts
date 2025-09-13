@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+import { tap } from 'rxjs/operators';
 
 // ------------ DTO Interfaces ------------
 
@@ -32,14 +33,25 @@ export interface LoanTakenResponseDto {
   loanNo: string;
   loanDate: string;
   loanType: string;
+  customType?: string | null;
   memberNo: string;
   loanAmount: number;
+  previousLoan: number;
+  installments: number;
+  purpose: string;
+  authorizedBy: string;
+  paymentMode: string;
+  bank?: string | null;
+  chequeNo?: string | null;
+  chequeDate?: string | null;
+  status: string;
   netLoan: number;
   installmentAmount: number;
   newLoanShare: number;
   payAmount: number;
   createdAt: string;
 }
+
 
 export interface MemberDto {
 id?: number;
@@ -212,8 +224,8 @@ export interface SocietyLimitDto {
   providedIn: 'root'
 })
 export class LoanTakenService {
-  // private readonly baseUrl = 'https://fintcsapi-1.onrender.com/api/LoanTaken';
-  private readonly baseUrl = 'http://localhost:5000/api/LoanTaken';
+  private readonly baseUrl = 'https://fintcsapi-1.onrender.com/api/LoanTaken';
+  // private readonly baseUrl = 'http://localhost:5000/api/LoanTaken';
 
   constructor(
     private http: HttpClient,
@@ -263,10 +275,12 @@ export class LoanTakenService {
   }
 
   // 📌 Get all loans
+  
   getLoans(): Observable<LoanTakenResponseDto[]> {
     const headers = this.getHeaders();
 
     return this.http.get<ApiResponse<LoanTakenResponseDto[]>>(this.baseUrl, { headers }).pipe(
+      tap(res => console.log('Raw loan API response:', res)), // 👈 logs full response
       map(res => {
         if (res.success && res.data) return res.data;
         throw new Error(res.message || 'Failed to fetch loans');

@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup, FormsModule } from '@angular/forms';
 import { LoanTakenService, MemberDto, LoanTakenResponseDto, LoanTakenCreateDto, SocietyLimitDto, Member } from '../../../services/loan-taken.service';
-import { max } from 'rxjs';
+import { max, firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-loan-entry-form',
@@ -17,7 +17,7 @@ import { max } from 'rxjs';
       </div>
 
       <!-- Form Content -->
-      <form [formGroup]="form" (ngSubmit)="onSave()" class="space-y-6">
+      <form [formGroup]="form" class="space-y-6">
         <!-- Loan Type Section -->
         <div class="bg-white p-4 border">
           <div class="grid grid-cols-1 gap-4">
@@ -297,12 +297,12 @@ import { max } from 'rxjs';
             <div class="bg-[#4f46e4] px-6 py-3 text-white">  
               <h3 class="text-lg font-semibold">Select Loan</h3>
             </div>
-            <div class="p-6">
+            <div class="p-6 flex flex-col flex-grow">
               <div class="mb-4">
                 <input type="text" placeholder="Search loans..." [(ngModel)]="loanSearchTerm" 
                   (input)="filterLoans()" class="w-full p-2 border rounded">
               </div>
-              <div class="overflow-y-auto flex-grow">
+              <div class="overflow-y-auto flex-grow mb-4">
                 <table class="w-full">
                   <thead class="bg-gray-50">
                     <tr>
@@ -314,16 +314,19 @@ import { max } from 'rxjs';
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-gray-200">
-                    <tr *ngFor="let loan of filteredLoans" class="hover:bg-gray-50">
-                      <td class="p-2 text-sm">{{ loan.loanNo }}</td>
-                      <td class="p-2 text-sm">{{ loan.memberNo }}</td>
-                      <td class="p-2 text-sm">{{ loan.loanType }}</td>
-                      <td class="p-2 text-sm">{{ formatCurrency(loan.loanAmount) }}</td>
+                    <tr *ngFor="let l of filteredLoans" class="hover:bg-gray-50">
+                      <td class="p-2 text-sm">{{ l.loanNo || "NA"}}</td>
+                      <td class="p-2 text-sm">{{ l.memberNo || "NA"}}</td>
+                      <td class="p-2 text-sm">{{ l.loanType || "NA"}}</td>
+                      <td class="p-2 text-sm">{{ formatCurrency(l.loanAmount) || "NA"}}</td>
                       <td class="p-2 text-center">
-                        <button (click)="selectLoan(loan)" class="px-3 py-1 bg-[#4f46e4] text-white rounded text-xs">
+                        <button (click)="selectLoan(l)" class="px-3 py-1 bg-[#4f46e4] text-white rounded text-xs">
                           Select
                         </button>
                       </td>
+                    </tr>
+                    <tr *ngIf="filteredLoans.length === 0">
+                      <td colspan="5" class="p-4 text-center text-sm text-gray-500">No loans found</td>
                     </tr>
                   </tbody>
                 </table>
@@ -411,7 +414,7 @@ import { max } from 'rxjs';
           <input type="text" placeholder="Search members..." [(ngModel)]="memberSearchTerm" 
             (input)="filterMembers()" class="w-full p-2 border rounded">
         </div>
-        <div class="overflow-y-auto flex-grow">
+        <div class="overflow-y-auto h-40 flex-grow">
           <table class="w-full">
             <thead class="bg-gray-50">
               <tr>
@@ -471,7 +474,7 @@ export class LoanTakenComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private loanService?: LoanTakenService
+    private loanService: LoanTakenService
   ) {
     const today = new Date().toISOString().split('T')[0];
     this.form = this.fb.group({
@@ -510,9 +513,12 @@ export class LoanTakenComponent implements OnInit {
   }
 
   async ngOnInit() {
+    await this.loadLoans();
     await this.loadMembers();
     await this.loadSocietyLimits();
-    await this.loadLoans(); // Load existing loans
+
+    console.log("filtered loan from ngOnInit:",this.filteredLoans);
+     // Load existing loans
     
     this.loanService?.getSocietyLimits().subscribe((res: any) => {
       if (res?.loanTypes) {
@@ -524,21 +530,26 @@ export class LoanTakenComponent implements OnInit {
 
   // New method to load existing loans
   async loadLoans() {
-    try {
-      this.allLoans = await this.loanService?.getLoans().toPromise() || [];
-      this.filteredLoans = [...this.allLoans];
-    } catch (error) {
-      console.error('Error loading loans:', error);
-      alert('Failed to load loans');
-    }
+  try {
+    this.allLoans = await firstValueFrom(this.loanService.getLoans());
+    this.filteredLoans = [...this.allLoans];
+    console.log("Loaded loans:", this.allLoans);
+  } catch (error) {
+    console.error('Error loading loans:', error);
+    alert('Failed to load loans');
+    this.allLoans = [];
+    this.filteredLoans = [];
   }
+}
 
   // New method to open loan selection popup
   openLoanPopup() {
-    this.showLoanPopup = true;
-    this.loanSearchTerm = '';
-    this.filterLoans();
-  }
+  this.showLoanPopup = true;
+  this.loanSearchTerm = '';
+  this.filterLoans();
+  console.log("after open", this.filteredLoans);  
+}
+
 
   // New method to filter loans based on search term
   filterLoans() {
@@ -549,24 +560,35 @@ export class LoanTakenComponent implements OnInit {
 
     const term = this.loanSearchTerm.toLowerCase();
     this.filteredLoans = this.allLoans.filter(loan =>
-      loan.loanNo.toLowerCase().includes(term) ||
-      loan.memberNo.toLowerCase().includes(term) ||
-      loan.loanType.toLowerCase().includes(term)
+      (loan.loanNo?.toLowerCase() || '').includes(term) ||
+      (loan.memberNo?.toLowerCase() || '').includes(term) ||
+      (loan.loanType?.toLowerCase() || '').includes(term)
     );
   }
 
   // New method to select a loan
   selectLoan(loan: LoanTakenResponseDto) {
-    this.form.patchValue({
-      loanNo: loan.loanNo,
-      loanDate: loan.loanDate.split('T')[0], // Format date if needed
-      loanType: loan.loanType,
-      loanAmount: loan.loanAmount,
-      // You might want to populate other fields based on the selected loan
-    });
-    
-    this.showLoanPopup = false;
+  this.form.patchValue({
+    loanNo: loan.loanNo,
+    loanDate: loan.loanDate ? loan.loanDate.split('T')[0] : new Date().toISOString().split('T')[0],
+    loanType: loan.loanType,
+    loanAmount: loan.loanAmount,
+    memberNo: loan.memberNo,
+  });
+  
+  // If member data is available in the loan, select the member
+  if (loan.memberNo) {
+    const member = this.members.find(m => m.memNo === loan.memberNo);
+    if (member) {
+      this.selectedMember = member;
+      this.form.patchValue({ memberName: member.name });
+      this.loadSuretyInformation(member.memNo);
+    }
   }
+  
+  this.showLoanPopup = false;
+}
+
 
 
   async loadMembers() {
@@ -630,15 +652,6 @@ export class LoanTakenComponent implements OnInit {
     return this.form.get('loanType')?.value === 'General Loan';
   }
 
-  generateLoanNoStr() {
-    const t = Date.now().toString().slice(-6);
-    return `LN-${new Date().getFullYear()}-${t}`;
-  }
-
-  generateLoanNo() {
-    this.form.patchValue({ loanNo: this.generateLoanNoStr() });
-  }
-
   openMemberPopup() {
     this.showMemberPopup = true;
     this.memberSearchTerm = '';
@@ -688,7 +701,7 @@ export class LoanTakenComponent implements OnInit {
   onClear() {
     const today = new Date().toISOString().split('T')[0];
     this.form.reset({
-      loanNo: this.generateLoanNoStr(),
+      loanNo: '',
       loanDate: today,
       loanType: 'General',
       customType: '',
