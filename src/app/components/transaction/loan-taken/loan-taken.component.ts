@@ -731,8 +731,29 @@ filterLoans() {
     this.showMemberPopup = false;
     this.isValidated = false;
 
+    // ✅ Check for active loans of this member
+    const activeLoans = this.allLoans.filter(
+      l => l.memberNo === member.memNo && l.status === 'Active'
+    );
+
+    if (activeLoans.length > 0) {
+      // 👉 If multiple active loans, sum loan amounts
+      const totalActiveLoan = activeLoans.reduce((sum, l) => sum + (l.loanAmount || 0), 0);
+
+      this.form.patchValue({
+        previousLoan: totalActiveLoan
+      });
+    } else {
+      // No active loan → reset previousLoan to 0
+      this.form.patchValue({
+        previousLoan: 0
+      });
+    }
+
     this.loadSuretyInformation(member.memNo);
   }
+
+
 
   loadSuretyInformation(memberNo: string) {
     // Implement API call to get surety information
