@@ -101,7 +101,7 @@ import { max, firstValueFrom } from 'rxjs';
             
             <div>
               <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Previous Loan (Remaining)</label>
-              <input type="number" formControlName="previousLoan" (input)="recalculate()"
+              <input type="number" formControlName="previousLoan" (input)="recalculate()" readonly
                 class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
             </div>
           </div>
@@ -292,51 +292,7 @@ import { max, firstValueFrom } from 'rxjs';
           </div>
         </div>
 
-        <div *ngIf="showLoanPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
-          <div class="bg-white rounded-lg w-full max-w-2xl max-h-96 overflow-hidden flex flex-col">
-            <div class="bg-[#4f46e4] px-6 py-3 text-white">  
-              <h3 class="text-lg font-semibold">Select Loan</h3>
-            </div>
-            <div class="p-6 flex flex-col flex-grow">
-              <div class="mb-4">
-                <input type="text" placeholder="Search loans..." [(ngModel)]="loanSearchTerm" 
-                  (input)="filterLoans()" class="w-full p-2 border rounded">
-              </div>
-              <div class="overflow-y-auto flex-grow mb-4">
-                <table class="w-full">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th class="p-2 text-left text-xs font-medium text-gray-500">Loan No</th>
-                      <th class="p-2 text-left text-xs font-medium text-gray-500">Member No</th>
-                      <th class="p-2 text-left text-xs font-medium text-gray-500">Loan Type</th>
-                      <th class="p-2 text-left text-xs font-medium text-gray-500">Loan Amount</th>
-                      <th class="p-2 text-xs font-medium text-gray-500">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-gray-200">
-                    <tr *ngFor="let l of filteredLoans" class="hover:bg-gray-50">
-                      <td class="p-2 text-sm">{{ l.loanNo || "NA"}}</td>
-                      <td class="p-2 text-sm">{{ l.memberNo || "NA"}}</td>
-                      <td class="p-2 text-sm">{{ l.loanType || "NA"}}</td>
-                      <td class="p-2 text-sm">{{ formatCurrency(l.loanAmount) || "NA"}}</td>
-                      <td class="p-2 text-center">
-                        <button (click)="selectLoan(l)" class="px-3 py-1 bg-[#4f46e4] text-white rounded text-xs">
-                          Select
-                        </button>
-                      </td>
-                    </tr>
-                    <tr *ngIf="filteredLoans.length === 0">
-                      <td colspan="5" class="p-4 text-center text-sm text-gray-500">No loans found</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="mt-4 flex justify-end">
-                <button (click)="showLoanPopup = false" class="px-4 py-2 bg-gray-300 rounded mr-2">Cancel</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        
         
         <!-- Payment Mode Section -->
         <div class="bg-white p-4 border">
@@ -392,16 +348,72 @@ import { max, firstValueFrom } from 'rxjs';
           <button type="button" (click)="onClear()" class=" text-xs px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium">
             Clear
           </button>
-          <button type="button" (click)="onValidate()" class=" text-xs px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium">
+          <!-- Disable when loanNo is filled -->
+          <button type="button"
+                  [disabled]="isExistingLoan"
+                  (click)="onValidate()"
+                  class="text-xs px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium">
             Validate
           </button>
-          <button type="submit" (click)="onSave()" [disabled]="!canSave" 
-            class=" text-xs px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium">
+
+          <!-- Disable when loanNo is filled OR cannot save -->
+          <button type="submit"
+                  [disabled]="isExistingLoan || !canSave"
+                  (click)="onSave()"
+                  class="text-xs px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium">
             Save
           </button>
         </div>
       </form>
     </div>
+
+    <div *ngIf="showLoanPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+          <div class="bg-white rounded-lg w-full max-w-2xl max-h-96 overflow-hidden flex flex-col">
+            <div class="bg-[#4f46e4] px-6 py-3 text-white">  
+              <h3 class="text-lg font-semibold">Select Loan</h3>
+            </div>
+            <div class="p-6 flex flex-col flex-grow">
+              <div class="mb-4">
+                <input type="text" placeholder="Search loans..." [(ngModel)]="loanSearchTerm" 
+                  (input)="filterLoans()" class="w-full p-2 border rounded">
+              </div>
+              <div class="overflow-y-auto flex-grow mb-4">
+                <table class="w-full">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="p-2 text-left text-xs font-medium text-gray-500">Loan Date</th>
+                      <th class="p-2 text-left text-xs font-medium text-gray-500">Loan No</th>
+                      <th class="p-2 text-left text-xs font-medium text-gray-500">Member No</th>
+                      <th class="p-2 text-left text-xs font-medium text-gray-500">Loan Type</th>
+                      <th class="p-2 text-left text-xs font-medium text-gray-500">Loan Amount</th>
+                      <th class="p-2 text-xs font-medium text-gray-500">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-200">
+                    <tr *ngFor="let l of filteredLoans" class="hover:bg-gray-50">
+                      <td class="p-2 text-sm">{{ l.loanDate ? (l.loanDate | date:'dd/MM/yyyy') : 'NA' }}</td>
+                      <td class="p-2 text-sm">{{ l.loanNo || "NA"}}</td>
+                      <td class="p-2 text-sm">{{ l.memberNo || "NA"}}</td>
+                      <td class="p-2 text-sm">{{ l.loanType || "NA"}}</td>
+                      <td class="p-2 text-sm">{{ formatCurrency(l.loanAmount) || "NA"}}</td>
+                      <td class="p-2 text-center">
+                        <button (click)="selectLoan(l)" class="px-3 py-1 bg-[#4f46e4] text-white rounded text-xs">
+                          Select
+                        </button>
+                      </td>
+                    </tr>
+                    <tr *ngIf="filteredLoans.length === 0">
+                      <td colspan="5" class="p-4 text-center text-sm text-gray-500">No loans found</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="mt-4 flex justify-end">
+                <button (click)="showLoanPopup = false" class="px-4 py-2 bg-gray-300 rounded mr-2">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
     <!-- Member Selection Popup -->
     <div *ngIf="showMemberPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center  z-[9999]">
@@ -512,6 +524,8 @@ export class LoanTakenComponent implements OnInit {
     ]);
   }
 
+
+
   async ngOnInit() {
     await this.loadLoans();
     await this.loadMembers();
@@ -526,7 +540,18 @@ export class LoanTakenComponent implements OnInit {
         console.log('Loan Types ==>', this.loanTypes);
       }
     });
+
+    this.form.get('loanNo')?.valueChanges.subscribe(val => {
+      console.log('LoanNo changed:', val);
+    });
+
   }
+
+
+  get isExistingLoan(): boolean {
+  // true when loanNo is already filled (coming from select button)
+  return !!this.form.get('loanNo')?.value?.trim();
+}
 
   // New method to load existing loans
   async loadLoans() {
@@ -548,23 +573,47 @@ export class LoanTakenComponent implements OnInit {
   this.loanSearchTerm = '';
   this.filterLoans();
   console.log("after open", this.filteredLoans);  
+  this.filterLoans();
 }
 
 
   // New method to filter loans based on search term
-  filterLoans() {
-    if (!this.loanSearchTerm) {
-      this.filteredLoans = [...this.allLoans];
-      return;
+filterLoans() {
+  if (!this.loanSearchTerm) {
+    this.filteredLoans = [...this.allLoans];
+    return;
+  }
+
+  const term = this.loanSearchTerm.toLowerCase();
+
+  this.filteredLoans = this.allLoans.filter(loan => {
+    let loanDateStr = '';
+    let loanDateAltStr = '';
+
+    if (loan.loanDate) {
+      const d = new Date(loan.loanDate);
+
+      // yyyy-MM-dd
+      loanDateStr = d.toISOString().split('T')[0];  
+
+      // dd/MM/yyyy
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      loanDateAltStr = `${day}/${month}/${year}`;
     }
 
-    const term = this.loanSearchTerm.toLowerCase();
-    this.filteredLoans = this.allLoans.filter(loan =>
+    return (
       (loan.loanNo?.toLowerCase() || '').includes(term) ||
       (loan.memberNo?.toLowerCase() || '').includes(term) ||
-      (loan.loanType?.toLowerCase() || '').includes(term)
+      (loan.loanType?.toLowerCase() || '').includes(term) ||
+      loanDateStr.includes(term) ||
+      loanDateAltStr.includes(term)
     );
-  }
+  });
+}
+
+
 
   // New method to select a loan
   selectLoan(loan: LoanTakenResponseDto) {
@@ -574,6 +623,7 @@ export class LoanTakenComponent implements OnInit {
     loanType: loan.loanType,
     loanAmount: loan.loanAmount,
     memberNo: loan.memberNo,
+    purpose: loan.purpose
   });
   
   // If member data is available in the loan, select the member
