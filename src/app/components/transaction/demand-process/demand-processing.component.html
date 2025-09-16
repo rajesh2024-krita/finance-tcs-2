@@ -1,0 +1,88 @@
+<mat-card class="page-card">
+  <mat-card-title>Demand Processing</mat-card-title>
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="processDemand()" class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Month</mat-label>
+        <mat-select formControlName="month">
+          <mat-option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [value]="m">{{m}}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.controls['month'].hasError('required')">Month is required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Year</mat-label>
+        <input matInput formControlName="year" placeholder="e.g. 2025" />
+        <mat-error *ngIf="form.controls['year'].hasError('required')">Year is required</mat-error>
+        <mat-error *ngIf="form.controls['year'].hasError('pattern')">Enter a 4-digit year</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date of Recovery</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="recoveryDate" />
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+
+      <div class="actions">
+        <button mat-flat-button color="primary" type="submit" [disabled]="loading">Process Demand</button>
+      </div>
+    </form>
+
+    <div class="spinner" *ngIf="loading">
+      <mat-progress-spinner mode="indeterminate" diameter="36"></mat-progress-spinner>
+    </div>
+
+    <section class="results">
+      <h3>Latest Processed Demands</h3>
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
+
+        <!-- Member Name -->
+        <ng-container matColumnDef="memberName">
+          <th mat-header-cell *matHeaderCellDef>Member</th>
+          <td mat-cell *matCellDef="let row">{{row.memberName}}</td>
+        </ng-container>
+
+        <!-- Contribution -->
+        <ng-container matColumnDef="contribution">
+          <th mat-header-cell *matHeaderCellDef>Contribution</th>
+          <td mat-cell *matCellDef="let row">{{row.contribution | number:'1.2-2'}}</td>
+        </ng-container>
+
+        <!-- Loan Due -->
+        <ng-container matColumnDef="loanDue">
+          <th mat-header-cell *matHeaderCellDef>Loan Due</th>
+          <td mat-cell *matCellDef="let row">{{row.loanDue | number:'1.2-2'}}</td>
+        </ng-container>
+
+        <!-- Interest -->
+        <ng-container matColumnDef="interest">
+          <th mat-header-cell *matHeaderCellDef>Interest</th>
+          <td mat-cell *matCellDef="let row">{{row.interest | number:'1.2-2'}}</td>
+        </ng-container>
+
+        <!-- Penal Interest -->
+        <ng-container matColumnDef="penalInterest">
+          <th mat-header-cell *matHeaderCellDef>Penal Int.</th>
+          <td mat-cell *matCellDef="let row">{{row.penalInterest | number:'1.2-2'}}</td>
+        </ng-container>
+
+        <!-- Arrear -->
+        <ng-container matColumnDef="arrear">
+          <th mat-header-cell *matHeaderCellDef>Arrear</th>
+          <td mat-cell *matCellDef="let row">{{row.arrear | number:'1.2-2'}}</td>
+        </ng-container>
+
+        <!-- Total -->
+        <ng-container matColumnDef="total">
+          <th mat-header-cell *matHeaderCellDef>Total</th>
+          <td mat-cell *matCellDef="let row">{{row.total | number:'1.2-2'}}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <p *ngIf="!dataSource?.length && !loading">No demands found</p>
+    </section>
+  </mat-card-content>
+</mat-card>

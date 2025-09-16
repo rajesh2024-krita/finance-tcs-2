@@ -34,26 +34,24 @@ interface MonthlyDemand {
   selector: 'app-demand-process',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
-  template: `
-<div class="space-y-6 p-4">
+  template: `<div class="space-y-6 p-4">
   <h2 class="text-xl font-bold">Monthly Demand Processing</h2>
 
   <!-- 🔹 Demand Selection -->
   <div class="border rounded shadow bg-white p-4 flex gap-4 items-center">
     <div>
-      <label>Year</label>
-      <select [(ngModel)]="selectedYear" (change)="onMonthYearChange()" class="border rounded px-2 py-1">
-        <option *ngFor="let y of createdYears" [ngValue]="y">{{ y }}</option>
-      </select>
-    </div>
-    <div>
       <label>Month</label>
-      <select [(ngModel)]="selectedMonth" (change)="onMonthYearChange()" class="border rounded px-2 py-1">
-        <option *ngFor="let m of createdMonths" [ngValue]="m">{{ months[m - 1] }}</option>
-      </select>
+      <!-- Month -->
+<select [(ngModel)]="selectedMonth" (change)="onMonthYearChange()" class="border rounded px-2 py-1">
+  <option *ngFor="let m of createdMonths" [ngValue]="m">{{ months[m - 1] }}</option>
+</select>
     </div>
     <div>
-          <button (click)="addNewMonth()" class="bg-green-600 text-white px-4 py-2 rounded">New Month</button>
+      <label>Year</label>
+      <!-- Year -->
+<select [(ngModel)]="selectedYear" (change)="onMonthYearChange()" class="border rounded px-2 py-1">
+  <option *ngFor="let y of createdYears" [ngValue]="y">{{ y }}</option>
+</select>
     </div>
   </div>
 
@@ -113,18 +111,23 @@ interface MonthlyDemand {
       <div><label>Member No</label><input formControlName="MemberNo" class="border rounded px-2 py-1 w-full" /></div>
       <div><label>Member Name</label><input formControlName="MemberName" class="border rounded px-2 py-1 w-full" /></div>
       <div><label>CD Amount</label><input type="number" formControlName="CDAmount" class="border rounded px-2 py-1 w-full" /></div>
+
       <div><label>General Loan</label><input type="number" formControlName="General Loan" class="border rounded px-2 py-1 w-full" /></div>
       <div><label>Gen Installment</label><input type="number" formControlName="General LoanInstallment" class="border rounded px-2 py-1 w-full" /></div>
       <div><label>Gen Interest</label><input type="number" formControlName="General LoanInterest" class="border rounded px-2 py-1 w-full" /></div>
+
       <div><label>Emergency Loan</label><input type="number" formControlName="Emergency Loan" class="border rounded px-2 py-1 w-full" /></div>
       <div><label>E-Installment</label><input type="number" formControlName="Emergency LoanInstallment" class="border rounded px-2 py-1 w-full" /></div>
       <div><label>E-Interest</label><input type="number" formControlName="Emergency LoanInterest" class="border rounded px-2 py-1 w-full" /></div>
+
       <div><label>Festival Loan</label><input type="number" formControlName="Festival Loan" class="border rounded px-2 py-1 w-full" /></div>
       <div><label>F-Installment</label><input type="number" formControlName="Festival LoanInstallment" class="border rounded px-2 py-1 w-full" /></div>
       <div><label>F-Interest</label><input type="number" formControlName="Festival LoanInterest" class="border rounded px-2 py-1 w-full" /></div>
+
       <div><label>Net Deduction</label><input type="number" formControlName="NetDeduction" class="border rounded px-2 py-1 w-full" /></div>
       <div><label>Penal Int</label><input type="number" formControlName="PenalInterest" class="border rounded px-2 py-1 w-full" /></div>
       <div><label>Penal Ded</label><input type="number" formControlName="PenalDeduction" class="border rounded px-2 py-1 w-full" /></div>
+
       <div><label>Total Payable</label><input type="number" formControlName="TotalPayable" class="border rounded px-2 py-1 w-full" /></div>
       <div><label>Due Date</label><input formControlName="DueDate" class="border rounded px-2 py-1 w-full" /></div>
     </form>
@@ -136,7 +139,7 @@ interface MonthlyDemand {
     <button (click)="reset()" class="bg-gray-500 text-white px-4 py-2 rounded">Reset</button>
   </div>
 </div>
-  `
+`
 })
 export class DemandProcessComponent implements OnInit {
   demandList: Demand[] = [];
@@ -148,10 +151,10 @@ export class DemandProcessComponent implements OnInit {
   selectedMonth!: number;
   selectedYear!: number;
 
-  // ✅ Months array
+    // ✅ Define months as class property
   months: string[] = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'January','February','March','April','May','June',
+    'July','August','September','October','November','December'
   ];
 
   constructor(private fb: FormBuilder, private http: HttpClient) { }
@@ -177,8 +180,9 @@ export class DemandProcessComponent implements OnInit {
       DueDate: ['']
     });
 
-    // Load initial JSON data
+
     this.http.get<any>('/assets/demanddata.json').subscribe((json) => {
+      // Flatten JSON
       this.allDemands = json.data.map((item: any) => ({
         id: item.id,
         month: item.month,
@@ -187,9 +191,8 @@ export class DemandProcessComponent implements OnInit {
       }));
 
       // Populate dropdowns
-      this.createdMonths = Array.from(new Set(this.allDemands.map(d => d.month))).sort((a, b) => a - b);
-      this.createdYears = Array.from(new Set(this.allDemands.map(d => d.year))).sort((a, b) => a - b);
-
+      this.createdMonths = Array.from(new Set(this.allDemands.map(d => d.month)));
+      this.createdYears = Array.from(new Set(this.allDemands.map(d => d.year)));
 
       // Default selection
       this.selectedMonth = this.createdMonths[0];
@@ -199,67 +202,24 @@ export class DemandProcessComponent implements OnInit {
     });
   }
 
-  // 🔹 Update table for selected month/year
   updateDemandList() {
     const filtered = this.allDemands.find(d => d.month === this.selectedMonth && d.year === this.selectedYear);
     this.demandList = filtered ? filtered.data.Demand : [];
   }
 
-  // 🔹 Handle dropdown change
   onMonthYearChange() {
     this.updateDemandList();
   }
 
-  // 🔹 Load form on row click
   loadRow(row: Demand) {
     this.demandForm.patchValue(row);
   }
 
-  // 🔹 Save form
   save() {
     console.log('Saved:', this.demandForm.value);
-    alert('Saved in console (no backend).');
   }
 
-  // 🔹 Reset form
   reset() {
     this.demandForm.reset();
-  }
-
-  // 🔹 Add a new month
-  addNewMonth() {
-    let newMonth = this.selectedMonth + 1;
-    let newYear = this.selectedYear;
-
-    if (newMonth > 12) {
-      newMonth = 1;
-      newYear += 1;
-    }
-
-    // Prevent duplicate
-    const exists = this.allDemands.some(d => d.month === newMonth && d.year === newYear);
-    if (exists) {
-      alert('Demand for this month already exists!');
-      return;
-    }
-
-    // Create new month with empty demand list
-    const newDemand: MonthlyDemand = {
-      id: this.allDemands.length + 1,
-      month: newMonth,
-      year: newYear,
-      data: { Demand: [] }
-    };
-
-    this.allDemands.push(newDemand);
-
-    // Update dropdowns
-    if (!this.createdMonths.includes(newMonth)) this.createdMonths.push(newMonth);
-    if (!this.createdYears.includes(newYear)) this.createdYears.push(newYear);
-
-    this.selectedMonth = newMonth;
-    this.selectedYear = newYear;
-
-    this.updateDemandList();
   }
 }
