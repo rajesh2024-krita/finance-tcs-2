@@ -35,106 +35,98 @@ interface MonthlyDemand {
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   template: `
-<div class="space-y-6 p-4">
-  <h2 class="text-xl font-bold">Monthly Demand Processing</h2>
+<div class="space-y-3 bg-gray-50 min-h-screen">
 
-  <!-- 🔹 Demand Selection -->
-  <div class="border rounded shadow bg-white p-4 flex gap-4 items-center">
-    <div>
-      <label>Year</label>
-      <select [(ngModel)]="selectedYear" (change)="onMonthYearChange()" class="border rounded px-2 py-1">
+  <!-- 🔹 Header -->
+  <div class="flex items-center justify-between">
+    <h2 class="text-2xl font-bold text-gray-800">Monthly Demand Processing</h2>
+
+  </div>
+
+  <!-- 🔹 Month-Year Selection -->
+  <div class="bg-white p-4 flex gap-6 items-end border">
+    <div class="flex flex-col">
+      <label class="text-sm font-medium text-gray-600">Year</label>
+      <select [(ngModel)]="selectedYear" (change)="onMonthYearChange()"
+        class="border rounded-lg px-3 py-2 focus:ring focus:ring-blue-200">
         <option *ngFor="let y of createdYears" [ngValue]="y">{{ y }}</option>
       </select>
     </div>
-    <div>
-      <label>Month</label>
-      <select [(ngModel)]="selectedMonth" (change)="onMonthYearChange()" class="border rounded px-2 py-1">
+    <div class="flex flex-col">
+      <label class="text-sm font-medium text-gray-600">Month</label>
+      <select [(ngModel)]="selectedMonth" (change)="onMonthYearChange()"
+        class="border rounded-lg px-3 py-2 focus:ring focus:ring-blue-200">
         <option *ngFor="let m of createdMonths" [ngValue]="m">{{ months[m - 1] }}</option>
       </select>
     </div>
     <div>
-          <button (click)="addNewMonth()" class="bg-green-600 text-white px-4 py-2 rounded">New Month</button>
+          <button (click)="addNewMonth()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow">
+      + New Month
+    </button>
     </div>
   </div>
 
   <!-- 🔹 Demand Table -->
-  <div class="border rounded shadow bg-white overflow-auto">
-    <div class="p-3 border-b font-semibold">Demand List</div>
-    <table class="w-full border-collapse text-sm">
-      <thead class="bg-gray-100">
-        <tr>
-          <th class="border px-2 py-1">Member No</th>
-          <th class="border px-2 py-1">Member Name</th>
-          <th class="border px-2 py-1">CD</th>
-          <th class="border px-2 py-1">General Loan</th>
-          <th class="border px-2 py-1">Gen Installment</th>
-          <th class="border px-2 py-1">Gen Interest</th>
-          <th class="border px-2 py-1">Emergency Loan</th>
-          <th class="border px-2 py-1">E-Installment</th>
-          <th class="border px-2 py-1">E-Interest</th>
-          <th class="border px-2 py-1">Festival Loan</th>
-          <th class="border px-2 py-1">F-Installment</th>
-          <th class="border px-2 py-1">F-Interest</th>
-          <th class="border px-2 py-1">Net Deduction</th>
-          <th class="border px-2 py-1">Penal Int</th>
-          <th class="border px-2 py-1">Penal Ded</th>
-          <th class="border px-2 py-1">Total Payable</th>
-          <th class="border px-2 py-1">Due Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let row of demandList" (click)="loadRow(row)" class="cursor-pointer hover:bg-gray-50">
-          <td class="border px-2 py-1">{{ row.MemberNo }}</td>
-          <td class="border px-2 py-1">{{ row.MemberName }}</td>
-          <td class="border px-2 py-1">{{ row.CDAmount }}</td>
-          <td class="border px-2 py-1">{{ row["General Loan"] }}</td>
-          <td class="border px-2 py-1">{{ row["General LoanInstallment"] }}</td>
-          <td class="border px-2 py-1">{{ row["General LoanInterest"] }}</td>
-          <td class="border px-2 py-1">{{ row["Emergency Loan"] }}</td>
-          <td class="border px-2 py-1">{{ row["Emergency LoanInstallment"] }}</td>
-          <td class="border px-2 py-1">{{ row["Emergency LoanInterest"] }}</td>
-          <td class="border px-2 py-1">{{ row["Festival Loan"] }}</td>
-          <td class="border px-2 py-1">{{ row["Festival LoanInstallment"] }}</td>
-          <td class="border px-2 py-1">{{ row["Festival LoanInterest"] }}</td>
-          <td class="border px-2 py-1">{{ row.NetDeduction }}</td>
-          <td class="border px-2 py-1">{{ row.PenalInterest }}</td>
-          <td class="border px-2 py-1">{{ row.PenalDeduction }}</td>
-          <td class="border px-2 py-1">{{ row.TotalPayable }}</td>
-          <td class="border px-2 py-1">{{ row.DueDate }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="bg-white overflow-hidden">
+    <!-- <div class="p-3 border-b font-semibold text-gray-700 bg-gray-50">Demand List</div> -->
+    <div class="overflow-x-auto max-h-[400px]">
+      <table class="w-full border-collapse text-xs uppercase bg-white border">
+        <thead class=" bg-white">
+          <tr>
+            <th *ngFor="let col of tableHeaders" class="border-b px-8 py-2 text-left">{{ col }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of demandList" 
+              (click)="loadRow(row)" 
+              class="cursor-pointer hover:bg-blue-50 transition">
+            <td class="border-b px-3 py-2">{{ row.MemberNo }}</td>
+            <td class="border-b px-3 py-2">{{ row.MemberName }}</td>
+            <td class="border-b px-3 py-2">{{ row.CDAmount }}</td>
+            <td class="border-b px-3 py-2">{{ row["General Loan"] }}</td>
+            <td class="border-b px-3 py-2">{{ row["General LoanInstallment"] }}</td>
+            <td class="border-b px-3 py-2">{{ row["General LoanInterest"] }}</td>
+            <td class="border-b px-3 py-2">{{ row["Emergency Loan"] }}</td>
+            <td class="border-b px-3 py-2">{{ row["Emergency LoanInstallment"] }}</td>
+            <td class="border-b px-3 py-2">{{ row["Emergency LoanInterest"] }}</td>
+            <td class="border-b px-3 py-2">{{ row["Festival Loan"] }}</td>
+            <td class="border-b px-3 py-2">{{ row["Festival LoanInstallment"] }}</td>
+            <td class="border-b px-3 py-2">{{ row["Festival LoanInterest"] }}</td>
+            <td class="border-b px-3 py-2">{{ row.NetDeduction }}</td>
+            <td class="border-b px-3 py-2">{{ row.PenalInterest }}</td>
+            <td class="border-b px-3 py-2">{{ row.PenalDeduction }}</td>
+            <td class="border-b px-3 py-2">{{ row.TotalPayable }}</td>
+            <td class="border-b px-3 py-2">{{ row.DueDate }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- 🔹 Editable Form -->
-  <div class="border rounded shadow bg-white mt-6">
-    <div class="p-3 border-b font-semibold">Demand Details</div>
-    <form [formGroup]="demandForm" class="grid grid-cols-3 gap-4 p-4 text-sm">
-      <div><label>Member No</label><input formControlName="MemberNo" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>Member Name</label><input formControlName="MemberName" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>CD Amount</label><input type="number" formControlName="CDAmount" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>General Loan</label><input type="number" formControlName="General Loan" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>Gen Installment</label><input type="number" formControlName="General LoanInstallment" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>Gen Interest</label><input type="number" formControlName="General LoanInterest" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>Emergency Loan</label><input type="number" formControlName="Emergency Loan" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>E-Installment</label><input type="number" formControlName="Emergency LoanInstallment" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>E-Interest</label><input type="number" formControlName="Emergency LoanInterest" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>Festival Loan</label><input type="number" formControlName="Festival Loan" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>F-Installment</label><input type="number" formControlName="Festival LoanInstallment" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>F-Interest</label><input type="number" formControlName="Festival LoanInterest" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>Net Deduction</label><input type="number" formControlName="NetDeduction" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>Penal Int</label><input type="number" formControlName="PenalInterest" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>Penal Ded</label><input type="number" formControlName="PenalDeduction" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>Total Payable</label><input type="number" formControlName="TotalPayable" class="border rounded px-2 py-1 w-full" /></div>
-      <div><label>Due Date</label><input formControlName="DueDate" class="border rounded px-2 py-1 w-full" /></div>
+  <div class="bg-white">
+    <!-- <div class="p-3 font-semibold text-gray-700 bg-gray-50">Edit Demand Details</div> -->
+    <form [formGroup]="demandForm" class="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 text-sm border">
+      <ng-container *ngFor="let key of formKeys">
+        <div>
+          <label class="text-xs font-medium text-gray-500">{{ key }}</label>
+          <input [type]="isNumberField(key) ? 'number' : 'text'" formControlName="{{key}}" 
+            class="border rounded-lg px-3 py-2 w-full focus:ring focus:ring-blue-200" />
+        </div>
+      </ng-container>
     </form>
   </div>
 
   <!-- 🔹 Action Buttons -->
-  <div class="flex gap-2 mt-4">
-    <button (click)="save()" class="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
-    <button (click)="reset()" class="bg-gray-500 text-white px-4 py-2 rounded">Reset</button>
+  <div class="flex gap-3">
+    <button (click)="save()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow">
+      Save
+    </button>
+    <button (click)="reset()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg shadow">
+      Reset
+    </button>
   </div>
+
 </div>
   `
 })
@@ -148,118 +140,68 @@ export class DemandProcessComponent implements OnInit {
   selectedMonth!: number;
   selectedYear!: number;
 
-  // ✅ Months array
   months: string[] = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'January','February','March','April','May','June',
+    'July','August','September','October','November','December'
   ];
 
-  constructor(private fb: FormBuilder, private http: HttpClient) { }
+  // Table Headers
+  tableHeaders: string[] = [
+    "Member No","Member Name","CD","General Loan","Gen Installment","Gen Interest",
+    "Emergency Loan","E-Installment","E-Interest",
+    "Festival Loan","F-Installment","F-Interest",
+    "Net Deduction","Penal Int","Penal Ded","Total Payable","Due Date"
+  ];
+
+  formKeys: string[] = [
+    "MemberNo","MemberName","CDAmount","General Loan","General LoanInstallment",
+    "General LoanInterest","Emergency Loan","Emergency LoanInstallment","Emergency LoanInterest",
+    "Festival Loan","Festival LoanInstallment","Festival LoanInterest","NetDeduction",
+    "PenalInterest","PenalDeduction","TotalPayable","DueDate"
+  ];
+
+  constructor(private fb: FormBuilder, private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.demandForm = this.fb.group({
-      MemberNo: [''],
-      MemberName: [''],
-      CDAmount: [0],
-      "General Loan": [0],
-      "General LoanInstallment": [0],
-      "General LoanInterest": [0],
-      "Emergency Loan": [0],
-      "Emergency LoanInstallment": [0],
-      "Emergency LoanInterest": [0],
-      "Festival Loan": [0],
-      "Festival LoanInstallment": [0],
-      "Festival LoanInterest": [0],
-      NetDeduction: [0],
-      PenalInterest: [0],
-      PenalDeduction: [0],
-      TotalPayable: [0],
-      DueDate: ['']
-    });
-
-    // Load initial JSON data
+    this.demandForm = this.fb.group(Object.fromEntries(this.formKeys.map(k => [k, ['']])));
     this.http.get<any>('/assets/demanddata.json').subscribe((json) => {
-      this.allDemands = json.data.map((item: any) => ({
-        id: item.id,
-        month: item.month,
-        year: item.year,
-        data: item.data
-      }));
-
-      // Populate dropdowns
-      this.createdMonths = Array.from(new Set(this.allDemands.map(d => d.month))).sort((a, b) => a - b);
-      this.createdYears = Array.from(new Set(this.allDemands.map(d => d.year))).sort((a, b) => a - b);
-
-
-      // Default selection
+      this.allDemands = json.data;
+      this.createdMonths = [...new Set(this.allDemands.map(d => d.month))].sort((a, b) => a - b);
+      this.createdYears = [...new Set(this.allDemands.map(d => d.year))].sort((a, b) => a - b);
       this.selectedMonth = this.createdMonths[0];
       this.selectedYear = this.createdYears[0];
-
       this.updateDemandList();
     });
   }
 
-  // 🔹 Update table for selected month/year
   updateDemandList() {
     const filtered = this.allDemands.find(d => d.month === this.selectedMonth && d.year === this.selectedYear);
     this.demandList = filtered ? filtered.data.Demand : [];
   }
 
-  // 🔹 Handle dropdown change
-  onMonthYearChange() {
-    this.updateDemandList();
-  }
+  onMonthYearChange() { this.updateDemandList(); }
 
-  // 🔹 Load form on row click
-  loadRow(row: Demand) {
-    this.demandForm.patchValue(row);
-  }
+  loadRow(row: Demand) { this.demandForm.patchValue(row); }
 
-  // 🔹 Save form
-  save() {
-    console.log('Saved:', this.demandForm.value);
-    alert('Saved in console (no backend).');
-  }
+  save() { console.log('Saved:', this.demandForm.value); alert('Saved in console.'); }
 
-  // 🔹 Reset form
-  reset() {
-    this.demandForm.reset();
-  }
+  reset() { this.demandForm.reset(); }
 
-  // 🔹 Add a new month
   addNewMonth() {
     let newMonth = this.selectedMonth + 1;
     let newYear = this.selectedYear;
-
-    if (newMonth > 12) {
-      newMonth = 1;
-      newYear += 1;
+    if (newMonth > 12) { newMonth = 1; newYear += 1; }
+    if (this.allDemands.some(d => d.month === newMonth && d.year === newYear)) {
+      alert('Demand already exists!'); return;
     }
-
-    // Prevent duplicate
-    const exists = this.allDemands.some(d => d.month === newMonth && d.year === newYear);
-    if (exists) {
-      alert('Demand for this month already exists!');
-      return;
-    }
-
-    // Create new month with empty demand list
-    const newDemand: MonthlyDemand = {
-      id: this.allDemands.length + 1,
-      month: newMonth,
-      year: newYear,
-      data: { Demand: [] }
-    };
-
-    this.allDemands.push(newDemand);
-
-    // Update dropdowns
+    this.allDemands.push({ id: this.allDemands.length + 1, month: newMonth, year: newYear, data: { Demand: [] } });
     if (!this.createdMonths.includes(newMonth)) this.createdMonths.push(newMonth);
     if (!this.createdYears.includes(newYear)) this.createdYears.push(newYear);
-
-    this.selectedMonth = newMonth;
-    this.selectedYear = newYear;
-
+    this.selectedMonth = newMonth; this.selectedYear = newYear;
     this.updateDemandList();
+  }
+
+  isNumberField(key: string): boolean {
+    return !["MemberNo","MemberName","DueDate"].includes(key);
   }
 }
