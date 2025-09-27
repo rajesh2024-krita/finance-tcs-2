@@ -192,7 +192,7 @@
               <div>
                 <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Share</label>
                 <div class="flex gap-2">
-                  <input type="number" formControlName="shareAmount"
+                  <input type="number" formControlName="share"
                     class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                   <select
                     class="block p-2 w-1/2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
@@ -237,9 +237,9 @@
                   </div>
                   <div>
                     <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Account No</label>
-                    <input type="text" formControlName="accountNo"
+                    <input type="text" formControlName="accountNumber"
                       class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      formControlName="accountNo" />
+                      formControlName="accountNumber" />
                   </div>
                 </div>
               </div>
@@ -260,7 +260,7 @@
                 </div>
                 <div>
                   <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Resignation Date</label>
-                  <input type="date" formControlName="doRetirement"
+                  <input type="date" formControlName="dor"
                     [disabled]="!(memberForm.get('status')?.value !== 'Active')" class="block p-2 w-full text-gray-900 border border-gray-300 rounded-lg 
            bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 
            dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 

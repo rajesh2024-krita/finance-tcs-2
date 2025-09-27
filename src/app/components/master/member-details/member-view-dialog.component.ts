@@ -58,7 +58,7 @@ import { Member } from '../../../services/member.service';
                 </h4>
                 <div class="space-y-2">
                   <p><span class="text-gray-600">Father/Husband:</span> {{data.fhName || 'N/A'}}</p>
-                  <p><span class="text-gray-600">Date of Birth:</span> {{(data.dateOfBirth | date) || 'N/A'}}</p>
+                  <p><span class="text-gray-600">Date of Birth:</span> {{(data.dob | date) || 'N/A'}}</p>
                   <p><span class="text-gray-600">Mobile:</span> {{data.mobile || 'N/A'}}</p>
                   <p><span class="text-gray-600">Email:</span> {{data.email || 'N/A'}}</p>
                   <p><span class="text-gray-600">City:</span> {{data.city || 'N/A'}}</p>
@@ -74,8 +74,8 @@ import { Member } from '../../../services/member.service';
                 <div class="space-y-2">
                   <p><span class="text-gray-600">Designation:</span> {{data.designation || 'N/A'}}</p>
                   <p><span class="text-gray-600">Branch:</span> {{data.branch || 'N/A'}}</p>
-                  <p><span class="text-gray-600">DOJ Job:</span> {{(data.dojJob | date) || 'N/A'}}</p>
-                  <p><span class="text-gray-600">Retirement:</span> {{(data.doRetirement | date) || 'N/A'}}</p>
+                  <p><span class="text-gray-600">DOJ Job:</span> {{(data.dojSociety | date) || 'N/A'}}</p>
+                  <p><span class="text-gray-600">Retirement:</span> {{(data.dor | date) || 'N/A'}}</p>
                   <p><span class="text-gray-600">DOJ Society:</span> {{(data.dojSociety | date) || 'N/A'}}</p>
                 </div>
               </div>
@@ -107,7 +107,7 @@ import { Member } from '../../../services/member.service';
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
                     <p class="text-gray-600">Share Amount:</p>
-                    <p>{{data.shareAmount | currency:'INR'}}</p>
+                    <p>{{data.share | currency:'INR'}}</p>
                   </div>
                   <div>
                     <p class="text-gray-600">CD Amount:</p>
@@ -119,7 +119,7 @@ import { Member } from '../../../services/member.service';
                   </div>
                   <div>
                     <p class="text-gray-600">Account No:</p>
-                    <p>{{data.accountNo || 'N/A'}}</p>
+                    <p>{{data.accountNumber || 'N/A'}}</p>
                   </div>
                 </div>
               </div>

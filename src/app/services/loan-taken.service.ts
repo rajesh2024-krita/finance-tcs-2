@@ -224,7 +224,7 @@ export interface SocietyLimitDto {
   providedIn: 'root'
 })
 export class LoanTakenService {
-  private readonly baseUrl = 'https://fintcsapi-1.onrender.com/api/LoanTaken';
+  private readonly baseUrl = 'https://1d4tg1qv-5000.inc1.devtunnels.ms/api/LoanTaken';
   // private readonly baseUrl = 'http://localhost:5000/api/LoanTaken';
 
   constructor(

@@ -3,26 +3,25 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 
 export interface User {
   id: number;
   username: string;
   email: string;
   role: UserRole;
-  societyId?: number;
-  societyName?: string;
-  firstName: string;
-  lastName: string;
-  isActive: boolean;
+  firstName?: string;
+  lastName?: string;
+  isActive?: boolean;
   createdBy?: number;
-  createdDate: Date;
+  createdDate?: Date;
   lastLogin?: Date;
   token?: string;
+  expiresAt?: Date; // added from API response
 }
 
 export enum UserRole {
-  SUPER_ADMIN = 'super_admin',
+  SUPER_ADMIN = 'Admin',
   SOCIETY_ADMIN = 'society_admin',
   BRANCH_ADMIN = 'branch_admin',
   ACCOUNTANT = 'accountant',
@@ -40,6 +39,7 @@ export interface LoginResponse {
   message: string;
   data?: {
     token: string;
+    expires?: string;
     user: User;
   };
 }
@@ -55,8 +55,8 @@ export interface LoginRequest {
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   private isLoggedInSubject = new BehaviorSubject<boolean>(false);
-  private apiUrl = 'https://fintcsapi-1.onrender.com/api/Auth/login';
-  // https://fintcsapi-1.onrender.com/api/Auth/login
+  private apiUrl = 'https://1d4tg1qv-5000.inc1.devtunnels.ms/api/Auth/login';
+  // private apiUrl = 'https://fintcsapi-1.onrender.com/api/Auth/login';
 
   public currentUser$ = this.currentUserSubject.asObservable();
   public isLoggedIn$ = this.isLoggedInSubject.asObservable();
@@ -93,59 +93,48 @@ export class AuthService {
   }
 
   login(username: string, password: string): Observable<boolean> {
-  const loginData: LoginRequest = { username, password };
+    const loginData: LoginRequest = { username, password };
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-  const headers = new HttpHeaders({
-    'Content-Type': 'application/json'
-  });
+    return this.http.post<LoginResponse>(this.apiUrl, loginData, { headers }).pipe(
+      map(response => {
+        console.log('Login API raw response:', response);
 
-  return this.http.post<any>(this.apiUrl, loginData, { headers }).pipe(
-    map(response => {
-      console.log('Login API raw response:', response);
+        const success = response?.success ?? false;
+        const data = response?.data;
 
-      const success = response?.success ?? false;
-      const data = response?.data;
+        if (success && data) {
+          let user = data.user || {} as User;
 
-      if (success && data) {
-        // If data.user does not exist, treat data itself as user object
-        const user = data.user || {
-          id: data.id,
-          username: data.username,
-          email: data.email,
-          role: data.role,
-          expiresAt: data.expiresAt,
-        };
+          // attach token & expiry
+          user.token = data.token;
+          user.expiresAt = data.expires ? new Date(data.expires) : undefined;
+          user.lastLogin = new Date();
 
-        console.log('user = ', user)
+          this.currentUserSubject.next(user);
+          this.isLoggedInSubject.next(true);
 
-        if (!user) throw new Error('User data missing in response');
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('tokenExpiry', data.expires ?? '');
 
-        user.token = data.token;
-        user.lastLogin = new Date();
-
-        this.currentUserSubject.next(user);
-        this.isLoggedInSubject.next(true);
-
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        localStorage.setItem('authToken', data.token);
-
-        return true;
-      } else {
-        throw new Error(response?.message || 'Login failed');
-      }
-    }),
-    catchError(error => {
-      console.error('Login error:', error);
-      return throwError(() => new Error(error?.error?.message || 'Login failed'));
-    })
-  );
-}
-
+          return true;
+        } else {
+          throw new Error(response?.message || 'Login failed');
+        }
+      }),
+      catchError(error => {
+        console.error('Login error:', error);
+        return throwError(() => new Error(error?.error?.message || 'Login failed'));
+      })
+    );
+  }
 
   logout(): void {
     if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
       localStorage.removeItem('currentUser');
       localStorage.removeItem('authToken');
+      localStorage.removeItem('tokenExpiry');
     }
     this.currentUserSubject.next(null);
     this.isLoggedInSubject.next(false);
@@ -157,10 +146,13 @@ export class AuthService {
   }
 
   getAuthToken(): string | null {
-    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-      return localStorage.getItem('authToken');
-    }
-    return null;
+    return localStorage.getItem('authToken');
+  }
+
+  isTokenExpired(): boolean {
+    const expiry = localStorage.getItem('tokenExpiry');
+    if (!expiry) return true;
+    return new Date(expiry) < new Date();
   }
 
   hasPermission(module: string, action: string): boolean {
@@ -181,7 +173,6 @@ export class AuthService {
   canAccessRoute(route: string): boolean {
     const user = this.getCurrentUser();
     if (!user) return false;
-
     if (user.role === UserRole.SUPER_ADMIN) return true;
 
     const routePermissions: { [key: string]: { module: string, action: string } } = {
@@ -217,25 +208,26 @@ export class AuthService {
   }
 
   private loadUserFromStorage(): void {
-    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-      const userData = localStorage.getItem('currentUser');
-      if (userData) {
-        try {
-          const user = JSON.parse(userData);
-          this.currentUserSubject.next(user);
-          this.isLoggedInSubject.next(true);
-        } catch (error) {
-          console.error('Error parsing user data from localStorage:', error);
-          this.clearStorage();
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        if (this.isTokenExpired()) {
+          this.logout();
+          return;
         }
+        this.currentUserSubject.next(user);
+        this.isLoggedInSubject.next(true);
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+        this.clearStorage();
       }
     }
   }
 
   private clearStorage(): void {
-    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('authToken');
-    }
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('tokenExpiry');
   }
 }

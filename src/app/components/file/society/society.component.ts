@@ -1,5 +1,5 @@
 // src/app/components/file/society/society.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray, FormsModule, FormControl } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -14,7 +14,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { SocietyService, SocietyDto, SocietyEditPending, SocietyTabsDto, LoanTypeDto } from '../../../services/society.service';
+import { SocietyService, SocietyDto, SocietyEditPending, LoanTypeDto, CreateSocietyDto } from '../../../services/society.service';
+import { LoanTypeService } from '../../../services/loan-type.service';
 import { AuthService, User, UserRole } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 import { catchError, takeUntil, finalize } from 'rxjs/operators';
@@ -40,357 +41,417 @@ import { of, Subject } from 'rxjs';
     FormsModule
   ],
   template: `
-    <div class="animate-fade-in">
-      <!-- Page Header -->
-      <div class="">
-        <div class="uppercase text-lg mb-2">Society Details</div>
-      </div>
+      <div class="animate-fade-in">
+        <!-- Page Header -->
+        <div class="">
+          <div class="uppercase text-lg mb-2">Society Details</div>
+        </div>
 
-      <!-- Main Society Form -->
-      <div>
-        <form [formGroup]="societyForm" class="form-container">
-          
-          <!-- Basic Information Section -->
-          <div class="form-section border">
-            <div class="text-sm font-normal flex items-end gap-2 px-6 mt-2">
-              <mat-icon class="text-indigo-500">business</mat-icon>
-              <span>Basic Information</span>
-            </div>
-            <div class="form-section-content">
-              <div class="form-grid form-grid-2">
-                <div class="form-field">
-                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Name</label>
-                  <input 
-                    type="text" 
-                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    formControlName="societyName"
-                    placeholder="Enter society name"
-                    [readonly]="!isEditing">
-                  <div *ngIf="societyForm.get('societyName')?.invalid && societyForm.get('societyName')?.touched" 
-                       class="form-error">
-                    Society name is required
-                  </div>
-                </div>
-                
-                <div class="form-field">
-                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Registration Number</label>
-                  <input 
-                    type="text" 
-                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    formControlName="registrationNumber"
-                    placeholder="Enter registration number"
-                    [readonly]="!isEditing">
-                  <div *ngIf="societyForm.get('registrationNumber')?.invalid && societyForm.get('registrationNumber')?.touched" 
-                       class="form-error">
-                    Registration number is required
-                  </div>
-                </div>
-                
-                <div class="form-field">
-                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Address</label>
-                  <textarea 
-                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    formControlName="address"
-                    placeholder="Enter complete address"
-                    [readonly]="!isEditing"
-                    rows="1"></textarea>
-                  <div *ngIf="societyForm.get('address')?.invalid && societyForm.get('address')?.touched" 
-                       class="form-error">
-                    Address is required
-                  </div>
-                </div>
-                
-                <div class="form-field">
-                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">City</label>
-                  <input 
-                    type="text" 
-                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    formControlName="city"
-                    placeholder="Enter city name"
-                    [readonly]="!isEditing">
-                  <div *ngIf="societyForm.get('city')?.invalid && societyForm.get('city')?.touched" 
-                       class="form-error">
-                    City is required
-                  </div>
-                </div>
+        <!-- Loading State -->
+        <div *ngIf="loading" class="flex justify-center items-center p-8">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="error && !loading" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {{ error }}
+        </div>
+
+        <!-- Main Society Form -->
+        <div *ngIf="!loading && !error">
+          <form [formGroup]="societyForm" class="form-container">
+            
+            <!-- Basic Information Section -->
+            <div class="form-section border">
+              <div class="text-sm font-normal flex items-end gap-2 px-6 mt-2">
+                <mat-icon class="text-indigo-500">business</mat-icon>
+                <span>Basic Information</span>
               </div>
-            </div>
-          </div>
-
-          <!-- Contact Information Section -->
-          <div class="form-section border">
-            <div class="text-sm font-normal flex items-end gap-2 px-6 mt-2">
-              <mat-icon class="text-indigo-500">contact_phone</mat-icon>
-              <span>Contact Information</span>
-            </div>
-            <div class="form-section-content">
-              <div class="grid grid-cols-4 gap-4">
-                <div class="form-field">
-                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Phone</label>
-                  <input 
-                    type="tel" 
-                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    formControlName="phone"
-                    placeholder="+91 9876543210"
-                    [readonly]="!isEditing">
-                  <div *ngIf="societyForm.get('phone')?.invalid && societyForm.get('phone')?.touched" 
-                       class="form-error">
-                    Phone number is required
-                  </div>
-                </div>
-                
-                <div class="form-field">
-                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Fax</label>
-                  <input 
-                    type="tel" 
-                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    formControlName="fax"
-                    placeholder="+91 2234567890"
-                    [readonly]="!isEditing">
-                </div>
-                
-                <div class="form-field">
-                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Email</label>
-                  <input 
-                    type="email" 
-                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    formControlName="email"
-                    placeholder="info@fintcs.com"
-                    [readonly]="!isEditing">
-                  <div *ngIf="societyForm.get('email')?.invalid && societyForm.get('email')?.touched" 
-                       class="form-error">
-                    Valid email is required
-                  </div>
-                </div>
-                
-                <div class="form-field">
-                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Website</label>
-                  <input 
-                    type="url" 
-                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    formControlName="website"
-                    placeholder="www.society.com"
-                    [readonly]="!isEditing">
-                </div>
-              </div>
-            </div>
-          </div>
-
-
-          <!-- Loan Types Section -->
-<div class="p-4 bg-white shadow rounded-lg">
-  <h2 class="text-lg font-normal mb-4">Loan Types</h2>
-
-  <div formArrayName="loanTypes">
-    <!-- Tab headers -->
-    <div class="flex mb-4 overflow-x-auto justify-between">
-      <div>
-        <ng-container *ngFor="let loanGroup of loanTypesFormArray.controls; let i = index">
-          <button
-            type="button"
-            (click)="activeLoanTab = i"
-            (dblclick)="openRenamePopup(i)"
-            [ngClass]="{
-              'border-b-2 border-blue-600 font-normal text-blue-600': activeLoanTab === i,
-              'text-gray-600 hover:text-blue-600': activeLoanTab !== i
-            }"
-            class="px-4 py-2 focus:outline-none whitespace-nowrap"
-          >
-            {{ loanGroup.get('loanType')?.value || 'New Loan' }}
-          </button>
-        </ng-container>
-      </div>
-
-      <button
-        type="button"
-        (click)="addLoanType(); activeLoanTab = loanTypesFormArray.length - 1"
-        class="ml-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs"
-      >
-        + Add New Loan Type
-      </button>
-    </div>
-
-    <!-- Rename Popup -->
-    <div
-      *ngIf="showRenamePopup"
-      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-    >
-      <div class="bg-white rounded-lg shadow-lg p-6 w-80">
-        <h3 class="text-lg font-semibold mb-4">Rename Loan Type</h3>
-
-        <input
-          type="text"
-          [formControl]="renameControl"
-          class="w-full px-3 py-2 border rounded mb-4 focus:outline-none focus:ring"
-          placeholder="Enter new loan name"
-        />
-
-        <div class="flex justify-end gap-2">
-          <button
-            class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-            (click)="closeRenamePopup()"
-          >
-            Cancel
-          </button>
-          <button
-            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            (click)="saveRename()"
-          >
-            Save
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tab content -->
-    <div *ngFor="let loanGroup of loanTypesFormArray.controls; let i = index" 
-        [hidden]="activeLoanTab !== i" 
-        [formGroupName]="i" 
-        class="border rounded p-4 mb-3 bg-gray-50">
-
-      <div class="grid grid-cols-3 gap-4">
-        <!-- Interest -->
-        <div>
-          <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
-            Interest (%)
-          </label>
-          <input type="number" formControlName="interest"
-            class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
-        </div>
-
-        <!-- Loan Limit -->
-        <div>
-          <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
-            Loan Limit
-          </label>
-          <input type="number" formControlName="limit"
-            class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
-        </div>
-
-        <!-- Show remaining fields ONLY if General Loan -->
-        <ng-container *ngIf="loanGroup.get('loanType')?.value === 'General Loan'">
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
-              Compulsory Deposit
-            </label>
-            <input type="number" formControlName="compulsoryDeposit"
-              class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
-          </div>
-
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
-              Optional Deposit
-            </label>
-            <input type="number" formControlName="optionalDeposit"
-              class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
-          </div>
-
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
-              Share Amount
-            </label>
-            <input type="number" formControlName="share"
-              class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
-          </div>
-
-          <div>
-            <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
-              N Times of Share Amount
-            </label>
-            <input type="number" formControlName="xTimes"
-              class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500" />
-          </div>
-        </ng-container>
-      </div>
-
-      <div class="flex justify-end mt-2">
-        <button type="button" (click)="removeLoanType(i)" 
-          class="text-red-500 hover:text-red-700 text-sm font-medium">
-          Remove
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-          <!-- Additional Settings Section -->
-          <div class="form-section">
-            <!-- <div class="form-section-header">
-              <mat-icon>settings</mat-icon>
-              <span>Additional Settings</span>
-            </div> -->
-            <div class="form-section-content border">
-              <div class="">
-                <div class="w-full">
-                  <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Cheque Bounce Charge (₹)</label>
-                  <div class="flex justify-between gap-4">
+              <div class="form-section-content">
+                <div class="form-grid form-grid-2">
+                  <div class="form-field">
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Name</label>
                     <input 
-                      type="number" 
-                      class="block p-2 w-1/2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      formControlName="chBounceCharge"
-                      placeholder="500"
-                      min="0"
+                      type="text" 
+                      class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      formControlName="name"
+                      placeholder="Enter society name"
                       [readonly]="!isEditing">
-                       <select
-                          formControlName="targetDropdown"
-                          class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 
-                                focus:ring-blue-500 focus:border-blue-500 
-                                dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-                                dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                          [disabled]="!isEditing">
-                          <option value="" disabled>Select charge</option>
-                          <option *ngFor="let charge of societyForm.get('dropdownArray')?.value" [value]="charge">
-                            {{ charge }}
-                          </option>
-                        </select>
+                    <div *ngIf="societyForm.get('name')?.invalid && societyForm.get('name')?.touched" 
+                        class="form-error">
+                      Society name is required
+                    </div>
+                  </div>
+                  
+                  <div class="form-field">
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Registration Number</label>
+                    <input 
+                      type="text" 
+                      class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      formControlName="registrationNumber"
+                      placeholder="Enter registration number"
+                      [readonly]="!isEditing">
+                    <div *ngIf="societyForm.get('registrationNumber')?.invalid && societyForm.get('registrationNumber')?.touched" 
+                        class="form-error">
+                      Registration number is required
+                    </div>
+                  </div>
+                  
+                  <div class="form-field">
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Address</label>
+                    <textarea 
+                      class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      formControlName="address"
+                      placeholder="Enter complete address"
+                      [readonly]="!isEditing"
+                      rows="1"></textarea>
+                    <div *ngIf="societyForm.get('address')?.invalid && societyForm.get('address')?.touched" 
+                        class="form-error">
+                      Address is required
+                    </div>
+                  </div>
+                  
+                  <div class="form-field">
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">City</label>
+                    <input 
+                      type="text" 
+                      class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      formControlName="city"
+                      placeholder="Enter city name"
+                      [readonly]="!isEditing">
+                    <div *ngIf="societyForm.get('city')?.invalid && societyForm.get('city')?.touched" 
+                        class="form-error">
+                      City is required
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Form Actions --> 
-           <!-- *ngIf="!isEditing && canEdit()"  -->
-          <div class="">
-            <div class="flex justify-end gap-3">
-              <!-- [disabled]="societyForm.invalid || submitting" -->
-              
-              <!-- *ngIf="isEditing"  -->
-              <div class="flex gap-3">
-                <button 
-                  type="button"
-                  (click)="saveChanges()"
+            <!-- Contact Information Section -->
+            <div class="form-section border">
+              <div class="text-sm font-normal flex items-end gap-2 px-6 mt-2">
+                <mat-icon class="text-indigo-500">contact_phone</mat-icon>
+                <span>Contact Information</span>
+              </div>
+              <div class="form-section-content">
+                <div class="grid grid-cols-4 gap-4">
+                  <div class="form-field">
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Phone</label>
+                    <input 
+                      type="tel" 
+                      class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      formControlName="phone"
+                      placeholder="+91 9876543210"
+                      [readonly]="!isEditing">
+                    <div *ngIf="societyForm.get('phone')?.invalid && societyForm.get('phone')?.touched" 
+                        class="form-error">
+                      Phone number is required
+                    </div>
+                  </div>
                   
-                  class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium">
-                  <!-- <mat-icon>save</mat-icon> --> Save
-                  <!-- {{ submitting ? 'Applying...' : (societyData ? 'Apply' : 'Create Society') }} -->
-                </button>
+                  <div class="form-field">
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Fax</label>
+                    <input 
+                      type="tel" 
+                      class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      formControlName="fax"
+                      placeholder="+91 2234567890"
+                      [readonly]="!isEditing">
+                  </div>
+                  
+                  <div class="form-field">
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Email</label>
+                    <input 
+                      type="email" 
+                      class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      formControlName="email"
+                      placeholder="info@fintcs.com"
+                      [readonly]="!isEditing">
+                    <div *ngIf="societyForm.get('email')?.invalid && societyForm.get('email')?.touched" 
+                        class="form-error">
+                      Valid email is required
+                    </div>
+                  </div>
+                  
+                  <div class="form-field">
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Website</label>
+                    <input 
+                      type="url" 
+                      class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      formControlName="website"
+                      placeholder="www.society.com"
+                      [readonly]="!isEditing">
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </form>
+
+            <!-- Loan Types Section -->
+            <div class="p-4 bg-white shadow rounded-lg">
+              <h2 class="text-lg font-normal mb-4">Loan Types</h2>
+
+              <div formArrayName="loanTypes">
+                <!-- Tab headers -->
+                <div class="flex mb-4 overflow-x-auto justify-between">
+                  <div>
+                    <ng-container *ngFor="let loanGroup of loanTypesFormArray.controls; let i = index">
+                      <button
+                        type="button"
+                        (click)="activeLoanTab = i"
+                        (dblclick)="openRenamePopup(i)"
+                        [ngClass]="{
+                          'border-b-2 border-blue-600 font-normal text-blue-600': activeLoanTab === i,
+                          'text-gray-600 hover:text-blue-600': activeLoanTab !== i
+                        }"
+                        class="px-4 py-2 focus:outline-none whitespace-nowrap"
+                      >
+                        {{ loanGroup.get('name')?.value || 'New Loan' }}
+                      </button>
+                    </ng-container>
+                  </div>
+
+                  <button
+                    type="button"
+                    (click)="addLoanType(); activeLoanTab = loanTypesFormArray.length - 1"
+                    class="ml-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs"
+                    [disabled]="!isEditing"
+                  >
+                    + Add New Loan Type
+                  </button>
+                </div>
+
+                <!-- Rename Popup -->
+                <div
+                  *ngIf="showRenamePopup"
+                  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+                >
+                  <div class="bg-white rounded-lg shadow-lg p-6 w-80">
+                    <h3 class="text-lg font-semibold mb-4">Rename Loan Type</h3>
+
+                    <input
+                      type="text"
+                      [formControl]="renameControl"
+                      class="w-full px-3 py-2 border rounded mb-4 focus:outline-none focus:ring"
+                      placeholder="Enter new loan name"
+                    />
+
+                    <div class="flex justify-end gap-2">
+                      <button
+                        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                        (click)="closeRenamePopup()"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        (click)="saveRename()"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Tab content -->
+                <div *ngFor="let loanGroup of loanTypesFormArray.controls; let i = index" 
+                    [hidden]="activeLoanTab !== i" 
+                    [formGroupName]="i" 
+                    class="border rounded p-4 mb-3 bg-gray-50">
+
+                  <div class="grid grid-cols-3 gap-4">
+                    <!-- Loan Type Name -->
+                    <div>
+                      <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+                        Loan Type Name
+                      </label>
+                      <input type="text" formControlName="name"
+                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500"
+                        [readonly]="!isEditing" />
+                    </div>
+
+                    <!-- Interest -->
+                    <div>
+                      <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+                        Interest (%)
+                      </label>
+                      <input type="number" formControlName="interestPercent"
+                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500"
+                        [readonly]="!isEditing" />
+                    </div>
+
+                    <!-- Loan Limit -->
+                    <div>
+                      <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+                        Loan Limit
+                      </label>
+                      <input type="number" formControlName="limitAmount"
+                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500"
+                        [readonly]="!isEditing" />
+                    </div>
+
+                    <!-- Show remaining fields ONLY if General Loan -->
+                    <ng-container *ngIf="loanGroup.get('name')?.value === 'General Loan'">
+                      <div>
+                        <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+                          Compulsory Deposit
+                        </label>
+                        <input type="number" formControlName="compulsoryDeposit"
+                          class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500"
+                          [readonly]="!isEditing" />
+                      </div>
+
+                      <div>
+                        <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+                          Optional Deposit
+                        </label>
+                        <input type="number" formControlName="optionalDeposit"
+                          class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500"
+                          [readonly]="!isEditing" />
+                      </div>
+
+                      <div>
+                        <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+                          Share Amount
+                        </label>
+                        <input type="number" formControlName="shareAmount"
+                          class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500"
+                          [readonly]="!isEditing" />
+                      </div>
+
+                      <div>
+                        <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+                          N Times of Share Amount
+                        </label>
+                        <input type="number" formControlName="xTimes"
+                          class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-white text-xs focus:ring-blue-500 focus:border-blue-500"
+                          [readonly]="!isEditing" />
+                      </div>
+                    </ng-container>
+                  </div>
+
+                  <div class="flex justify-end mt-2" *ngIf="isEditing">
+                    <button type="button" (click)="deleteLoanType(i)" 
+                      class="text-red-500 hover:text-red-700 text-sm font-medium">
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional Settings Section -->
+            <div class="form-section">
+              <div class="form-section-content border">
+                <div class="">
+                  <div class="w-full">
+                    <label class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">Cheque Bounce Charge (₹)</label>
+                    <div class="flex justify-between gap-4">
+                      <input 
+                        type="number" 
+                        class="block p-2 w-1/2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        formControlName="chequeBounceCharge"
+                        placeholder="500"
+                        min="0"
+                        [readonly]="!isEditing">
+                      <select
+                        formControlName="targetDropdown"
+                        class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 
+                              focus:ring-blue-500 focus:border-blue-500 
+                              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
+                              dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        [disabled]="!isEditing">
+                        <option value="" disabled>Select charge</option>
+                        <option *ngFor="let charge of bankNames" [value]="charge">
+                          {{ charge }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="mt-6">
+              <div class="flex justify-end gap-3">
+                <div class="flex gap-3">
+                  <button 
+                    *ngIf="!isEditing && canEdit()"
+                    type="button"
+                    (click)="enableEditing()"
+                    class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium">
+                    Edit Society
+                  </button>
+                  
+                  <button 
+                    *ngIf="isEditing"
+                    type="button"
+                    (click)="cancelEditing()"
+                    class="px-5 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium">
+                    Cancel
+                  </button>
+                  
+                  <button 
+                    type="button"
+                    (click)="saveChanges()"
+                    [disabled]="societyForm.invalid || submitting"
+                    class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium disabled:bg-gray-400">
+                    {{ submitting ? 'Saving...' : 'Save Changes' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
-  `,
+    `,
+  styles: [`
+      .form-error {
+        color: #ef4444;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+      }
+      .form-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .form-section {
+        margin-bottom: 1.5rem;
+        border-radius: 0.5rem;
+        background: white;
+      }
+      .form-section-content {
+        padding: 1.5rem;
+      }
+      .form-grid {
+        display: grid;
+        gap: 1rem;
+      }
+      .form-grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .form-field {
+        margin-bottom: 1rem;
+      }
+    `]
 })
-export class SocietyComponent implements OnInit {
+export class SocietyComponent implements OnInit, OnDestroy {
   societyForm: FormGroup;
   isEditing = false;
   loading = true;
   submitting = false;
   error: string | null = null;
-  loanTypes: LoanTypeDto[] = [];
 
   societyData: SocietyDto | null = null;
   pendingRequest: SocietyEditPending | null = null;
   currentUser: User | null = null;
-  activeLoanTab: number = 0;
 
+  activeLoanTab = 0;
   editingLoanIndex: number | null = null;
   showRenamePopup = false;
-  renameValue = '';
-
   renameControl = new FormControl('');
-
+  bankNames: string[] = [];
 
   private destroy$ = new Subject<void>();
 
@@ -399,9 +460,9 @@ export class SocietyComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private societyService: SocietyService,
+    private loanTypeService: LoanTypeService,
     private authService: AuthService,
-    private router: Router,
-
+    private router: Router
   ) {
     this.societyForm = this.createForm();
   }
@@ -410,75 +471,13 @@ export class SocietyComponent implements OnInit {
     return this.societyForm.get('loanTypes') as FormArray;
   }
 
-  openRenamePopup(index: number) {
-    this.editingLoanIndex = index;
-    this.renameControl.setValue(
-      this.loanTypesFormArray.at(index).get('loanType')?.value || ''
-    );
-    this.showRenamePopup = true;
-  }
-
-  saveRename() {
-    if (this.editingLoanIndex !== null) {
-      this.loanTypesFormArray
-        .at(this.editingLoanIndex)
-        .get('loanType')
-        ?.setValue(this.renameControl.value);
-    }
-    this.closeRenamePopup();
-  }
-  closeRenamePopup() {
-    this.showRenamePopup = false;
-    this.editingLoanIndex = null;
-    this.renameValue = '';
-  }
-
-  addLoanType(loan?: Partial<LoanTypeDto>) {
-    console.log('Adding loan type:', loan);
-
-    const group = this.fb.group({
-      loanType: [loan?.LoanType || '', Validators.required],
-      interest: [loan?.Interest || 0, [Validators.min(0), Validators.max(100)]],
-      limit: [loan?.Limit || 0, Validators.min(0)],
-      compulsoryDeposit: [loan?.CompulsoryDeposit || 0, Validators.min(0)],
-      optionalDeposit: [loan?.OptionalDeposit || 0, Validators.min(0)],
-      share: [loan?.Share || 0, Validators.min(0)],
-      xTimes: [loan?.XTimes || 0, Validators.min(0)]
-    });
-    this.loanTypesFormArray.push(group);
-  }
-
-
-  removeLoanType(index: number) {
-    this.loanTypesFormArray.removeAt(index);
-  }
-
-
-  private isPendingEdit(obj: any): obj is SocietyEditPending {
-    return obj && typeof obj === 'object' && 'status' in obj;
-  }
-
-  activeTab: string = 'interest'; // default tab
-
-  setActiveTab(tab: string) {
-    this.activeTab = tab;
-  }
-
-  isActive(tab: string): boolean {
-    return this.activeTab === tab;
-  }
-
-
   ngOnInit() {
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         this.currentUser = user;
-        if (user) {
-          this.loadData();
-        } else {
-          this.router.navigate(['/login']);
-        }
+        if (user) this.loadData();
+        else this.router.navigate(['/login']);
       });
   }
 
@@ -487,338 +486,266 @@ export class SocietyComponent implements OnInit {
     this.destroy$.complete();
   }
 
-  get isSuperAdmin(): boolean {
-    return this.currentUser?.role === UserRole.SUPER_ADMIN;
-  }
-
-  get isSocietyAdmin(): boolean {
-    return this.currentUser?.role === UserRole.SOCIETY_ADMIN;
-  }
-
   canEdit(): boolean {
-    return this.isSuperAdmin || this.isSocietyAdmin;
+    return this.currentUser?.role === UserRole.SUPER_ADMIN || this.currentUser?.role === UserRole.SOCIETY_ADMIN;
   }
 
   canApprove(): boolean {
     if (!this.pendingRequest || !this.currentUser) return false;
-
-    // Check if user already approved/rejected
-    const existingApproval = this.pendingRequest.approvals.find(
-      approval => approval.userId === this.currentUser!.id
-    );
-
-    return !existingApproval && (this.isSuperAdmin || this.isSocietyAdmin);
+    const existing = this.pendingRequest.approvals.find(a => a.userId === this.currentUser!.id);
+    return !existing && (this.currentUser.role === UserRole.SUPER_ADMIN || this.currentUser.role === UserRole.SOCIETY_ADMIN);
   }
 
   createForm(): FormGroup {
     return this.fb.group({
-      societyName: ['', Validators.required],
+      name: ['', Validators.required],
       registrationNumber: ['', Validators.required],
       address: ['', Validators.required],
       city: ['', Validators.required],
       phone: ['', Validators.required],
       fax: [''],
-      targetDropdown: [''],
       email: ['', [Validators.required, Validators.email]],
       website: [''],
-      dividend: [0, [Validators.min(0), Validators.max(100)]],
-      overdraft: [0, [Validators.min(0), Validators.max(100)]],
-      currentDeposit: [0, [Validators.min(0), Validators.max(100)]],
-      loan: [0, [Validators.min(0), Validators.max(100)]],
-      emergencyLoan: [0, [Validators.min(0), Validators.max(100)]],
-      las: [0, [Validators.min(0), Validators.max(100)]],
-      shareLimit: [0, Validators.min(0)],
-      loanLimit: [0, Validators.min(0)],
-      emergencyLoanLimit: [0, Validators.min(0)],
-      chBounceCharge: [0, Validators.min(0)],
-      chequeReturnCharge: ['', Validators.required],  // dropdown selected value
-      dropdownArray: this.fb.control<string[]>([]),
-      cash: [0, Validators.min(0)],
-      bonus: [0, Validators.min(0)],
-
-      // 🔹 Add this
+      chequeBounceCharge: [0, [Validators.required, Validators.min(0)]],
+      targetDropdown: [''],
       loanTypes: this.fb.array([])
     });
   }
 
-
-
   loadData() {
     this.loading = true;
-    this.error = null;
-
-    // Load society data first
     this.societyService.getSociety()
       .pipe(
         takeUntil(this.destroy$),
         catchError(err => {
           console.error('Error loading society:', err);
-          this.error = err.error?.message || 'Failed to load society data';
+          this.error = err.message || 'Failed to load society data';
           return of(null);
         }),
-        finalize(() => {
-          this.loading = false;
-        })
+        finalize(() => (this.loading = false))
       )
-      .subscribe(society => {
+      .subscribe((society: SocietyDto | null) => {
         if (society) {
-          console.log('📊 Raw society data:', society);
-
           this.societyData = society;
           this.populateForm(society);
-          this.loadPendingRequests();
-
-          // Extract and console loanTypes as array of objects
-          this.extractAndLogLoanTypes(society);
+          this.bankNames = society.bankAccounts?.map(b => b.bankName) || [];
+        } else {
+          this.error = 'No society data found';
         }
+        this.loadPendingRequests();
       });
-  }
-
-  private extractAndLogLoanTypes(society: any) {
-    try {
-      let parsedLoanTypes: LoanTypeDto[] = [];
-
-      if (society.loanTypes) {
-        if (typeof society.loanTypes === 'string') {
-          // Parse the stringified JSON array
-          parsedLoanTypes = JSON.parse(society.loanTypes);
-        } else if (Array.isArray(society.loanTypes)) {
-          // Already an array
-          parsedLoanTypes = society.loanTypes;
-        }
-        this.loanTypes = parsedLoanTypes; // Store for later use if needed
-        console.log('✅ Successfully parsed loanTypes:', this.loanTypes);
-
-
-        // Optional: Log each loan type individually for better readability
-        parsedLoanTypes.forEach((loanType, index) => {
-          console.log(`📋 Loan Type ${index + 1}:`, loanType);
-        });
-      } else {
-        console.log('ℹ️ No loanTypes data found in society');
-        this.loanTypes = [];
-      }
-    } catch (error) {
-      console.error('❌ Error parsing loanTypes:', error);
-      this.loanTypes = [];
-    }
   }
 
   loadPendingRequests() {
     if (!this.canApprove()) return;
-
     this.societyService.getPendingEdits()
       .pipe(
         takeUntil(this.destroy$),
-        catchError(err => {
-          console.error('Error loading pending edits:', err);
-          return of([]);
-        })
+        catchError(() => of([]))
       )
       .subscribe(pendingEdits => {
-        // Get the first pending request
-        this.pendingRequest = pendingEdits.find(edit => edit.status === 'Pending') || null;
+        this.pendingRequest = pendingEdits.find(p => p.status === 'Pending') || null;
       });
   }
 
-  // Populate with backend data
-  populateForm(society: any) {
-    if (!society) {
-      console.warn("⚠️ No society data provided");
-      return;
-    }
+  populateForm(society: SocietyDto) {
+    const formData = {
+      name: society.name,
+      registrationNumber: society.registrationNumber,
+      address: society.address,
+      city: society.city,
+      phone: society.phone,
+      fax: society.fax || '',
+      email: society.email,
+      website: society.website || '',
+      chequeBounceCharge: society.chequeBounceCharge,
+      targetDropdown: ''
+    };
 
-    try {
-      console.log("📥 Raw society data received:", society);
+    this.societyForm.patchValue(formData);
 
-      // ---------------- Tabs Extraction ----------------
-      let tabs: SocietyTabsDto = {
-        interest: { dividend: 0, od: 0, cd: 0, loan: 0, emergencyLoan: 0, las: 0 },
-        limit: { share: 0, loan: 0, emergencyLoan: 0 }
-      };
-
-      if (society.tabs) {
-        const parsedTabs = typeof society.tabs === "string"
-          ? JSON.parse(society.tabs)
-          : society.tabs;
-
-        console.log("🗂 Parsed tabs object:", parsedTabs);
-
-        if (parsedTabs.Interest) {
-          tabs.interest = {
-            dividend: parsedTabs.Interest.Dividend || 0,
-            od: parsedTabs.Interest.OD || 0,
-            cd: parsedTabs.Interest.CD || 0,
-            loan: parsedTabs.Interest.Loan || 0,
-            emergencyLoan: parsedTabs.Interest.EmergencyLoan || 0,
-            las: parsedTabs.Interest.LAS || 0
-          };
-        }
-
-        if (parsedTabs.Limit) {
-          tabs.limit = {
-            share: parsedTabs.Limit.Share || 0,
-            loan: parsedTabs.Limit.Loan || 0,
-            emergencyLoan: parsedTabs.Limit.EmergencyLoan || 0
-          };
-        }
-      } else {
-        console.log("ℹ️ No tabs data found in society");
-      }
-
-      // ---------------- Dropdown Array Extraction ----------------
-      let parsedDropdownArray: string[] = [];
-      try {
-        parsedDropdownArray = typeof society.dropdownArray === "string"
-          ? JSON.parse(society.dropdownArray || "[]")
-          : society.dropdownArray || [];
-      } catch {
-        parsedDropdownArray = [];
-      }
-      console.log("📌 Parsed dropdown array:", parsedDropdownArray);
-
-      // ---------------- LoanTypes Extraction ----------------
-      let parsedLoanTypes: LoanTypeDto[] = [];
-      console.log("🔍 checks ypes data:", society.loanTypes);
-
-      if (society.loanTypes) {
-        if (typeof society.loanTypes === "string") {
-          parsedLoanTypes = JSON.parse(society.loanTypes);
-        } else if (Array.isArray(society.loanTypes)) {
-          parsedLoanTypes = society.loanTypes;
-        }
-      }
-      console.log("💰 Parsed loanTypes:", parsedLoanTypes);
-      this.loanTypes = parsedLoanTypes;
-
-      // Clear existing FormArray before populating
-      this.loanTypesFormArray.clear();
-      parsedLoanTypes.forEach(loan => this.addLoanType(loan));
-
-      // ---------------- Build Form Data ----------------
-      const formData = {
-        societyName: society.societyName || "",
-        registrationNumber: society.registrationNumber || "",
-        address: society.address || "",
-        city: society.city || "",
-        phone: society.phone || "",
-        fax: society.fax || "",
-        email: society.email || "",
-        website: society.website || "",
-
-        // Tabs
-        dividend: tabs.interest.dividend,
-        overdraft: tabs.interest.od,
-        currentDeposit: tabs.interest.cd,
-        loan: tabs.interest.loan,
-        emergencyLoan: tabs.interest.emergencyLoan,
-        las: tabs.interest.las,
-
-        shareLimit: tabs.limit.share,
-        loanLimit: tabs.limit.loan,
-        emergencyLoanLimit: tabs.limit.emergencyLoan,
-
-        // Charges and dropdowns
-        targetDropdown: society.targetDropdown || "",
-        dropdownArray: parsedDropdownArray,
-
-        // Other
-        chBounceCharge: society.chBounceCharge || 0,
-        chequeReturnCharge: society.chequeReturnCharge || 0,
-        cash: society.cash || 0,
-        bonus: society.bonus || 0
-      };
-
-      console.log("📝 Final form data to patch:", formData);
-
-      // ---------------- Patch Form ----------------
-      this.societyForm.patchValue(formData);
-
-    } catch (error) {
-      console.error("❌ Error parsing society data:", error);
-      this.error = "Failed to parse society data";
-    }
+    // Populate loan types
+    this.loanTypesFormArray.clear();
+    (society.loanTypes || []).forEach(loan => this.addLoanType(loan));
   }
 
-
-
-
-  enableEdit(index: number) {
-    this.editingLoanIndex = index;
-    // optional: delay focus after input renders
-    setTimeout(() => {
-      const input = document.getElementById('loanInput' + index) as HTMLInputElement;
-      input?.focus();
+  addLoanType(loan?: LoanTypeDto) {
+    const group = this.fb.group({
+      loanTypeId: [loan?.loanTypeId || null],
+      name: [loan?.name || 'General Loan', Validators.required],
+      interestPercent: [loan?.interestPercent || 0, [Validators.min(0), Validators.max(100)]],
+      limitAmount: [loan?.limitAmount || 0, Validators.min(0)],
+      compulsoryDeposit: [loan?.compulsoryDeposit || 0, Validators.min(0)],
+      optionalDeposit: [loan?.optionalDeposit || 0, Validators.min(0)],
+      shareAmount: [loan?.shareAmount || 0, Validators.min(0)],
+      xTimes: [loan?.xTimes || 0, Validators.min(0)]
     });
+    this.loanTypesFormArray.push(group);
   }
 
-  saveEdit() {
+  deleteLoanType(index: number) {
+    const loanGroup = this.loanTypesFormArray.at(index);
+    const loanTypeId = loanGroup.get('loanTypeId')?.value;
+
+    if (loanTypeId) {
+      // Call API only if loanTypeId exists (i.e., it's saved in backend)
+      this.loanTypeService.deleteLoanType(loanTypeId).subscribe({
+        next: () => {
+          console.log('Loan type deleted successfully:', loanTypeId);
+          this.snackBar.open('Loan type deleted successfully', 'Close', { duration: 3000 });
+          this.removeLoanTypeFromForm(index);
+        },
+        error: (err) => {
+          console.error('Failed to delete loan type:', err);
+          this.snackBar.open(err.message || 'Failed to delete loan type', 'Close', { duration: 5000 });
+        }
+      });
+    } else {
+      // If it's a new unsaved loan type, just remove from form array
+      this.removeLoanTypeFromForm(index);
+    }
+  }
+
+  // Helper to remove from FormArray and adjust active tab
+  private removeLoanTypeFromForm(index: number) {
+    this.loanTypesFormArray.removeAt(index);
+    if (this.activeLoanTab >= index && this.activeLoanTab > 0) {
+      this.activeLoanTab--;
+    }
+  }
+
+  openRenamePopup(index: number) {
+    if (!this.isEditing) return;
+    this.editingLoanIndex = index;
+    this.renameControl.setValue(this.loanTypesFormArray.at(index).get('name')?.value || '');
+    this.showRenamePopup = true;
+  }
+
+  saveRename() {
+    if (this.editingLoanIndex !== null) {
+      this.loanTypesFormArray.at(this.editingLoanIndex).get('name')?.setValue(this.renameControl.value);
+    }
+    this.closeRenamePopup();
+  }
+
+  closeRenamePopup() {
+    this.showRenamePopup = false;
     this.editingLoanIndex = null;
+    this.renameControl.setValue('');
   }
 
-  cancelEdit() {
-    this.editingLoanIndex = null;
+  enableEditing() {
+    this.isEditing = true;
   }
 
-
-  // cancelEdit() {
-  //   this.isEditing = false;
-  //   if (this.societyData) {
-  //     this.populateForm(this.societyData);
-  //   } else {
-  //     this.societyForm.reset();
-  //   }
-  // }
+  cancelEditing() {
+    this.isEditing = false;
+    if (this.societyData) {
+      this.populateForm(this.societyData);
+    }
+  }
 
   saveChanges() {
     if (this.societyForm.invalid) {
-      this.markFormGroupTouched(this.societyForm);
+      Object.values(this.societyForm.controls).forEach(c => {
+        if (c.invalid) {
+          c.markAsTouched();
+          c.markAsDirty();
+        }
+      });
+
+      // Mark all loan type controls as touched
+      this.loanTypesFormArray.controls.forEach((loanGroup: any) => {
+        Object.values(loanGroup?.controls).forEach((control: any) => {
+          if (control?.invalid) {
+            control?.markAsTouched();
+            control?.markAsDirty();
+          }
+        });
+      });
+
+      this.snackBar.open('Please fix validation errors before saving', 'Close', { duration: 3000 });
       return;
     }
 
     this.submitting = true;
     const formData = this.societyForm.value;
 
-    // Prepare data for backend (convert dropdownArray to string if needed)
-    const saveData: any = {
-      ...formData,
-      dropdownArray: Array.isArray(formData.dropdownArray)
-        ? JSON.stringify(formData.dropdownArray)
-        : formData.dropdownArray
+    // Transform loan types with proper integer ID handling
+    const loanTypes = formData.loanTypes.map((lt: any) => {
+      // Handle loanTypeId - ensure it's either a valid integer or null for new records
+      let loanTypeId = lt.loanTypeId;
+
+      // If loanTypeId exists but is not a valid integer, set to null (new record)
+      if (loanTypeId && !this.isValidInteger(loanTypeId)) {
+        console.warn('Invalid integer format for loanTypeId:', loanTypeId);
+        loanTypeId = null;
+      }
+
+      // If loanTypeId is empty string, set to null
+      if (loanTypeId === '') {
+        loanTypeId = null;
+      }
+
+      return {
+        loanTypeId: loanTypeId,
+        societyId: this.societyData?.id || '',
+        name: lt.name,
+        interestPercent: Number(lt.interestPercent),
+        limitAmount: Number(lt.limitAmount),
+        compulsoryDeposit: Number(lt.compulsoryDeposit) || 0,
+        optionalDeposit: Number(lt.optionalDeposit) || 0,
+        shareAmount: Number(lt.shareAmount) || 0,
+        xTimes: Number(lt.xTimes) || 0,
+        createdAt: this.societyData?.loanTypes?.find(l => l.loanTypeId === lt.loanTypeId)?.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+    });
+
+    const updateData: Partial<CreateSocietyDto> = {
+      name: formData.name,
+      registrationNumber: formData.registrationNumber,
+      address: formData.address,
+      city: formData.city,
+      phone: formData.phone,
+      fax: formData.fax || undefined,
+      email: formData.email,
+      website: formData.website || undefined,
+      chequeBounceCharge: Number(formData.chequeBounceCharge),
+      loanTypes: loanTypes,
+      bankAccounts: this.societyData?.bankAccounts || [],
+      members: this.societyData?.members || []
     };
 
-    const saveObservable = this.societyData
-      ? this.societyService.updateSociety(this.societyData.id, saveData)
-      : this.societyService.createSociety(saveData);
+    console.log('Saving data:', JSON.stringify(updateData, null, 2));
 
-    saveObservable
+    if (!this.societyData?.id) {
+      this.snackBar.open('Society ID not found', 'Close', { duration: 3000 });
+      this.submitting = false;
+      return;
+    }
+
+    this.societyService.updateSociety(this.societyData.id, updateData)
       .pipe(
         takeUntil(this.destroy$),
-        finalize(() => {
-          this.submitting = false;
-        })
+        finalize(() => (this.submitting = false))
       )
       .subscribe({
-        next: (result) => {
+        next: (res) => {
           this.isEditing = false;
+          this.societyData = res;
+          this.snackBar.open('Society saved successfully', 'Close', { duration: 3000 });
+          this.societyService.setCurrentSociety(this.societyData);
 
-          if (this.isPendingEdit(result)) {
-            this.snackBar.open('Changes submitted for approval', 'Close', { duration: 3000 });
-            this.pendingRequest = result;
-          } else {
-            this.societyData = result as SocietyDto;
-            this.snackBar.open(
-              this.societyData ? 'Society updated successfully' : 'Society created successfully',
-              'Close',
-              { duration: 3000 }
-            );
-            this.societyService.setCurrentSociety(this.societyData);
+          // Save loan types separately with proper error handling
+          if (loanTypes.length > 0) {
+            this.saveLoanTypesSequentially(loanTypes);
           }
         },
         error: (err) => {
-          console.error('Error saving society:', err);
+          console.error('Save error:', err);
           this.snackBar.open(
-            err.error?.message || 'Error saving changes',
+            err.message || 'Failed to save changes',
             'Close',
             { duration: 5000 }
           );
@@ -826,81 +753,110 @@ export class SocietyComponent implements OnInit {
       });
   }
 
-  approvePendingEdit() {
-    if (!this.pendingRequest) return;
+  // Replace GUID validation with integer validation
+  private isValidInteger(value: any): boolean {
+    // Check if value is a valid integer (including string representations)
+    if (value === null || value === undefined) return false;
+    
+    const num = Number(value);
+    return !isNaN(num) && Number.isInteger(num) && num >= 0;
+  }
 
-    this.submitting = true;
-    this.societyService.reviewPendingEdit(this.pendingRequest.id, true)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => {
-          this.submitting = false;
-        })
-      )
-      .subscribe({
-        next: () => {
-          this.snackBar.open('Changes approved successfully', 'Close', { duration: 3000 });
-          this.loadData(); // Reload to get updated data
+  // Update the loan type saving method to use integers
+  private saveLoanTypesSequentially(loanTypes: any[]): void {
+    let index = 0;
+    let successCount = 0;
+    let errorCount = 0;
+
+    const saveNextLoanType = () => {
+      if (index >= loanTypes.length) {
+        console.log(`Loan type processing completed: ${successCount} success, ${errorCount} errors`);
+        if (errorCount === 0) {
+          this.snackBar.open(`All ${successCount} loan types saved successfully`, 'Close', { duration: 3000 });
+        } else {
+          this.snackBar.open(`Saved ${successCount} loan types, ${errorCount} failed`, 'Close', { duration: 5000 });
+        }
+        return;
+      }
+
+      const loanType = loanTypes[index];
+      index++;
+
+      console.log('Processing loan type:', index - 1, loanType);
+
+      // Create a clean loanTypeData object with only the necessary fields
+      const loanTypeData: any = {
+        name: loanType.name || 'General Loan',
+        interestPercent: Number(loanType.interestPercent) || 0,
+        limitAmount: Number(loanType.limitAmount) || 0,
+        societyId: this.societyData?.id || ''
+      };
+      
+      // Add optional fields only if they exist and are valid
+      if (loanType.compulsoryDeposit !== undefined) {
+        loanTypeData.compulsoryDeposit = Number(loanType.compulsoryDeposit) || 0;
+      }
+      if (loanType.optionalDeposit !== undefined) {
+        loanTypeData.optionalDeposit = Number(loanType.optionalDeposit) || 0;
+      }
+      if (loanType.shareAmount !== undefined) {
+        loanTypeData.shareAmount = Number(loanType.shareAmount) || 0;
+      }
+      if (loanType.xTimes !== undefined) {
+        loanTypeData.xTimes = Number(loanType.xTimes) || 0;
+      }
+
+      console.log('LoanTypeData to send:', loanTypeData);
+
+      // Determine if it's a create or update operation
+      const isUpdate = loanType.loanTypeId && this.isValidInteger(loanType.loanTypeId);
+      console.log('loanType.loanTypeId == ', loanType.loanTypeId);
+
+      const loanTypeObservable = isUpdate
+        ? this.loanTypeService.updateLoanType(loanType.loanTypeId, loanTypeData)
+        : this.loanTypeService.createLoanType(loanTypeData);
+
+      loanTypeObservable.subscribe({
+        next: (ltRes) => {
+          console.log('✅ Loan type saved successfully:', ltRes);
+          successCount++;
+          saveNextLoanType();
         },
-        error: (err) => {
-          console.error('Error approving changes:', err);
-          this.snackBar.open(
-            err.error?.message || 'Error approving changes',
-            'Close',
-            { duration: 5000 }
-          );
+        error: (ltErr) => {
+          console.error('❌ LoanType save error:', ltErr);
+          errorCount++;
+
+          // Enhanced error logging
+          this.logLoanTypeError(ltErr, loanType);
+          saveNextLoanType();
         }
       });
+    };
+
+    saveNextLoanType();
   }
 
-  rejectPendingEdit() {
-    if (!this.pendingRequest) return;
-
-    this.submitting = true;
-    this.societyService.reviewPendingEdit(this.pendingRequest.id, false, 'Rejected by user')
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => {
-          this.submitting = false;
-        })
-      )
-      .subscribe({
-        next: () => {
-          this.snackBar.open('Changes rejected', 'Close', { duration: 3000 });
-          this.loadData(); // Reload to get updated data
-        },
-        error: (err) => {
-          console.error('Error rejecting changes:', err);
-          this.snackBar.open(
-            err.error?.message || 'Error rejecting changes',
-            'Close',
-            { duration: 5000 }
-          );
-        }
-      });
-  }
-
-  getApprovedCount(): number {
-    if (!this.pendingRequest) return 0;
-    return this.pendingRequest.approvals.filter(approval => approval.approved).length;
-  }
-
-  getTotalRequired(): number {
-    if (!this.pendingRequest) return 0;
-    return this.pendingRequest.approvals.length;
-  }
-
-  getApprovalProgress(): number {
-    const total = this.getTotalRequired();
-    if (total === 0) return 0;
-    return (this.getApprovedCount() / total) * 100;
-  }
-
-
-  private markFormGroupTouched(formGroup: FormGroup) {
-    Object.keys(formGroup.controls).forEach(key => {
-      const control = formGroup.get(key);
-      control?.markAsTouched();
+  // Add this helper method for better error logging
+  private logLoanTypeError(error: any, loanType: any): void {
+    console.error('Error details:', {
+      status: error.status,
+      statusText: error.statusText,
+      url: error.url,
+      loanType: loanType,
+      errorResponse: error.error
     });
+
+    let errorMessage = `Failed to save "${loanType.name}"`;
+
+    if (error.error?.errors) {
+      // Handle validation errors
+      errorMessage += `: ${JSON.stringify(error.error.errors)}`;
+    } else if (error.error?.message) {
+      errorMessage += `: ${error.error.message}`;
+    } else if (error.message) {
+      errorMessage += `: ${error.message}`;
+    }
+
+    this.snackBar.open(errorMessage, 'Close', { duration: 6000 });
   }
 }

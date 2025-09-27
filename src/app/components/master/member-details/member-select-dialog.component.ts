@@ -40,9 +40,9 @@ import { Member } from '../../../services/member.service';
             </thead>
             <tbody class="divide-y divide-gray-200">
               <tr *ngFor="let m of filteredMembers" class="hover:bg-gray-50">
-                <td class="p-2 text-sm">{{ m.memNo || m.memberNo }}</td>
+                <td class="p-2 text-sm">{{ m.id || m.memberNo }}</td>
                 <td class="p-2 text-sm">{{ m.name }}</td>
-                <td class="p-2 text-sm">{{ m.bankingDetails?.share }}</td>
+                <td class="p-2 text-sm">{{ m?.share }}</td>
                 <td class="p-2 text-center">
                   <button (click)="selectMember(m)" class="px-3 py-1 bg-[#4f46e4] text-white rounded text-xs">
                     Select
@@ -80,12 +80,13 @@ export class MemberSelectDialogComponent implements OnInit {
     const searchValue = this.memberSearchTerm.toLowerCase();
     this.filteredMembers = this.data.members.filter(member =>
       (member.name || '').toLowerCase().includes(searchValue) ||
-      (member.memNo || member.memberNo || '').toString().toLowerCase().includes(searchValue) ||
+      (member.id || member.memberNo || '').toString().toLowerCase().includes(searchValue) ||
       (member.mobile || '').includes(searchValue)
     );
   }
 
   selectMember(member: Member): void {
+    console.log('member dialogue === ', member)
     this.dialogRef.close(member);
   }
 

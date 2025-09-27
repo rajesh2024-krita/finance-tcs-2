@@ -19,6 +19,9 @@ import { MemberService, Member } from '../../../services/member.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MemberViewDialogComponent } from './member-view-dialog.component';
 import { MemberSelectDialogComponent } from './member-select-dialog.component';
+import { SocietyService, SocietyDto, SocietyEditPending, LoanTypeDto, CreateSocietyDto } from '../../../services/society.service';
+import { map, filter } from 'rxjs/operators'; // ✅ make sure this is imported
+
 
 @Component({
   selector: 'app-member-details',
@@ -59,29 +62,57 @@ export class MemberDetailsComponent implements OnInit {
 
   searchTerm: string = '';
   allMembers: Member[] = [];
+  societyId: string = '';
 
   constructor(
     private fb: FormBuilder,
     private memberService: MemberService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private societyService: SocietyService
   ) {
     this.memberForm = this.createMemberForm();
   }
 
   ngOnInit() {
-    this.loadMembers();
+    console.log('load mem')
+    // 1️⃣ Load societies first
+    this.societyService.getSociety()
+      .pipe(
+        map((res: any) => {
+          console.log('Raw response from getSociety():', res);
+          return res?.data || res;
+        })
+      )
+      .subscribe({
+        next: (societies: any) => {
+          console.log('Societies array in subscribe:', societies);
+          if (societies) {
+            this.societyId = societies?.id;
+            console.log('Assigned societyId:', this.societyId);
+            this.loadMembers();
+          } else {
+            console.warn('No societies found!');
+          }
+        },
+        error: (err) => {
+          console.error('Error loading societies:', err);
+        }
+      });
 
+
+    // 3️⃣ Form status logic
     this.memberForm.get('status')?.valueChanges.subscribe(status => {
-    const doRetirementControl = this.memberForm.get('doRetirement');
-    if (status === 'Resignation' || status === 'In-Active') {
-      doRetirementControl?.enable();   // enable only if resigned
-    } else {
-      doRetirementControl?.disable();  // otherwise keep disabled
-      doRetirementControl?.reset();    // optional: clear old value
-    }
-  });
+      const doRetirementControl = this.memberForm.get('dor');
+      if (status === 'Resignation' || status === 'In-Active') {
+        doRetirementControl?.enable();
+      } else {
+        doRetirementControl?.disable();
+        doRetirementControl?.reset();
+      }
+    });
   }
+
 
   // Signal getters
   isOffCanvasOpen = () => this.offCanvasOpen();
@@ -107,13 +138,13 @@ export class MemberDetailsComponent implements OnInit {
       designation: [''],
       branch: [''],
       dojJob: [''],
-      doRetirement: [{ value: '', disabled: true }],
+      dor: [{ value: null, disabled: true }],
       dojSociety: [''],
       phoneOffice: [''],
       phoneResidence: [''],
-      shareAmount: [0],
+      share: [0],
       bankName: ['', Validators.required],
-      accountNo: ['', Validators.required],
+      accountNumber: ['', Validators.required],
       payableAt: [''],
       shareDeduction: [0],
       withdrawal: [0],
@@ -126,7 +157,9 @@ export class MemberDetailsComponent implements OnInit {
   }
 
   loadMembers() {
-    this.memberService.getAllMembers().subscribe({
+    // Members
+    console.log(this.societyId)
+    this.memberService.getAllMembers(this.societyId).subscribe({
       next: (response: any) => {
         // Check if response has data property or is the array itself
         const members = response.data || response;
@@ -135,7 +168,7 @@ export class MemberDetailsComponent implements OnInit {
           ...m,
           memberNo: m.memNo || m.memberNo // Handle both cases
         }));
-        console.log('this.allMembers = ', this.allMembers );
+        console.log('this.allMembers = ', this.allMembers);
         this.dataSource.data = this.allMembers;
       },
       error: (error) => {
@@ -171,7 +204,7 @@ export class MemberDetailsComponent implements OnInit {
       this.currentMember.set(null);
       this.memberForm.reset();
       this.memberForm.patchValue({
-        shareAmount: 0,
+        share: 0,
         cdAmount: 0,
         status: 'Active',
         memberNo: this.generateNextMemberId(this.allMembers) // 👈 Auto ID here
@@ -223,50 +256,50 @@ export class MemberDetailsComponent implements OnInit {
   }
 
   populateForm(member: any) {
-  this.memberForm.patchValue({
-    memberNo: member.memNo || member.memberNo,
-    name: member.name,
-    fhName: member.fhName,
-    dateOfBirth: member.dob ? new Date(member.dob).toISOString().split('T')[0] : null,
-    mobile: member.mobile,
-    email: member.email,
-    branch: member.branch,
-    designation: member.designation,
-    dojJob: member.dojOrg ? new Date(member.dojOrg).toISOString().split('T')[0] : null,
-    doRetirement: member.dor ? new Date(member.dor).toISOString().split('T')[0] : null,
-    dojSociety: member.dojSociety ? new Date(member.dojSociety).toISOString().split('T')[0] : null,
-    officeAddress: member.officeAddress,
-    residenceAddress: member.residenceAddress,
-    city: member.city,
-    email2: member.email2,
-    mobile2: member.mobile2,
-    pincode: member.pincode,
-    phoneOffice: member.phoneOffice,
-    phoneResidence: member.phoneResidence || member.phoneRes,
-    nominee: member.nominee,
-    nomineeRelation: member.nomineeRelation,
-    shareAmount: member.bankingDetails?.share || 0,
-    cdAmount: member.cdAmount || "0",
-    bankName: member.bankName || (member.bankingDetails?.bankName),
-    payableAt: member.bankingDetails.payableAt || member.bankingDetails.branchName,
-    accountNo: member.accountNo || (member.bankingDetails?.accountNumber),
-    status: member.status || 'Active',
-    shareDeduction: member.shareDeduction || 0,
-    withdrawal: member.withdrawal || 0,
-    gLoanInstalment: member.gLoanInstalment || 0,
-    eLoanInstalment: member.eLoanInstalment || 0
-  });
+    this.memberForm.patchValue({
+      memberNo: member.id || member.id,
+      name: member.name,
+      fhName: member.fhName,
+      dateOfBirth: member.dob ? new Date(member.dob).toISOString().split('T')[0] : null,
+      mobile: member.mobile,
+      email: member.email,
+      branch: member.branch,
+      designation: member.designation,
+      dojJob: member.dojOrg ? new Date(member.dojOrg).toISOString().split('T')[0] : null,
+      dor: member.dor ? new Date(member.dor).toISOString().split('T')[0] : null,
+      dojSociety: member.dojSociety ? new Date(member.dojSociety).toISOString().split('T')[0] : null,
+      officeAddress: member.officeAddress,
+      residenceAddress: member.residenceAddress,
+      city: member.city,
+      email2: member.email2,
+      mobile2: member.mobile2,
+      pincode: member.pincode,
+      phoneOffice: member.phoneOffice,
+      phoneResidence: member.phoneResidence || member.phoneRes,
+      nominee: member.nominee,
+      nomineeRelation: member.nomineeRelation,
+      cdAmount: member.cdAmount || "0",
+      bankName: member.bankName,
+      payableAt: member.payableAt,
+      accountNumber: member.accountNumber || (member.bankingDetails?.accountNumber),
+      status: member.status || 'Active',
+      shareDeduction: member.shareDeduction || 0,
+      share: member.share,
+      withdrawal: member.withdrawal || 0,
+      gLoanInstalment: member.gLoanInstalment || 0,
+      eLoanInstalment: member.eLoanInstalment || 0
+    });
 
-  console.log('Populated form with member:', member );
-  
+    console.log('Populated form with member:', member);
 
-  // 👇 handle enable/disable based on existing member status
-  if (member.status === 'Resignation') {
-    this.memberForm.get('doRetirement')?.enable();
-  } else {
-    this.memberForm.get('doRetirement')?.disable();
+
+    // 👇 handle enable/disable based on existing member status
+    if (member.status === 'Resignation') {
+      this.memberForm.get('dor')?.enable();
+    } else {
+      this.memberForm.get('dor')?.disable();
+    }
   }
-}
 
 
   private toUtcString(date: any): string | undefined {
@@ -287,38 +320,39 @@ export class MemberDetailsComponent implements OnInit {
 
 
   private transformFormDataToApi(formValue: any): Member {
-  return {
-    memNo: formValue.memberNo,
-    name: formValue.name,
-    fhName: formValue.fhName,
-    dob: this.toUtcString(formValue.dateOfBirth),
-    dojSociety: this.toUtcString(formValue.dojSociety),
-    dojOrg: this.toUtcString(formValue.dojJob),
-    dor: this.toUtcString(formValue.doRetirement), // 👈 mapped to backend
-    email: formValue.email,
-    mobile: formValue.mobile,
-    mobile2: formValue.mobile2,
-    email2: formValue.email2,
-    status: formValue.status,
-    pincode: formValue.pincode,
-    cdAmount: formValue.cdAmount,
-    designation: formValue.designation,
-    branch: formValue.branch,
-    officeAddress: formValue.officeAddress,
-    residenceAddress: formValue.residenceAddress,
-    city: formValue.city,
-    phoneOffice: formValue.phoneOffice,
-    phoneRes: formValue.phoneResidence,
-    nominee: formValue.nominee,
-    nomineeRelation: formValue.nomineeRelation,
-    bankingDetails: {
+    return {
+      memNo: formValue.memberNo,
+      name: formValue.name,
+      fhName: formValue.fhName,
+      dob: this.toUtcString(formValue.dateOfBirth),
+      dojSociety: this.toUtcString(formValue.dojSociety),
+      // dojOrg: this.toUtcString(formValue.dojJob),
+      dor: this.toUtcString(formValue.dor), // 👈 mapped to backend
+      email: formValue.email,
+      mobile: formValue.mobile,
+      mobile2: formValue.mobile2,
+      email2: formValue.email2,
+      status: formValue.status,
+      pincode: formValue.pincode,
+      cdAmount: formValue.cdAmount,
+      designation: formValue.designation,
+      branch: formValue.branch,
+      officeAddress: formValue.officeAddress,
+      residenceAddress: formValue.residenceAddress,
+      city: formValue.city,
+      phoneOffice: formValue.phoneOffice,
+      phoneRes: formValue.phoneResidence,
+      nominee: formValue.nominee,
+      nomineeRelation: formValue.nomineeRelation,
+
+      // ✅ Flattened banking fields
       bankName: formValue.bankName,
-      accountNumber: formValue.accountNo,
+      accountNumber: formValue.accountNumber,
       payableAt: formValue.payableAt,
       share: formValue.share
-    }
-  };
-}
+    };
+  }
+
 
 
 
@@ -469,26 +503,35 @@ export class MemberDetailsComponent implements OnInit {
       residenceAddress: formValue.residenceAddress,
       dob: formValue.dateOfBirth,
       dojSociety: formValue.dojSociety,
-      dojOrg: formValue.dojJob,
-      dor: formValue.doRetirement,
+      // dojOrg: formValue.dojJob,
+      dor: formValue.dor || null,
       nominee: formValue.nominee,
       nomineeRelation: formValue.nomineeRelation,
       branch: formValue.branch,
       phoneOffice: formValue.phoneOffice,
       phoneRes: formValue.phoneResidence,
-      status:formValue.status,
-      bankingDetails: {
-        bankName: formValue.bankName,
-        accountNumber: formValue.accountNo,
-        payableAt: formValue.payableAt,
-        share: formValue.shareAmount || 0
-      }
+      status: formValue.status,
+
+      // ✅ Flattened banking fields
+      bankName: formValue.bankName,
+      accountNumber: formValue.accountNumber,
+      payableAt: formValue.payableAt,
+      share: formValue.share || 0
     };
+
 
     if (!currentId) {
       // 🔹 Create Member
       console.log("Creating new member:", memberData);
-      this.memberService.createMember(memberData).subscribe({
+      console.log("this.societyId:", this.societyId);
+      const society_id = this.societyId;
+
+      const payload = {
+        ...memberData,
+        societyId: society_id
+      };
+
+      this.memberService.createMember(payload).subscribe({
         next: (res) => {
           console.log("Create successful:", res);
           this.showSnackBar("Member created successfully!");
@@ -500,6 +543,7 @@ export class MemberDetailsComponent implements OnInit {
           this.showSnackBar("Failed to create member: " + err.message);
         }
       });
+
     } else {
       // 🔹 Update Member
       console.log("Updating member:", memberData.cdAmount);
