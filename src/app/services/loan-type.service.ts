@@ -16,7 +16,7 @@ export interface ApiResponse<T> {
     providedIn: 'root'
 })
 export class LoanTypeService {
-    private readonly baseUrl = 'https://1d4tg1qv-5000.inc1.devtunnels.ms/api/LoanType';
+    private readonly baseUrl = 'https://fintcssociety.onrender.com/api/LoanType';
 
     constructor(
         private http: HttpClient,

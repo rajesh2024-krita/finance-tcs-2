@@ -235,7 +235,6 @@ export class LoanTakenService {
   private readonly loanTypeUrl = 'https://fintcssociety.onrender.com/api/LoanType';
   private readonly ledgerAllUrl = 'https://fintcssociety.onrender.com/api/Ledger/all';
   private readonly VoucherCreateUrl = 'https://fintcssociety.onrender.com/api/Voucher/create';
-  private readonly bankAccountUrl = 'https://fintcssociety.onrender.com/api/BankAccount';
 
   constructor(
     private http: HttpClient,
@@ -308,21 +307,6 @@ export class LoanTakenService {
       })
     );
   }
-  
-  // 📌 Get all members
-  getBankAccount(): Observable<any[]> {
-    const headers = this.getHeaders();
-    return this.http.get<ApiResponse<any[]>>(`${this.bankAccountUrl}?societyId=1`, { headers }).pipe(
-      map(res => {
-        if (res.success && res.data) return res.data;
-        throw new Error(res.message || 'Failed to fetch members');
-      }),
-      catchError(err => {
-        console.error('Error fetching members:', err);
-        return throwError(() => new Error(err.error?.message || 'Failed to fetch members'));
-      })
-    );
-  }
 
   // 📌 Get loan types
   getLoanTypes(): Observable<LoanTypeDto[]> {
@@ -354,56 +338,56 @@ export class LoanTakenService {
     );
   }
 
-  // createNewShare(dto: LoanTakenCreateDto): void {
-  //   const headers = this.getHeaders();
+  createNewShare(dto: LoanTakenCreateDto): void {
+    const headers = this.getHeaders();
 
-  //   if (dto.newLoanShare > 0) {
-  //     this.getLedgerAll(dto.memberId).subscribe({
-  //       next: ledgerAccount => {
-  //         const ledgerId = ledgerAccount?.ledgerAccountId;
-  //         console.log('Ledger account fetched:', ledgerId);
+    if (dto.newLoanShare > 0) {
+      this.getLedgerAll(dto.memberId).subscribe({
+        next: ledgerAccount => {
+          const ledgerId = ledgerAccount?.ledgerAccountId;
+          console.log('Ledger account fetched:', ledgerId);
 
-  //         if (!ledgerId) {
-  //           console.error('Ledger ID not found, cannot create voucher.');
-  //           return;
-  //         }
+          if (!ledgerId) {
+            console.error('Ledger ID not found, cannot create voucher.');
+            return;
+          }
 
-  //         const voucherData = {
-  //           ledgerAccountId: ledgerId,
-  //           particularId: ledgerId,
-  //           societyId: dto.societyId,
-  //           voucherType: "Receipt",
-  //           voucherDate: new Date().toISOString(),
-  //           narration: "New share amount",
-  //           memberId: dto.memberId,
-  //           loanId: null,
-  //           amount: dto.newLoanShare,
-  //           bankId: dto.bank,
-  //           chequeNumber: dto.chequeNo,
-  //           chequeDate: dto.chequeDate
-  //         };
+          const voucherData = {
+            ledgerAccountId: ledgerId,
+            particularId: ledgerId,
+            societyId: dto.societyId,
+            voucherType: "Reciept",
+            voucherDate: new Date().toISOString(),
+            narration: "New share amount",
+            memberId: dto.memberId,
+            loanId: null,
+            amount: dto.newLoanShare,
+            bankId: 1,
+            chequeNumber: dto.chequeNo,
+            chequeDate: dto.chequeDate
+          };
 
-  //         // Make the HTTP request
-  //         this.http.post<ApiResponse<any>>(this.VoucherCreateUrl, voucherData, { headers }).pipe(
-  //           map(res => {
-  //             if (res.success) {
-  //               console.log('Voucher created successfully:', res);
-  //             } else {
-  //               throw new Error(res.message || 'Failed to create voucher');
-  //             }
-  //           }),
-  //           catchError(err => {
-  //             console.error('Error creating voucher:', err);
-  //             return throwError(() => new Error(err.error?.message || 'Failed to create voucher'));
-  //           })
-  //         ).subscribe(); // subscribe to trigger the POST
-  //       },
-  //       error: err => {
-  //         console.error('Error fetching ledger:', err);
-  //       }
-  //     });
-  //   }
-  // }
+          // Make the HTTP request
+          this.http.post<ApiResponse<any>>(this.VoucherCreateUrl, voucherData, { headers }).pipe(
+            map(res => {
+              if (res.success) {
+                console.log('Voucher created successfully:', res);
+              } else {
+                throw new Error(res.message || 'Failed to create voucher');
+              }
+            }),
+            catchError(err => {
+              console.error('Error creating voucher:', err);
+              return throwError(() => new Error(err.error?.message || 'Failed to create voucher'));
+            })
+          ).subscribe(); // subscribe to trigger the POST
+        },
+        error: err => {
+          console.error('Error fetching ledger:', err);
+        }
+      });
+    }
+  }
 
 
   createLoan(dto: LoanTakenCreateDto): Observable<any> {
@@ -432,26 +416,20 @@ export class LoanTakenService {
             return;
           }
 
-          console.log('dto === ', dto)
-          const bankId = (!dto.bank || dto.bank === 0) ? 1 : dto.bank;
-
-
           const voucherData = {
-            // ledgerAccountId: ledgerId,
+            ledgerAccountId: ledgerId,
             particularId: ledgerId,
             societyId: dto.societyId,
-            voucherType: "Receipt",
+            voucherType: "Reciept",
             voucherDate: new Date().toISOString(),
             narration: "New share amount",
             memberId: dto.memberId,
             loanId: null,
             amount: dto.newLoanShare,
-            bankId: bankId,
+            bankId: 1,
             chequeNumber: dto.chequeNo,
             chequeDate: dto.chequeDate
           };
-
-          console.log('voucherData == ', voucherData)
 
           // Make the HTTP request
           this.http.post<ApiResponse<any>>(this.VoucherCreateUrl, voucherData, { headers }).pipe(
@@ -474,10 +452,8 @@ export class LoanTakenService {
       });
     }
 
-    dto.bank = 1
-
     // 🚫 Commented out actual API call, so it won’t store data
-    return this.http.post<ApiResponse<LoanTakenResponseDto>>(this.baseUrl, dto, { headers }).pipe(
+    return this.http.post<ApiResponse<any>>(this.baseUrl, dto, { headers }).pipe(
       map(res => {
         if (res.success) return res;
         throw new Error(res.message || 'Failed to create loan');
