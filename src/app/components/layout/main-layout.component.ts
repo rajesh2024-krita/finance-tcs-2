@@ -157,7 +157,14 @@ export class MainLayoutComponent implements OnInit {
         { label: 'Loan Taken', icon: 'account_balance_wallet', route: '/transaction/loan-taken' },
         { label: 'Demand', icon: 'account_balance_wallet', route: '/transaction/demand-process' },
       ]
-    }
+    },
+    {
+      label: 'Accounts',
+      icon: '',
+      children: [
+        { label: 'Voucher', icon: 'account_balance_wallet', route: '/accounts/voucher-creation' },
+      ]
+    },
   ];
 
   constructor(

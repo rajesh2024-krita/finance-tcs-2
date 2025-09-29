@@ -236,6 +236,7 @@ export class LoanTakenService {
   private readonly ledgerAllUrl = 'https://fintcssociety.onrender.com/api/Ledger/all';
   private readonly VoucherCreateUrl = 'https://fintcssociety.onrender.com/api/Voucher/create';
   private readonly bankAccountUrl = 'https://fintcssociety.onrender.com/api/BankAccount';
+  private readonly memberUpdateUrl = 'https://fintcssociety.onrender.com/api/Member';
 
   constructor(
     private http: HttpClient,
@@ -458,6 +459,24 @@ export class LoanTakenService {
             map(res => {
               if (res.success) {
                 console.log('Voucher created successfully:', res);
+              } else {
+                throw new Error(res.message || 'Failed to create voucher');
+              }
+            }),
+            catchError(err => {
+              console.error('Error creating voucher:', err);
+              return throwError(() => new Error(err.error?.message || 'Failed to create voucher'));
+            })
+          ).subscribe(); // subscribe to trigger the POST
+
+          const newMemberShareData = {
+            share: dto.newLoanShare
+          };
+          
+          this.http.put<ApiResponse<any>>(`${this.memberUpdateUrl}/${dto.memberId}`, newMemberShareData, { headers }).pipe(
+            map(res => {
+              if (res.success) {
+                console.log('Member New share updated successfully:', res);
               } else {
                 throw new Error(res.message || 'Failed to create voucher');
               }
